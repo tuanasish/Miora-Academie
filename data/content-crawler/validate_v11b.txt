@@ -1,0 +1,44 @@
+ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
+≡ƒôè DATA QUALITY REPORT - V11
+ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
+Total Sujets: 2745
+Corrections OK: 2741
+Empty/Missing: 4
+Short (<50 chars): 0
+Garbage (RSC artifacts): 126
+Quality Rate: 95%
+
+ΓÜá∩╕Å  ISSUES FOUND: 202
+By type: {"GARBAGE":126,"FEW_TACHES":76}
+
+First 15 issues:
+  Γ¥î [GARBAGE] Janvier 2026 | Partie 7 | T3 | ID:17566
+     Start: "ion occupe une place importante dans le quotidien des enfants. Selon moi, elle peut participer au d├⌐"
+     End:   "dre une culture, le voyage et lΓÇÖimmersion restent les moyens les plus efficaces."
+  Γä╣∩╕Å [FEW_TACHES] Janvier 2025 | Partie 1 | taches=[3] | 5 sujets
+  Γä╣∩╕Å [FEW_TACHES] Janvier 2025 | Partie 2 | taches=[3] | 5 sujets
+  Γä╣∩╕Å [FEW_TACHES] Janvier 2025 | Partie 3 | taches=[3] | 5 sujets
+  Γä╣∩╕Å [FEW_TACHES] Janvier 2025 | Partie 4 | taches=[3] | 5 sujets
+  Γä╣∩╕Å [FEW_TACHES] Janvier 2025 | Partie 5 | taches=[3] | 5 sujets
+  Γ¥î [GARBAGE] Janvier 2025 | Partie 6 | T3 | ID:15514
+     Start: "├⌐ a toujours occup├⌐ une place importante dans la soci├⌐t├⌐, mais elle semble prendre une dimension enc"
+     End:   "alit├⌐s int├⌐rieures, qui d├⌐finissent r├⌐ellement la valeur dΓÇÖune personne.49:T678,"
+  Γ¥î [GARBAGE] Janvier 2025 | Partie 6 | T3 | ID:15515
+     Start: "├⌐ a toujours occup├⌐ une place importante dans la soci├⌐t├⌐, mais elle semble prendre une dimension enc"
+     End:   "alit├⌐s int├⌐rieures, qui d├⌐finissent r├⌐ellement la valeur dΓÇÖune personne.49:T678,"
+  Γ¥î [GARBAGE] Janvier 2025 | Partie 6 | T3 | ID:15516
+     Start: "├⌐ a toujours occup├⌐ une place importante dans la soci├⌐t├⌐, mais elle semble prendre une dimension enc"
+     End:   "alit├⌐s int├⌐rieures, qui d├⌐finissent r├⌐ellement la valeur dΓÇÖune personne.49:T678,"
+  Γ¥î [GARBAGE] Janvier 2025 | Partie 6 | T3 | ID:15517
+     Start: "├⌐ a toujours occup├⌐ une place importante dans la soci├⌐t├⌐, mais elle semble prendre une dimension enc"
+     End:   "alit├⌐s int├⌐rieures, qui d├⌐finissent r├⌐ellement la valeur dΓÇÖune personne.49:T678,"
+  Γä╣∩╕Å [FEW_TACHES] Janvier 2025 | Partie 6 | taches=[3] | 5 sujets
+  Γä╣∩╕Å [FEW_TACHES] Janvier 2025 | Partie 7 | taches=[3] | 5 sujets
+  Γä╣∩╕Å [FEW_TACHES] Janvier 2025 | Partie 8 | taches=[3] | 5 sujets
+  Γä╣∩╕Å [FEW_TACHES] Mai 2025 | Partie 5 | taches=[2] | 5 sujets
+  Γä╣∩╕Å [FEW_TACHES] Juin 2025 | Partie 9 | taches=[2] | 5 sujets
+
+≡ƒôè T├óche distribution across parties:
+  T├óches [2,3]: 238 parties
+  T├óches [2]: 68 parties
+  T├óches [3]: 8 parties

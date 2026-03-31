@@ -1,0 +1,4 @@
+  MISS: ref=$4d tache=3 title="On peut conna├«tre les autres cultures sans voyager. QuΓÇÖen pe" afterTref=237 textBlock=null
+
+Parties: 7, Resolved: 34, Unresolved: 1
+Rate: 97%

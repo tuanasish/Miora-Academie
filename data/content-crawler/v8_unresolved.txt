@@ -1,0 +1,53 @@
+Janvier 2026: 69 resolved, 1 unresolved
+Novembre 2025: 29 resolved, 1 unresolved
+Juin 2024: 89 resolved, 1 unresolved
+Septembre 2024: 119 resolved, 1 unresolved
+Novembre 2023: 154 resolved, 3 unresolved
+
+Total resolved: 2738, Total unresolved: 7
+
+Sample unresolved (first 20):
+[
+  {
+    month: 'Janvier 2026',
+    jour: 1,
+    tache: 3,
+    title: 'Les parents doivent laisser leurs enfants utiliser les réseaux sociaux ? Qu’en pensez-vous ?'
+  },
+  {
+    month: 'Novembre 2025',
+    jour: 2,
+    tache: 3,
+    title: '🏴Il est plus facile de vivre seul(e) qu’en famille. Qu’en pensez-vous ?'
+  },
+  {
+    month: 'Juin 2024',
+    jour: 2,
+    tache: 3,
+    title: 'La plupart des gens veulent paraître jeune que leur âge. Qu’en pensez-vous?'
+  },
+  {
+    month: 'Septembre 2024',
+    jour: 1,
+    tache: 3,
+    title: 'Quand on s’installe dans un nouveau pays, est-ce qu’il faut changer ses habitudes de vie (alimentation, vacances, vêtements, etc.)?'
+  },
+  {
+    month: 'Novembre 2023',
+    jour: 3,
+    tache: 2,
+    title: 'Je suis votre ami. Vous venez d’arriver au Canada et vous avez un entretien d’embauche. Posez-moi des questions pour vous renseigner sur son déroulement.'
+  },
+  {
+    month: 'Novembre 2023',
+    jour: 9,
+    tache: 2,
+    title: 'Vous voulez visiter une région québécoise. Vous allez à l’office du tourisme pour vous renseigner sur les hébergements dans cette région (type d’hébergement, situation, prix, etc.). Je suis l’employé(e) de l’office du tourisme qui vous accueille.'
+  },
+  {
+    month: 'Novembre 2023',
+    jour: 14,
+    tache: 3,
+    title: 'Certaines personnes préfèrent voyager seules. Qu’en pensez vous'
+  }
+]

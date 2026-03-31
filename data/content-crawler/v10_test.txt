@@ -1,0 +1,17 @@
+Total chunks: 83
+Total textBlocks: 33
+
+2c: T-ref size=3244, afterTref=0 chars, passesGlue=false
+  Preview: "..."
+
+4a: T-ref size=1277, afterTref=183 chars, passesGlue=false
+  Preview: "La question de lΓÇÖinterdiction des voitures dans les centres-villes est de plus e..."
+
+4b: T-ref size=1308, afterTref=153 chars, passesGlue=false
+  Preview: "Le salaire est un ├⌐l├⌐ment essentiel dans le choix dΓÇÖun travail, mais selon moi, ..."
+
+4c: T-ref size=1389, afterTref=73 chars, passesGlue=false
+  Preview: "La t├⌐l├⌐vision participe au d├⌐veloppement des enfants. QuΓÇÖen pensez-vous ?..."
+
+4d: T-ref size=1279, afterTref=237 chars, passesGlue=false
+  Preview: "AujourdΓÇÖhui, gr├óce aux nouvelles technologies, il est possible de d├⌐couvrir dΓÇÖau..."

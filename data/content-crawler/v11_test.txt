@@ -1,0 +1,24 @@
+fullStream length: 229778
+
+2c: size=3244, extracted=3244 chars
+  Start: "Les parents doivent-ils laisser leurs enfants utiliser les r├⌐seaux sociaux ?
+Per..."
+  End:   "... mais ├á certaines conditions. Elle ne do"
+
+4a: size=1277, extracted=1277 chars
+  Start: "La question de lΓÇÖinterdiction des voitures dans les centres-villes est de plus e..."
+  End:   "...b:T51c,Le salaire est un ├⌐l├⌐ment essenti"
+
+4b: size=1308, extracted=1308 chars
+  Start: "Le salaire est un ├⌐l├⌐ment essentiel dans le choix dΓÇÖun travail, mais selon moi, ..."
+  End:   "...├⌐l├⌐vision participe au d├⌐veloppement des"
+
+4c: size=1389, extracted=1389 chars
+  Start: "La t├⌐l├⌐vision participe au d├⌐veloppement des enfants. QuΓÇÖen pensez-vous ?
+
+La t├⌐..."
+  End:   "...e aux nouvelles technologies, il est pos"
+
+4d: size=1279, extracted=1279 chars
+  Start: "AujourdΓÇÖhui, gr├óce aux nouvelles technologies, il est possible de d├⌐couvrir dΓÇÖau..."
+  End:   "..."$","div",null,{"className":"min-h-scree"

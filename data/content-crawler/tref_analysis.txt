@@ -1,0 +1,16 @@
+T-ref push blocks: 29
+
+T-ref at 172514: [1,"2c:Tcac,"]
+  NEXT push at 175736 (14 c / 8 unescaped): 2d:T9c0,
+
+T-ref at 175736: [1,"2d:T9c0,"]
+  NEXT push at 178231 (14 c / 8 unescaped): 2e:Tc4f,
+
+T-ref at 178231: [1,"2e:Tc4f,"]
+  NEXT push at 181362 (14 c / 8 unescaped): 2f:Tb06,
+
+T-ref at 181362: [1,"2f:Tb06,"]
+  NEXT push at 184170 (14 c / 8 unescaped): 30:Tc39,
+
+T-ref at 184170: [1,"30:Tc39,"]
+  NEXT push at 187286 (14 c / 8 unescaped): 31:Tcf8,

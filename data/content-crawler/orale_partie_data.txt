@@ -1,0 +1,811 @@
+﻿
+
+=== CHUNK 2 (len=5438) ===
+0:{"P":null,"b":"QFhbjNxkC7bqPQ96P2ONH","c":["","epreuve","expression-orale","sujets-actualites","httpsstaging-tcf-canada-nextbendevaiepreuveexpression-oralesujets-actualitesjanvier-2026"],"q":"","i":false,"f":[[["",{"children":["(main)",{"children":["epreuve",{"children":["expression-orale",{"children":["sujets-actualites",{"children":[["month","httpsstaging-tcf-canada-nextbendevaiepreuveexpression-oralesujets-actualitesjanvier-2026","d"],{"children":["__PAGE__",{}]}]}]}]}]}]},"$undefined","$undefined",true],[["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/_next/static/chunks/25d2991e4787edd1.css?dpl=dpl_BJTvNTjy9ZRvvGR5bBQK5fTHzeWx","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}],["$","link","1",{"rel":"stylesheet","href":"/_next/static/chunks/b9e80737e5028c3b.css?dpl=dpl_BJTvNTjy9ZRvvGR5bBQK5fTHzeWx","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}],["$","script","script-0",{"src":"/_next/static/chunks/4158a9a017d4e8ea.js?dpl=dpl_BJTvNTjy9ZRvvGR5bBQK5fTHzeWx","async":true,"nonce":"$undefined"}],["$","script","script-1",{"src":"/_next/static/chunks/0be489febe76ddea.js?dpl=dpl_BJTvNTjy9ZRvvGR5bBQK5fTHzeWx","async":true,"nonce":"$undefined"}],["$","script","script-2",{"src":"/_next/static/chunks/0c45c7043a8c9513.js?dpl=dpl_BJTvNTjy9ZRvvGR5bBQK5fTHzeWx","async":true,"nonce":"$undefined"}]],"$L2"]}],{"children":[["$","$1","c",{"children":[[["$","script","script-0",{"src":"/_next/static/chunks/c8154b27751890b2.js?dpl=dpl_BJTvNTjy9ZRvvGR5bBQK5fTHzeWx","async":true,"nonce":"$undefined"}],["$","script","script-1",{"src":"/_next/static/chunks/4a29235d565b664b.js?dpl=dpl_BJTvNTjy9ZRvvGR5bBQK5fTHzeWx","async":true,"nonce":"$undefined"}],["$","script","script-2",{"src":"/_next/static/chunks/88a4981a29591bae.js?dpl=dpl_BJTvNTjy9ZRvvGR5bBQK5fTHzeWx","async":true,"nonce":"$undefined"}]],["$L3",["$","$L4",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L5",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":[["$","main",null,{"className":"min-h-screen bg-linear-to-br from-blue-50 via-white to-cyan-50 flex items-center justify-center p-4","children":["$","div",null,{"className":"max-w-lg w-full text-center","children":[["$","div",null,{"className":"mb-8","children":["$","div",null,{"className":"w-32 h-32 bg-linear-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center shadow-2xl mx-auto","children":["$","svg",null,{"ref":"$undefined","xmlns":"http://www.w3.org/2000/svg","width":24,"height":24,"viewBox":"0 0 24 24","fill":"none","stroke":"currentColor","strokeWidth":2,"strokeLinecap":"round","strokeLinejoin":"round","className":"lucide lucide-search w-16 h-16 text-white","children":[["$","circle","4ej97u",{"cx":"11","cy":"11","r":"8"}],["$","path","1qie3q",{"d":"m21 21-4.3-4.3"}],"$undefined"]}]}]}],["$","h1",null,{"className":"text-4xl font-bold text-gray-900 mb-2","children":"404"}],["$","h2",null,{"className":"text-2xl font-semibold text-gray-700 mb-4","children":"Page introuvable"}],["$","p",null,{"className":"text-gray-600 mb-8 text-lg","children":"Oups ! La page que vous recherchez n'existe pas ou a été déplacée."}],["$","div",null,{"className":"flex flex-col sm:flex-row gap-4 justify-center","children":[["$","$L6",null,{"href":"/","className":"inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [\u0026_svg]:pointer-events-none [\u0026_svg]:shrink-0 [\u0026_svg:not([class*='size-'])]:size-4 text-primary-foreground h-9 px-4 py-2 has-[\u003esvg]:px-3 bg-blue-600 hover:bg-blue-700","children":[["$","svg",null,{"ref":"$undefined","xmlns":"http://www.w3.org/2000/svg","width":24,"height":24,"viewBox":"0 0 24 24","fill":"none","stroke":"currentColor","strokeWidth":2,"strokeLinecap":"round","strokeLinejoin":"round","className":"lucide lucide-house w-4 h-4 mr-2","children":[["$","path","5wwlr5",{"d":"M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"}],["$","path","1d0kgt",{"d":"M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"}],"$undefined"]}],"Retour à l'accueil"]}],"$L7"]}],"$L8"]}]}],[]],"forbidden":"$undefined","unauthorized":"$undefined"}],"$L9","$La","$Lb"]]}],{"children":["$Lc",{"children":["$Ld",{"children":["$Le",{"children":["$Lf",{"children":["$L10",{},null,false,false]},null,false,false]},null,false,false]},null,false,false]},null,false,false]},null,false,false]},null,false,false],"$L11",false]],"m":"$undefined","G":["$12",[]],"S":false}
+
+
+=== CHUNK 31 (len=2922) ===
+🔹 SUJET 5
+
+À votre avis, qu’est-ce qui est préférable : avoir une grande famille ou avoir de bons amis ? Pourquoi ?
+
+Introduction – Deux formes de relations essentielles
+
+Dans la vie, les relations humaines jouent un rôle fondamental dans notre équilibre et notre bien-être. Certaines personnes accordent une grande importance à la famille, tandis que d’autres privilégient l’amitié. La question de savoir s’il est préférable d’avoir une grande famille ou de bons amis est donc très intéressante. Personnellement, je pense qu’avoir de bons amis est souvent préférable, même si la famille reste bien sûr très importante.
+
+Axe 1 – Les amis sont choisis librement
+
+Tout d’abord, l’une des grandes différences entre la famille et les amis est le choix. On ne choisit pas sa famille, alors que les amis sont des personnes que l’on sélectionne selon ses valeurs, ses intérêts et sa personnalité. Cette liberté permet de créer des relations basées sur une vraie compréhension mutuelle. Les bons amis partagent souvent la même vision de la vie, ce qui facilite la communication et renforce la confiance.
+
+Axe 2 – Un soutien émotionnel plus équilibré
+
+Ensuite, les amis jouent un rôle très important sur le plan émotionnel. On se confie souvent plus facilement à des amis qu’à des membres de sa famille, surtout sur des sujets personnels ou sensibles. Les amis peuvent offrir un soutien sans jugement et sans pression familiale. Dans les moments difficiles, comme le stress professionnel ou les problèmes personnels, avoir de bons amis permet de se sentir écouté et compris.
+
+Axe 3 – La famille : un lien fort mais parfois contraignant
+
+Cependant, la famille reste un pilier essentiel dans la vie de nombreuses personnes. Elle apporte un sentiment de sécurité et de stabilité. Une grande famille peut offrir un soutien matériel et moral important. Néanmoins, ces relations peuvent parfois être contraignantes. Les obligations familiales, les conflits ou les différences de mentalité peuvent créer des tensions. Dans certains cas, la proximité familiale peut limiter la liberté individuelle.
+
+Axe 4 – L’idéal : un équilibre entre famille et amitié
+
+À mon avis, la meilleure solution est de trouver un équilibre entre les deux. Les amis peuvent compléter la famille en apportant une autre forme de soutien, plus libre et plus flexible. Une personne entourée de bons amis et ayant des relations familiales saines est généralement plus épanouie. Ce n’est pas la quantité de relations qui compte, mais leur qualité.
+
+Conclusion – La qualité des relations avant tout
+
+En conclusion, je dirais que, même si la famille reste très importante, avoir de bons amis est souvent préférable, car ces relations sont basées sur le choix, la confiance et le partage. L’essentiel est d’entretenir des relations sincères et équilibrées, qu’elles soient familiales ou amicales, afin de construire une vie sociale harmonieuse.
+
+=== CHUNK 33 (len=3260) ===
+Nouer une amitié avec quelqu’un qui a des convictions opposées aux nôtres peut sembler 
+difficile au premier abord. Les convictions, qu’elles soient politiques, religieuses ou 
+culturelles, font partie de l’identité de chacun et influencent nos opinions et nos 
+comportements. Cependant, à mon avis, il est possible de développer une véritable amitié 
+avec une personne qui pense différemment, à condition d’avoir du respect, de l’ouverture 
+d’esprit et de la tolérance. 
+Tout d’abord, le respect est essentiel dans toute relation. Même si deux personnes ont des 
+convictions opposées, elles peuvent choisir de ne pas juger l’autre et d’accepter ses 
+différences. Par exemple, une personne peut avoir des opinions politiques très différentes de 
+celles de son ami, mais cela ne doit pas empêcher le dialogue ou l’échange. Respecter l’autre 
+permet de créer un climat de confiance et d’éviter les conflits inutiles. 
+Ensuite, l’ouverture d’esprit joue un rôle important. Être ouvert signifie être prêt à écouter et à 
+comprendre l’opinion de l’autre, même si elle semble étrange ou opposée à la nôtre. Cela ne 
+veut pas dire changer ses convictions, mais simplement reconnaître que chaque individu a le 
+droit de penser différemment. Une amitié fondée sur l’écoute et la compréhension mutuelle 
+peut devenir très enrichissante, car elle permet de découvrir de nouvelles perspectives et 
+d’élargir son horizon. 
+De plus, les différences peuvent renforcer une amitié lorsqu’elles sont gérées correctement. 
+Parler de sujets variés et partager ses expériences peut créer des liens solides. Par exemple, 
+deux amis peuvent discuter de politique ou de religion sans chercher à convaincre l’autre, 
+mais simplement pour mieux se connaître et apprendre. Ces échanges peuvent développer la 
+tolérance et l’empathie, des qualités essentielles pour toute relation durable. 
+Cependant, il est vrai que certaines différences peuvent provoquer des tensions. Si les 
+convictions de chacun sont très extrêmes ou si elles touchent des sujets sensibles, il peut être 
+difficile de maintenir une amitié. Dans ce cas, il est important de fixer des limites et de choisir 
+les sujets sur lesquels on peut échanger sans conflit. Une amitié saine repose sur la capacité à 
+éviter les disputes inutiles et à privilégier les points communs plutôt que les divergences. 
+Enfin, nouer une amitié avec une personne aux convictions différentes peut également être 
+une occasion de grandir personnellement. Cela permet de mieux comprendre le monde et 
+d’apprendre à vivre avec des opinions diverses. Cela développe la patience, la tolérance et le 
+respect des autres, des qualités qui sont utiles dans la vie sociale et professionnelle. 
+En conclusion, il est tout à fait possible de nouer une amitié avec une personne dont les 
+convictions sont opposées aux nôtres. Cela nécessite du respect, de l’ouverture d’esprit et une 
+communication honnête. Même si certaines différences peuvent créer des tensions, les points 
+communs et l’envie de partager des expériences peuvent renforcer le lien. Une amitié fondée 
+sur la tolérance et la compréhension mutuelle est non seulement possible, mais elle peut aussi 
+être très enrichissante pour les deux personnes.
+
+=== CHUNK 39 (len=4447) ===
+Les animaux de compagnie occupent une place importante dans la vie de nombreuses 
+personnes. Chats, chiens, oiseaux ou petits rongeurs peuvent apporter de la joie, de la 
+compagnie et du réconfort. Pour les personnes âgées, qui peuvent parfois se sentir seules ou 
+isolées, la présence d’un animal de compagnie peut jouer un rôle très positif dans leur bien
+être. À mon avis, les animaux de compagnie sont souvent essentiels pour améliorer la qualité 
+de vie des personnes âgées, à condition que ces dernières soient capables de s’en occuper 
+correctement. 
+Tout d’abord, les animaux de compagnie permettent de lutter contre la solitude et l’isolement. 
+Les personnes âgées, surtout celles qui vivent seules ou qui ont peu de contacts familiaux, 
+peuvent ressentir un manque de compagnie. Dans ce contexte, un animal devient un véritable 
+compagnon, qui offre de la présence et de l’affection au quotidien. Par exemple, un chien qui 
+attend son maître pour la promenade ou un chat qui se blottit sur les genoux apporte un 
+sentiment de chaleur et de sécurité. La compagnie d’un animal aide ainsi à réduire les 
+sentiments de solitude et peut améliorer la santé mentale des personnes âgées, en diminuant 
+l’anxiété et le stress. 
+Ensuite, les animaux de compagnie favorisent l’activité physique et la routine quotidienne. 
+Pour les personnes âgées, il est essentiel de rester actives afin de maintenir leur santé 
+physique et leur mobilité. Promener un chien plusieurs fois par jour ou s’occuper des besoins 
+d’un animal implique un effort physique régulier, même modéré, qui contribue à la santé 
+cardiovasculaire et musculaire. De plus, cette routine quotidienne structure la journée et 
+donne un sens aux activités, ce qui peut être particulièrement bénéfique pour les personnes 
+retraitées ou isolées. 
+Par ailleurs, les animaux peuvent améliorer le bien-être émotionnel et psychologique. Les 
+interactions avec un animal, comme caresser un chat ou jouer avec un chien, libèrent des 
+hormones du bonheur, telles que l’ocytocine, qui procurent une sensation de plaisir et de 
+détente. Ces moments de tendresse et d’attention peuvent aider à lutter contre la dépression et 
+les émotions négatives, qui touchent fréquemment certaines personnes âgées. La relation 
+affective avec un animal peut également renforcer l’estime de soi et le sentiment d’utilité, car 
+il faut prendre soin de l’animal et répondre à ses besoins. 
+De plus, les animaux de compagnie favorisent les interactions sociales. Les promenades avec 
+un chien, par exemple, peuvent être l’occasion de rencontrer d’autres personnes et d’échanger 
+quelques mots avec des voisins ou d’autres propriétaires d’animaux. Cela contribue à 
+maintenir un lien social actif et à prévenir l’isolement. Même dans un cadre familial, un 
+animal peut rassembler les générations, car il devient un sujet de conversation et d’intérêt 
+commun entre parents, enfants et petits-enfants. 
+Cependant, il est important de noter que la présence d’un animal n’est pas sans responsabilité. 
+Les personnes âgées doivent être capables de s’occuper correctement de leur compagnon, ce 
+qui demande du temps, de l’énergie et parfois un soutien financier. Pour certaines personnes 
+fragiles ou avec des problèmes de santé, il peut être nécessaire de choisir un animal facile à 
+entretenir ou de recevoir l’aide de la famille ou de services spécialisés. 
+Enfin, certains types d’animaux sont plus adaptés que d’autres aux besoins des personnes 
+âgées. Les chiens et les chats sont souvent les plus bénéfiques, car ils offrent à la fois 
+affection et interaction. Les animaux plus petits, comme les poissons ou les oiseaux, apportent 
+de la compagnie, mais nécessitent moins d’interaction physique, ce qui peut convenir à ceux 
+qui ont une mobilité réduite. 
+En conclusion, les animaux de compagnie sont très importants pour le bien-être des personnes 
+âgées. Ils apportent de la compagnie, réduisent la solitude, encouragent l’activité physique et 
+améliorent la santé émotionnelle et sociale. Bien que leur présence implique des 
+responsabilités, les bénéfices pour la qualité de vie sont indéniables. Pour ces raisons, les 
+animaux de compagnie peuvent être considérés comme essentiels pour favoriser un 
+vieillissement actif et heureux. Ils ne remplacent pas les relations humaines, mais elles les 
+complètent en apportant affection, soutien et joie quotidienne.
+
+=== CHUNK 45 (len=3817) ===
+La culture occupe une place essentielle dans la vie des individus. Elle permet de s’informer, 
+de se divertir, de réfléchir et de mieux comprendre le monde. Les musées, les livres, le cinéma 
+ou encore les théâtres offrent des expériences riches et variées. Cependant, la question de 
+savoir si l’accès à la culture devrait être gratuit est souvent débattue. À mon avis, rendre la 
+culture gratuite est une idée très positive, car cela favorise l’éducation, l’égalité et le bien-être 
+des citoyens, même si certains aspects financiers doivent être pris en compte. 
+Tout d’abord, l’accès gratuit à la culture permet de favoriser l’éducation et l’apprentissage. 
+Les musées, les bibliothèques ou les expositions offrent la possibilité de découvrir l’histoire, 
+l’art, la science ou la littérature. Par exemple, un élève qui visite un musée gratuitement peut 
+mieux comprendre certains sujets étudiés à l’école. La culture gratuite contribue donc à 
+réduire les inégalités d’accès à l’information et à la connaissance. Elle permet à tous, quel que 
+soit leur niveau de revenus, de s’instruire et de s’ouvrir à de nouvelles idées. 
+Ensuite, la gratuité de la culture favorise l’égalité sociale. Aujourd’hui, certaines personnes 
+n’ont pas les moyens financiers d’acheter des livres, d’aller au cinéma ou de visiter des 
+musées. Si ces services étaient gratuits, tout le monde pourrait en bénéficier, quels que soient 
+ses revenus. Cela est particulièrement important pour les familles modestes et les jeunes, qui 
+sont souvent les plus éloignés de l’offre culturelle. L’accès à la culture gratuite aide donc à 
+créer une société plus juste, où chacun a la possibilité de s’épanouir et de participer à la vie 
+culturelle. 
+Par ailleurs, la culture gratuite contribue au bien-être et à la qualité de vie des citoyens. Aller 
+au cinéma, visiter un musée ou assister à un concert permet de se détendre, de se divertir et de 
+vivre des expériences enrichissantes. Ces activités participent à la santé mentale et à 
+l’équilibre personnel. Par exemple, une personne âgée qui visite une bibliothèque ou assiste à 
+une exposition peut ressentir de la joie, de la curiosité et un sentiment d’accomplissement. 
+Rendre la culture gratuite favorise donc le développement personnel et le bonheur des 
+individus. 
+Cependant, il faut aussi prendre en compte les contraintes financières. Les musées, les 
+cinémas et les bibliothèques doivent payer leurs employés, entretenir les bâtiments et acheter 
+de nouveaux livres ou œuvres. Si tout devient gratuit, il peut être difficile de maintenir la 
+qualité des services. Une solution possible est de proposer la gratuité pour certains publics, 
+comme les étudiants, les enfants ou les personnes en difficulté, tout en maintenant des tarifs 
+abordables pour les autres. Cette approche permet d’équilibrer l’accès à la culture et la 
+viabilité économique des institutions. 
+Enfin, il est important de souligner que la culture gratuite ne doit pas diminuer la valeur que 
+les gens accordent aux activités culturelles. Même si les billets sont gratuits, il est essentiel 
+d’encourager les citoyens à participer activement et à respecter les lieux culturels. La gratuité 
+devrait être un moyen d’ouvrir les portes, et non un facteur de négligence ou de désintérêt. 
+En conclusion, l’accès gratuit à la culture est une initiative bénéfique, car elle favorise 
+l’éducation, l’égalité sociale et le bien-être personnel. Bien que des contraintes financières 
+existent, des solutions peuvent permettre de rendre la culture accessible à tous sans 
+compromettre la qualité. La culture est un droit fondamental et un moyen de développement 
+humain ; la rendre gratuite, même partiellement, contribue à construire une société plus 
+instruite, ouverte et épanouie.
+
+=== CHUNK 49 (len=4529) ===
+Choisir un métier à tester est une réflexion intéressante, car il existe une grande variété de 
+professions et chacune apporte des expériences uniques. Personnellement, j’aimerais un jour 
+tester le métier de journaliste. Ce choix s’explique par plusieurs raisons liées à ma curiosité 
+pour l’actualité, mon goût pour la communication et mon intérêt pour l’écriture. Tester ce 
+métier serait pour moi une expérience enrichissante sur le plan personnel et professionnel. 
+Tout d’abord, le journalisme offre la possibilité de découvrir le monde sous différents angles. 
+Un journaliste enquête sur des événements locaux ou internationaux, rencontre des personnes 
+aux parcours variés et observe des situations qui échappent souvent au grand public. Par 
+exemple, un journaliste peut suivre des sujets politiques, économiques ou culturels, et 
+comprendre comment ces événements influencent la société. Tester ce métier me permettrait 
+de mieux connaître le monde, d’élargir mes horizons et d’apprendre à analyser des situations 
+complexes. Cette dimension d’exploration et de découverte est l’un des aspects les plus 
+motivants pour moi. 
+Ensuite, le journalisme permet de développer de nombreuses compétences intellectuelles et 
+techniques. La recherche d’informations exige de la rigueur, de l’esprit critique et de la 
+curiosité. Il faut savoir vérifier les faits, consulter différentes sources et présenter des 
+informations de manière claire et objective. Tester ce métier me donnerait l’opportunité 
+d’améliorer mes capacités de communication, d’écriture et d’analyse. Par exemple, rédiger un 
+article ou réaliser un reportage vidéo demande de synthétiser les informations et de les 
+présenter de façon compréhensible et attrayante pour le public. Ces compétences sont non 
+seulement utiles dans le journalisme, mais elles peuvent également être appliquées dans de 
+nombreux autres domaines professionnels. 
+De plus, le métier de journaliste implique des interactions humaines enrichissantes. Les 
+rencontres avec des témoins, des experts ou des personnalités permettent d’échanger des 
+idées, de comprendre différents points de vue et d’apprendre des expériences des autres. Ces 
+interactions seraient une occasion précieuse de développer l’empathie, l’écoute et la capacité à 
+poser des questions pertinentes. Ces qualités sont importantes dans toutes les professions, 
+mais elles sont particulièrement essentielles pour un journaliste qui souhaite informer le 
+public de manière juste et équilibrée. 
+Par ailleurs, tester le métier de journaliste permettrait de participer à la société de manière 
+active. Le journalisme joue un rôle clé dans la diffusion d’informations, la sensibilisation du 
+public et la promotion de la transparence. Un journaliste peut informer les citoyens sur des 
+sujets importants, révéler des injustices ou contribuer à la compréhension de problèmes 
+sociaux. Pour moi, cette dimension sociale et civique est particulièrement valorisante, car elle 
+montre que le métier ne se limite pas à un travail individuel, mais qu’il a un impact direct sur 
+la communauté. 
+Cependant, il est important de reconnaître que le journalisme comporte aussi des défis. Le 
+travail peut être stressant, exigeant et parfois dangereux, surtout pour ceux qui couvrent des 
+événements sensibles ou conflictuels. Il demande de la persévérance, de la rigueur et une 
+grande capacité à gérer la pression. Tester ce métier me permettrait de mesurer ces aspects et 
+de mieux comprendre les réalités du terrain, au-delà de l’image que l’on peut avoir à travers 
+les médias. 
+Enfin, tester ce métier serait également un moyen de confirmer ou d’infirmer mon intérêt pour 
+cette profession. Même si je suis attiré par le journalisme, il est important de vivre 
+l’expérience concrète pour savoir si ce métier correspond réellement à mes attentes et à mes 
+compétences. Cette expérience pratique serait un apprentissage précieux pour mon orientation 
+future et mon développement personnel. 
+En conclusion, j’aimerais tester le métier de journaliste parce qu’il combine exploration, 
+apprentissage, interactions humaines et engagement social. C’est un métier stimulant qui offre 
+l’opportunité de découvrir le monde, d’améliorer ses compétences et de contribuer à la 
+société. Bien qu’il comporte des défis, tester cette profession serait une expérience 
+enrichissante et formatrice, qui pourrait m’aider à mieux comprendre le monde et à confirmer 
+mon projet professionnel futur.
+
+=== CHUNK 55 (len=3418) ===
+L’éducation des enfants est un sujet complexe et essentiel pour le développement personnel et 
+social de chaque individu. L’autorité est souvent évoquée comme un élément central de 
+l’éducation, mais certains pensent qu’elle peut être trop restrictive ou autoritaire. À mon avis, 
+l’autorité est nécessaire dans l’éducation d’un enfant, à condition qu’elle soit juste, 
+bienveillante et adaptée à son âge. 
+Tout d’abord, l’autorité permet de fixer des limites et des règles. Les enfants ont besoin de 
+savoir ce qui est acceptable et ce qui ne l’est pas afin de se sentir en sécurité et de comprendre 
+comment se comporter dans la société. Par exemple, des règles simples comme ne pas frapper 
+les autres, respecter les horaires ou ranger ses affaires aident l’enfant à développer le respect 
+et la discipline. Sans ces repères, il pourrait avoir des difficultés à comprendre les 
+conséquences de ses actes et à vivre harmonieusement avec les autres. 
+Ensuite, l’autorité aide à transmettre des valeurs et à former le caractère de l’enfant. Les 
+parents ou les éducateurs jouent un rôle de guide pour enseigner la responsabilité, l’empathie, 
+la tolérance et l’honnêteté. Par exemple, en corrigeant calmement un comportement 
+inapproprié et en expliquant pourquoi il est mauvais, l’adulte aide l’enfant à réfléchir et à 
+intégrer des principes moraux. L’autorité bien exercée contribue donc à former des individus 
+responsables et respectueux. 
+De plus, l’autorité crée un cadre stable et rassurant. Les enfants ont besoin de stabilité pour se 
+sentir protégés et confiants. Savoir que certaines règles sont immuables leur donne un 
+sentiment de sécurité et les aide à développer leur autonomie. Par exemple, un enfant qui sait 
+qu’il doit se coucher à une heure fixe ou qu’il doit terminer ses devoirs avant de jouer apprend 
+à gérer son temps et ses priorités. Cette structure est un soutien pour son développement 
+intellectuel et émotionnel. 
+Cependant, il est important de souligner que l’autorité ne doit pas être confondue avec la 
+violence ou l’excès de contrôle. Une autorité trop stricte ou punitive peut provoquer peur, 
+stress ou rébellion. L’enfant risque de se fermer, de ne pas exprimer ses émotions ou de 
+développer un manque de confiance en lui. L’autorité doit donc être exercée avec équilibre, 
+en combinant fermeté et bienveillance, en écoutant l’enfant et en expliquant les raisons des 
+règles. 
+Enfin, l’autorité peut être progressive et adaptée à l’âge de l’enfant. Les jeunes enfants ont 
+besoin de plus de guidance, tandis que les adolescents ont besoin de plus de liberté et de 
+responsabilisation. Par exemple, un adolescent peut être encouragé à gérer son emploi du 
+temps ou à prendre certaines décisions, tout en restant encadré par des limites claires. Cette 
+approche permet à l’enfant de développer son autonomie tout en restant guidé par des adultes 
+responsables. 
+En conclusion, l’autorité est nécessaire dans l’éducation d’un enfant, car elle fournit un cadre, 
+des repères et des valeurs indispensables à son développement. Lorsqu’elle est exercée de 
+manière juste, bienveillante et adaptée à l’âge, elle favorise la sécurité, la confiance en soi et 
+la responsabilité. L’autorité ne doit pas être punitive ou excessive, mais équilibrée et 
+éducative, afin de permettre à l’enfant de grandir en harmonie avec lui-même et avec les 
+autres.
+
+=== CHUNK 57 (len=3789) ===
+Dans les grandes villes, les transports en commun jouent un rôle essentiel pour la mobilité des 
+habitants et la fluidité du trafic. Métros, bus, tramways ou trains urbains permettent de se 
+déplacer rapidement, d’éviter les embouteillages et de réduire la pollution. Cependant, l’idée 
+de rendre ces transports gratuits pour tous est un sujet de débat. À mon avis, rendre les 
+transports en commun gratuits présente de nombreux avantages, mais il faut aussi prendre en 
+compte certaines contraintes économiques et organisationnelles. 
+Tout d’abord, la gratuité des transports en commun favoriserait l’utilisation de ces services et 
+réduirait le trafic automobile. De nombreuses personnes utilisent leur voiture pour se 
+déplacer, même sur de courtes distances, parce que le coût des transports en commun peut 
+sembler élevé. Si les bus et les métros étaient gratuits, davantage de personnes choisiraient ces 
+modes de transport, ce qui diminuerait le nombre de voitures dans la ville. Cela aurait un 
+impact direct sur la circulation, permettant moins de bouchons et des déplacements plus 
+rapides pour tous. 
+Ensuite, rendre les transports gratuits contribuerait à la protection de l’environnement. Moins 
+de voitures sur les routes signifie moins de pollution de l’air et de gaz à effet de serre. Dans 
+les grandes villes, la qualité de l’air est souvent préoccupante, et l’utilisation massive de 
+véhicules personnels contribue fortement à ce problème. Encourager les habitants à prendre le 
+bus ou le métro grâce à la gratuité serait un moyen concret de lutter contre la pollution et de 
+préserver la santé publique. 
+De plus, la gratuité des transports en commun favoriserait l’égalité sociale. Aujourd’hui, 
+certaines personnes, notamment les jeunes, les étudiants ou les familles à faibles revenus, ont 
+des difficultés à se déplacer en ville en raison du coût des tickets ou des abonnements. Offrir 
+des transports gratuits à tous permettrait à chacun d’accéder plus facilement à l’éducation, au 
+travail ou aux services essentiels, et réduirait les inégalités liées à la mobilité. Cela pourrait 
+également encourager davantage de sorties culturelles ou sportives, contribuant ainsi à une vie 
+urbaine plus active et inclusive. 
+Cependant, il faut reconnaître que la gratuité totale des transports en commun représente un 
+défi économique important. Les revenus générés par la vente des billets et des abonnements 
+financent une partie de l’entretien, de l’amélioration et du fonctionnement des infrastructures. 
+Si ces revenus disparaissent, il faudra trouver d’autres sources de financement, par exemple 
+par des impôts ou des subventions publiques. Cette transition doit donc être bien planifiée 
+pour garantir la qualité et la sécurité des services. 
+Enfin, la gratuité pourrait avoir des effets secondaires, comme une surpopulation dans les 
+transports aux heures de pointe ou une utilisation moins responsable des installations. Il serait 
+donc nécessaire d’accompagner cette mesure d’investissements supplémentaires pour 
+améliorer la fréquence des passages, l’entretien des véhicules et la gestion des flux de 
+voyageurs. 
+En conclusion, rendre les transports en commun gratuits dans les grandes villes serait une 
+mesure bénéfique pour la mobilité, l’environnement et l’égalité sociale. Elle encouragerait les 
+habitants à utiliser davantage les transports collectifs, réduirait la pollution et faciliterait la vie 
+quotidienne des citoyens. Cependant, cette initiative doit être accompagnée d’une 
+planification financière et logistique pour assurer sa viabilité et maintenir la qualité du 
+service. La gratuité des transports pourrait ainsi devenir un outil efficace pour des villes plus 
+durables et plus accessibles à tous.
+
+=== CHUNK 74 (len=41825) ===
+1a:["$","div",null,{"className":"min-h-screen flex flex-col bg-gray-50","children":[["$","section",null,{"className":"relative bg-linear-to-br from-blue-600 via-blue-700 to-blue-800 overflow-hidden","children":[["$","div",null,{"className":"absolute inset-0 overflow-hidden","children":[["$","div",null,{"className":"absolute top-20 left-10 w-72 h-72 bg-cyan-400/30 rounded-full blur-3xl animate-float"}],["$","div",null,{"className":"absolute top-40 right-20 w-96 h-96 bg-blue-400/20 rounded-full blur-3xl animate-float-delayed"}],["$","div",null,{"className":"absolute bottom-32 left-1/4 w-80 h-80 bg-indigo-400/25 rounded-full blur-3xl animate-float-slow"}],["$","div",null,{"className":"absolute bottom-20 right-1/3 w-64 h-64 bg-blue-500/30 rounded-full blur-3xl animate-float-fast"}],["$","div",null,{"className":"absolute top-1/2 left-1/2 w-32 h-32 bg-white/10 rounded-full blur-2xl animate-pulse"}],["$","div",null,{"className":"absolute top-1/3 right-1/4 w-24 h-24 bg-cyan-300/20 rounded-full blur-xl animate-ping-slow"}]]}],["$","div",null,{"className":"relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 lg:py-16","children":[["$","$L6",null,{"href":"/epreuve/expression-orale/sujets-actualites","className":"inline-flex items-center gap-1.5 text-white/90 hover:text-white transition-colors mb-3 sm:mb-6 lg:mb-8 group text-sm sm:text-base","children":[["$","svg",null,{"ref":"$undefined","xmlns":"http://www.w3.org/2000/svg","width":24,"height":24,"viewBox":"0 0 24 24","fill":"none","stroke":"currentColor","strokeWidth":2,"strokeLinecap":"round","strokeLinejoin":"round","className":"lucide lucide-arrow-left w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover:-translate-x-1 transition-transform","children":[["$","path","1l729n",{"d":"m12 19-7-7 7-7"}],["$","path","x3x0zl",{"d":"M19 12H5"}],"$undefined"]}],["$","span",null,{"children":"Retour aux mois"}]]}],["$","div",null,{"className":"max-w-4xl","children":[["$","h1",null,{"className":"text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-2 sm:mb-4 lg:mb-6 tracking-tight","children":"Janvier 2026"}],["$","p",null,{"className":"text-sm sm:text-xl md:text-2xl text-white/90 leading-relaxed","children":["Découvrez les sujets organisés par"," ",["$","span",null,{"className":"font-semibold text-blue-200","children":"parties quotidiennes"}],". Chaque partie contient"," ",["$","span",null,{"className":"font-semibold text-blue-200 whitespace-nowrap","children":"5 sujets"}]," pour vous entraîner efficacement."]}]]}]]}],["$","div",null,{"className":"absolute bottom-0 left-0 right-0","children":["$","svg",null,{"className":"w-full h-8 sm:h-16 md:h-24 -scale-x-100","preserveAspectRatio":"none","viewBox":"0 0 1200 120","fill":"none","children":["$","path",null,{"d":"M0 0L50 10C100 20 200 40 300 46.7C400 53 500 47 600 43.3C700 40 800 40 900 46.7C1000 53 1100 67 1150 73.3L1200 80V120H1150C1100 120 1000 120 900 120C800 120 700 120 600 120C500 120 400 120 300 120C200 120 100 120 50 120H0V0Z","fill":"rgb(249 250 251)"}]}]}]]}],["$","$L2a",null,{"parties":[{"id":2103,"jour":1,"date":"Janvier 2026","sujets":[{"id":17450,"tache":2,"title":"Je travaille dans un restaurant. Vous voulez organiser un repas d’anniversaire pour votre meilleur(e) ami(e). Posez-moi des questions sur les services du restaurant (menus, prix, disponibilités, etc.)","description":"","question":"$undefined","correction":{"exemple":"🔹 Sujet 1 – Restaurant / repas d’anniversaire\
+Proposez-vous des menus spéciaux pour les anniversaires ?\
+Quels types de plats avez-vous (traditionnels, végétariens, halal, etc.) ?\
+Quel est le prix moyen par personne ?\
+Est-ce que le gâteau d’anniversaire est inclus ?\
+Peut-on apporter notre propre gâteau ?\
+Combien de personnes pouvez-vous accueillir ?\
+Avez-vous une salle privée pour les groupes ?\
+Est-ce qu’il faut réserver longtemps à l’avance ?\
+Proposez-vous des décorations pour l’anniversaire ?\
+Y a-t-il une formule boissons comprises ?\
+À quelle heure peut-on organiser le repas ?\
+Faites-vous des réductions pour les groupes ?\
+Est-ce que le menu peut être personnalisé ?\
+Quels moyens de paiement acceptez-vous ?\
+Avez-vous déjà organisé ce type d’événement ?"}},{"id":17485,"tache":3,"title":"Il est possible de vivre sans médicaments. Êtes-vous d’accord avec cette affirmation ?","description":"$undefined","question":"","correction":{"exemple":"$2b"}},{"id":17451,"tache":2,"title":"Nous sommes collègues de travail. Je vends un stock de vêtements d’occasion pour les enfants. Vous êtes intéressé(e). Posez-moi des questions sur ces vêtements (taille, prix, quantité, etc.)","description":"","question":"$undefined","correction":{"exemple":"🔹 Sujet 2 – Vente de vêtements d’occasion pour enfants\
+Pour quels âges sont les vêtements ?\
+Quelles tailles sont disponibles ?\
+Les vêtements sont-ils pour filles, garçons ou les deux ?\
+Dans quel état sont les vêtements ?\
+Est-ce qu’ils sont propres et en bon état ?\
+Quel est le prix moyen par article ?\
+Faites-vous un prix si j’en achète plusieurs ?\
+Combien de vêtements avez-vous au total ?\
+Y a-t-il des manteaux ou des vêtements d’hiver ?\
+De quelles marques s’agit-il ?\
+Puis-je voir les vêtements avant d’acheter ?\
+Est-ce possible de réserver certains articles ?\
+Où peut-on récupérer les vêtements ?\
+Quels moyens de paiement acceptez-vous ?\
+Jusqu’à quand dure la vente ?"}},{"id":17486,"tache":3,"title":"Les parents doivent laisser leurs enfants utiliser les réseaux sociaux ? Qu’en pensez-vous ?","description":"$undefined","question":"","correction":{"exemple":"$2c"}},{"id":17452,"tache":2,"title":"Je suis votre voisin(e). Je donne des cours de cuisine. Vous êtes intéressé(e). Posez-moi des questions pour savoir comment cela se","description":"","question":"$undefined","correction":{"exemple":"🔹 Sujet 3 – Cours de cuisine (voisin)\
+Quels types de cuisine enseignez-vous ?\
+À qui s’adressent les cours (débutants, avancés) ?\
+Combien de personnes participent par cours ?\
+Quel est le prix d’un cours ?\
+Combien de temps dure un cours ?\
+À quelle fréquence ont lieu les cours ?\
+Fournissez-vous les ingrédients ?\
+Est-ce que le matériel est inclus ?\
+Peut-on choisir les plats à préparer ?\
+Proposez-vous des cours individuels ?\
+Où se déroulent les cours ?\
+Y a-t-il des cours le week-end ?\
+Est-ce possible de s’inscrire pour plusieurs séances ?\
+Offrez-vous des réductions ou des forfaits ?\
+Comment peut-on s’inscrire ?"}},{"id":17487,"tache":3,"title":"Les employeurs doivent-ils autoriser la sieste au travail. Que pensez-vous ?","description":"$undefined","question":"","correction":{"exemple":"$2d"}},{"id":17488,"tache":3,"title":"Tout le monde est capable d’occuper des fonctions de responsable (responsable d’un service, un magasin, une association, etc.). Qu’en pensez-vous ?","description":"$undefined","question":"","correction":{"exemple":"$2e"}},{"id":17453,"tache":2,"title":"Je suis votre ami(e). J’ai fait une croisière en bateau, Vous voulez en faire une. Posez-moi des questions pour avoir des informations sur la croisière (tarifs, activités, services, etc.)","description":"","question":"$undefined","correction":{"exemple":"🔹 Sujet 4 – Croisière en bateau\
+Combien de temps dure la croisière ?\
+Quel est le prix par personne ?\
+Qu’est-ce qui est inclus dans le tarif ?\
+Y a-t-il des activités à bord ?\
+Est-ce que les repas sont compris ?\
+Quelles destinations sont prévues ?\
+À quelle période de l’année avez-vous voyagé ?\
+Y a-t-il des cabines privées ?\
+Est-ce adapté aux familles ?\
+Proposez-vous des excursions pendant la croisière ?\
+Comment est l’ambiance à bord ?\
+Y a-t-il une piscine ou un spa ?\
+Faut-il réserver longtemps à l’avance ?\
+Quels documents sont nécessaires ?"}},{"id":17454,"tache":2,"title":"Je suis votre ami(e). Je veux vendre ma maison. Vous êtes intéressé(e). Posez-moi des questions pour obtenir des informations (nombre de pièces, équipements, prix, etc)","description":"","question":"$undefined","correction":{"exemple":"🔹 Sujet 5 – Vente de maison\
+Combien de pièces compte la maison ?\
+Quelle est la superficie totale ?\
+Combien y a-t-il de chambres ?\
+Y a-t-il un jardin ou un garage ?\
+La maison est-elle meublée ?\
+Quel est le prix de vente ?\
+Est-ce que le prix est négociable ?\
+Dans quel quartier se situe la maison ?\
+Est-elle proche des transports et des commerces ?\
+De quand date la construction ?\
+Y a-t-il eu des rénovations récentes ?\
+Quels sont les équipements inclus ?\
+Quel est le montant des charges ?\
+Quand la maison est-elle disponible ?\
+Est-il possible de la visiter bientôt ?"}},{"id":17489,"tache":3,"title":"Vivre avec ses parents après l’âge de 25 ans peut être partique. Qu’en-pensez-vous?Vivre avec ses parents après l’âge de 25 ans peut être partique. Qu’en-pensez-vous?","description":"$undefined","question":"","correction":{"exemple":"$2f"}}]},{"id":2104,"jour":2,"date":"Janvier 2026","sujets":[{"id":17490,"tache":3,"title":"Comment les entreprises doivent-elles agir pour aider les nouveaux employés à trouver leur place ?","description":"$undefined","question":"","correction":{"exemple":"$30"}},{"id":17455,"tache":2,"title":"Je suis votre ami(e). Vous venez d’arriver dans ma ville. Demandez-moi des conseils pour faire une sortie bon marché (lieux, activités, transports, etc.).","description":"","question":"$undefined","correction":{"exemple":"🔹 Sujet 1 – Sortie bon marché dans la ville\
+\
+Quels endroits pas chers me conseilles-tu pour sortir dans la ville ?\
+Y a-t-il des parcs ou des lieux gratuits à visiter ?\
+Quelles activités peu coûteuses peut-on faire ici ?\
+Est-ce qu’il y a des musées gratuits certains jours ?\
+Où peut-on manger à petit prix ?\
+Est-ce qu’il y a des événements culturels gratuits ?\
+Quels quartiers sont agréables pour se promener ?\
+Comment se déplacer sans dépenser beaucoup ?\
+Les transports en commun sont-ils abordables ?\
+Existe-t-il des cartes ou abonnements économiques ?\
+Que me conseilles-tu pour une sortie le week-end ?\
+Y a-t-il des activités gratuites le soir ?\
+Quels endroits évites-tu parce qu’ils sont trop chers ?\
+Peut-on faire une sortie sympa avec un petit budget ?\
+Quel serait ton programme idéal pour une journée économique ?"}},{"id":17491,"tache":3,"title":"D’après vous, une personne qui a vécu dans plusieurs pays a-t-elle un meilleur avenir professionnel ?","description":"$undefined","question":"","correction":{"exemple":"$31"}},{"id":17456,"tache":2,"title":"Je suis votre voisin(e). J’ai une petite maison au bord de la mer, je la loue pendant les vacances. Vous êtes intéressé(e). Vous me posez des questions pour décider si vous allez la louer (aménagement, environnement, tarifs, etc.).","description":"","question":"$undefined","correction":{"exemple":"🔹 Sujet 2 – Location de maison au bord de la mer\
+\
+Où se situe exactement la maison ?\
+Quelle est la superficie de la maison ?\
+Combien de chambres y a-t-il ?\
+Combien de personnes peuvent y séjourner ?\
+Est-ce que la maison est meublée ?\
+Quels équipements sont inclus ?\
+Est-elle proche de la plage ?\
+Y a-t-il des commerces à proximité ?\
+Le quartier est-il calme ?\
+Quel est le prix de la location ?\
+Le prix varie-t-il selon la saison ?\
+Les charges sont-elles comprises ?\
+Y a-t-il un parking ?\
+Quelles sont les conditions de réservation ?\
+Est-ce disponible pendant les vacances scolaires ?"}},{"id":17457,"tache":2,"title":"Je travaille dans un magasin de meubles. Vous souhaitez faire livrer votre meuble. Vous m’interrogez sur les conditions proposées par notre magasin (tarifs, délais, mode de transport, etc.)","description":"","question":"$undefined","correction":{"exemple":"🔹 Sujet 3 – Livraison de meubles\
+\
+Proposez-vous un service de livraison ?\
+Quel est le coût de la livraison ?\
+Les frais dépendent-ils de la distance ?\
+En combien de temps le meuble est-il livré ?\
+Peut-on choisir la date de livraison ?\
+La livraison se fait-elle à domicile ?\
+Est-ce que le montage est inclus ?\
+Le meuble est-il livré à l’étage ?\
+Que se passe-t-il en cas de retard ?\
+Le transport est-il assuré ?\
+Puis-je suivre la livraison ?\
+Quels sont les modes de paiement acceptés ?\
+Puis-je annuler ou modifier la livraison ?\
+Que faire si le meuble arrive abîmé ?\
+Proposez-vous une livraison express ?"}},{"id":17492,"tache":3,"title":"Quel était votre cours préféré à l’école ? Pourquoi ?","description":"$undefined","question":"","correction":{"exemple":"$32"}},{"id":17458,"tache":2,"title":"Nous sommes dans une salle d’attente. Nous ne nous connaissons pas. Notre train a du retard. Je viens de vous dire que je suis passionné(e) de montagne. Vous me posez des questions sur ma passion (lieux, activités, équipement, etc.).","description":"","question":"$undefined","correction":{"exemple":"🔹 Sujet 4 – Passion pour la montagne\
+\
+Depuis quand êtes-vous passionné(e) par la montagne ?\
+Quels endroits de montagne préférez-vous ?\
+À quelle période allez-vous à la montagne ?\
+Quelles activités pratiquez-vous en montagne ?\
+Préférez-vous l’été ou l’hiver ?\
+Faites-vous de la randonnée ?\
+Pratiquez-vous des sports d’hiver ?\
+Quel équipement est nécessaire ?\
+Est-ce une activité coûteuse ?\
+Y allez-vous seul(e) ou accompagné(e) ?\
+Est-ce adapté aux débutants ?\
+Quels sont les dangers à éviter ?\
+Avez-vous déjà vécu une expérience marquante ?\
+Combien de temps durent vos séjours ?\
+Pourquoi aimez-vous autant la montagne ?"}},{"id":17493,"tache":3,"title":"Quelles matières devraient davantage être enseignées à l’école ? Pourquoi ?","description":"$undefined","question":"","correction":{"exemple":"$33"}},{"id":17459,"tache":2,"title":"Nous sommes dans une soirée, nous nous rencontrons pour la première fois. Je rentre d’un voyage. Vous me posez des questions sur le voyage que j’ai fait (durée, lieux, impressions, etc.).","description":"","question":"$undefined","correction":{"exemple":"🔹 Sujet 5 – Voyage\
+\
+Où êtes-vous parti(e) en voyage ?\
+Combien de temps a duré votre voyage ?\
+Étiez-vous seul(e) ou accompagné(e) ?\
+Quel était le but du voyage ?\
+Quels endroits avez-vous visités ?\
+Qu’avez-vous le plus aimé ?\
+Y a-t-il eu des difficultés ?\
+Comment était l’hébergement ?\
+Le voyage était-il cher ?\
+Avez-vous découvert une nouvelle culture ?\
+Quelle a été votre meilleure expérience ?\
+Recommanderiez-vous cette destination ?\
+Qu’avez-vous appris grâce à ce voyage ?\
+Avez-vous pris beaucoup de photos ?\
+Aimeriez-vous y retourner ?"}},{"id":17494,"tache":3,"title":"À votre avis, qu’est-ce qui est préférable : avoir une grande famille ou avoir de bons amis ? Pourquoi ?","description":"$undefined","question":"","correction":{"exemple":"$34"}}]},{"id":2105,"jour":3,"date":"Janvier 2026","sujets":[{"id":17460,"tache":2,"title":"Je suis votre collège, vous voulez m’accompagner à événement culturel (spectacle) . Posez moi des questions (programme, date, lieu)","description":"","question":"$undefined","correction":{"exemple":"🔹 Sujet 1 – Événement culturel (spectacle)\
+\
+De quel type de spectacle s’agit-il ?\
+Quand aura lieu l’événement ?\
+Où se déroulera le spectacle ?\
+À quelle heure commence-t-il ?\
+Combien de temps dure le spectacle ?\
+Est-ce qu’il faut acheter les billets à l’avance ?\
+Quel est le prix des billets ?\
+Y a-t-il des places encore disponibles ?\
+Est-ce que le spectacle est adapté à tous les publics ?\
+Comment peut-on s’y rendre ?"}},{"id":17540,"tache":3,"title":"Est-il possible de nouer une amitié avec une personne dont les  convictions sont opposées aux vôtres ?","description":"$undefined","question":"","correction":{"exemple":"$35"}},{"id":17461,"tache":2,"title":"Je travaille dans une compagnie d’assurance automobile. Vous envisagez de souscrire à une assurance auto. Posez-moi des questions","description":"","question":"$undefined","correction":{"exemple":"🔹 Sujet 2 – Assurance automobile\
+\
+Quels types d’assurance auto proposez-vous ?\
+Que couvre l’assurance de base ?\
+Quel est le prix moyen de l’assurance ?\
+Quels facteurs influencent le tarif ?\
+Y a-t-il des réductions possibles ?\
+L’assurance couvre-t-elle les accidents responsables ?\
+Que se passe-t-il en cas de panne ou d’accident ?\
+Est-ce que l’assistance est incluse ?\
+Quels documents faut-il fournir pour souscrire ?\
+Combien de temps dure le contrat ?"}},{"id":17542,"tache":3,"title":"Le voyage fait de vous une meilleure personne. Êtes-vous  d’accord avec cette affirmation ? ","description":"$undefined","question":"","correction":{"exemple":"$36"}},{"id":17543,"tache":3,"title":"Les menus végétariens sont-ils une alternative saine et durable  à l’alimentation traditionnelle. Qu’en pensez-vous ? ","description":"","question":"","correction":{"exemple":"$37"}},{"id":17462,"tache":2,"title":"Je travaille dans une agence de voyage. Vous êtes intéressé par un séjour au Canada. Posez-moi des questions.","description":"","question":"$undefined","correction":{"exemple":"🔹 Sujet 3 – Séjour au Canada (agence de voyage)\
+\
+Quelles destinations au Canada proposez-vous ?\
+Quelle est la durée des séjours disponibles ?\
+Que comprend le prix du séjour ?\
+Est-ce que le billet d’avion est inclus ?\
+Quels types d’hébergement sont proposés ?\
+À quelle période est-il préférable de voyager ?\
+Proposez-vous des activités sur place ?\
+Faut-il un visa pour voyager au Canada ?\
+Le séjour est-il adapté aux familles ?\
+Quelles sont les conditions de réservation ?"}},{"id":17463,"tache":2,"title":"Je travaille dans un centre culturel, posez-moi des questions pour participer à des activités (sport, théâtre, musées…)","description":"","question":"$undefined","correction":{"exemple":"🔹 Sujet 4 – Centre culturel / activités\
+\
+Quelles activités propose votre centre culturel ?\
+Y a-t-il des activités sportives disponibles ?\
+Proposez-vous des ateliers de théâtre ?\
+Organisez-vous des visites de musées ?\
+Quels sont les horaires des activités ?\
+Faut-il s’inscrire à l’avance ?\
+Les activités sont-elles payantes ?\
+Y a-t-il des activités pour les enfants ?\
+Où se situe le centre culturel ?\
+Comment peut-on s’inscrire ?"}},{"id":17544,"tache":3,"title":"Les animaux de compagnie sont-ils essentiels pour le bien-être  des personnes âgées ? Qu’en pensez-vous ? ","description":"$undefined","question":"","correction":{"exemple":"$38"}},{"id":17464,"tache":2,"title":"Je suis votre voisin, je vous demande de garder mon enfant de 3 ans ce week-end. Posez-moi des questions.","description":"","question":"$undefined","correction":{"exemple":"🔹 Sujet 5 – Garde d’un enfant de 3 ans\
+\
+À quelles dates dois-je garder ton enfant ?\
+À quelles heures as-tu besoin de moi ?\
+Ton enfant a-t-il des habitudes particulières ?\
+Y a-t-il des règles à respecter ?\
+Que mange-t-il habituellement ?\
+A-t-il des allergies ou des problèmes de santé ?\
+À quelle heure fait-il la sieste ?\
+Quels jeux ou activités aime-t-il ?\
+Dois-je sortir avec lui ou rester à la maison ?\
+Comment puis-je te contacter en cas de problème ?"}},{"id":17545,"tache":3,"title":"De nombreux magazines proposent des conseils pour perdre  du poids. Êtes-vous favorable à cette pratique ou y êtes vous opposé ? ","description":"$undefined","question":"","correction":{"exemple":"$39"}}]},{"id":2106,"jour":4,"date":"Janvier 2026","sujets":[{"id":17465,"tache":2,"title":"Je suis votre collègue. Je fais partie d’un club où l’on joue à des jeux de société. Vous êtes intéressé(e) et vous me posez quelques questions pour en savoir plus (lieu, coût, horaires, ambiance, etc.).","description":"","question":"$undefined","correction":{"exemple":"✅ Sujet 1 – Club de jeux de société\
+\
+Où se trouve le club exactement ?\
+Quels types de jeux proposez-vous ?\
+À quelle fréquence avez-vous des rencontres ?\
+Quels sont les jours d’ouverture ?\
+À quelles heures commencent les activités ?\
+Combien coûte l’inscription ?\
+Faut-il payer à chaque séance ?\
+L’ambiance est-elle plutôt conviviale ?\
+Y a-t-il des débutants ?\
+Combien de personnes participent en général ?\
+Faut-il apporter ses propres jeux ?\
+Est-ce ouvert à tous les âges ?\
+Peut-on venir avec un ami ?\
+Y a-t-il des tournois ?\
+Comment peut-on s’inscrire ?"}},{"id":17546,"tache":3,"title":"De nos jours, apprendre des langues étrangères est  essentiel. Qu’en pensez-vous ? ","description":"$undefined","question":"","correction":{"exemple":"$3a"}},{"id":17547,"tache":3,"title":"L’accès à la culture (musées, livres, cinéma, etc.) devrait-il être  gratuit selon vous ? ","description":"$undefined","question":"","correction":{"exemple":"$3b"}},{"id":17466,"tache":2,"title":"Je suis votre collègue. J’organise une fête pour fêter mon départ à la retraite et je vous ai invité(e). Vous me demandez quelques précisions (date, endroit, participants, déroulement, etc.).","description":"","question":"$undefined","correction":{"exemple":"✅ Sujet 2 – Fête de départ à la retraite\
+\
+Quelle est la date de la fête ?\
+À quelle heure commence-t-elle ?\
+Où aura lieu la fête ?\
+Combien de personnes sont invitées ?\
+Est-ce une fête formelle ou informelle ?\
+Y aura-t-il un repas ?\
+Est-ce que chacun apporte quelque chose ?\
+Y aura-t-il de la musique ?\
+Combien de temps dure la fête ?\
+Peut-on venir accompagné(e) ?\
+Y a-t-il un dress code ?\
+Est-ce en intérieur ou en extérieur ?\
+Y aura-t-il des discours ?\
+Faut-il confirmer sa présence ?\
+Y a-t-il un cadeau collectif prévu ?"}},{"id":17550,"tache":3,"title":"Pour préserver l’environnement, il faut consommer des  produits locaux et de saison. Êtes-vous d’accord avec cette idée  ? ","description":"$undefined","question":"","correction":{"exemple":"$3c"}},{"id":17467,"tache":2,"title":"Je suis votre voisin(e). Je propose des ateliers de jardinage dans le quartier. Vous souhaitez y participer et vous me posez des questions (prix, organisation, activités proposées, etc.).","description":"","question":"$undefined","correction":{"exemple":"✅ Sujet 3 – Ateliers de jardinage\
+\
+Où se déroulent les ateliers ?\
+À quels jours ont lieu les séances ?\
+À quelle heure commencent-elles ?\
+Combien coûte la participation ?\
+Est-ce par séance ou par abonnement ?\
+Combien de temps dure un atelier ?\
+Quels thèmes sont abordés ?\
+Faut-il du matériel personnel ?\
+Est-ce adapté aux débutants ?\
+Combien de participants par groupe ?\
+Est-ce pour adultes seulement ?\
+Les ateliers ont lieu toute l’année ?\
+Y a-t-il des ateliers pratiques ?\
+Peut-on s’inscrire à l’avance ?\
+Qui anime les ateliers ?"}},{"id":17551,"tache":3,"title":"Quel métier aimeriez-vous tester un jour ? Expliquez votre  choix. ","description":"$undefined","question":"","correction":{"exemple":"$3d"}},{"id":17468,"tache":2,"title":"Je travaille à la bibliothèque municipale. Vous avez besoin d’emprunter des documents et vous me demandez comment procéder (durée, nombre autorisé, conditions, etc.).","description":"","question":"$undefined","correction":{"exemple":"✅ Sujet 4 – Bibliothèque municipale\
+\
+Comment s’inscrire à la bibliothèque ?\
+Quels documents peut-on emprunter ?\
+Combien de documents sont autorisés ?\
+Quelle est la durée du prêt ?\
+Peut-on prolonger un emprunt ?\
+Y a-t-il des frais d’inscription ?\
+Faut-il une pièce d’identité ?\
+Les enfants peuvent-ils s’inscrire ?\
+Y a-t-il des pénalités de retard ?\
+Peut-on réserver un livre ?\
+Avez-vous des documents numériques ?\
+Quels sont les horaires d’ouverture ?\
+Peut-on travailler sur place ?\
+Y a-t-il des ordinateurs disponibles ?\
+Peut-on emprunter des films ?"}},{"id":17552,"tache":3,"title":"Chacun devrait pouvoir travailler à distance s’il le  souhaite. Qu’en pensez-vous ? ","description":"$undefined","question":"","correction":{"exemple":"$3e"}},{"id":17469,"tache":2,"title":"Je travaille à l’accueil de la piscine municipale. Vous voulez suivre des cours de natation et vous me posez des questions pour vous renseigner (tarifs, horaires, accès, etc.).","description":"","question":"$undefined","correction":{"exemple":"✅ Sujet 5 – Piscine municipale\
+\
+Quels types de cours proposez-vous ?\
+À partir de quel âge peut-on s’inscrire ?\
+Quels sont les horaires des cours ?\
+Combien coûte un cours ?\
+Est-ce un forfait mensuel ?\
+Combien de personnes par groupe ?\
+Le matériel est-il fourni ?\
+Les cours sont-ils mixtes ?\
+Y a-t-il des cours pour débutants ?\
+Quelle est la durée d’un cours ?\
+Faut-il un certificat médical ?\
+Comment s’inscrire ?\
+L’accès à la piscine est-il inclus ?\
+Y a-t-il des vestiaires ?\
+Les cours ont-ils lieu toute l’année ?"}}]},{"id":2107,"jour":5,"date":"Janvier 2026","sujets":[{"id":17553,"tache":3,"title":"De nos jours, on ne peut plus vivre sans Internet. Qu’en pensez vous ? ","description":"$undefined","question":"","correction":{"exemple":"$3f"}},{"id":17470,"tache":2,"title":"Je suis votre collègue. Je cherche un(e) partenaire pour faire du sport. Vous êtes intéressé(e). Vous me posez des questions sur mon activité sportive (type d’activité, horaires, niveau, etc.)","description":"","question":"$undefined","correction":{"exemple":"🔹 Sujet 1 – Partenaire pour faire du sport\
+\
+Quel sport pratiques-tu actuellement ?\
+Depuis combien de temps fais-tu ce sport ?\
+À quelle fréquence t’entraînes-tu ?\
+Quels sont les horaires habituels ?\
+Où se déroulent les entraînements ?\
+Est-ce un sport en salle ou en extérieur ?\
+Quel est ton niveau ?\
+Est-ce adapté à un débutant ?\
+Faut-il un équipement spécial ?\
+Y a-t-il un coût pour pratiquer ce sport ?\
+Préfères-tu le matin ou le soir ?\
+Est-ce plutôt pour le loisir ou la compétition ?\
+Combien de temps dure une séance ?\
+Y a-t-il d’autres personnes qui participent ?\
+Penses-tu que ce sport est motivant à long terme ?"}},{"id":17554,"tache":3,"title":"Est-ce que vous pensez que l’autorité est nécessaire dans  l’éducation d’un enfant ? Pourquoi ?","description":"$undefined","question":"","correction":{"exemple":"$40"}},{"id":17471,"tache":2,"title":"Je suis votre voisin(e) et nos enfants sont amis. Je vous propose d’emmener votre enfant en vacances avec ma famille. Vous me posez des questions avant d’accepter (lieu, dates, activités prévues, etc.).","description":"","question":"$undefined","correction":{"exemple":"🔹 Sujet 2 – Vacances avec l’enfant\
+\
+Où allez-vous partir en vacances ?\
+À quelles dates exactement ?\
+Combien de temps durera le séjour ?\
+Combien d’enfants vont participer ?\
+Quel âge ont-ils ?\
+Où allez-vous loger ?\
+Quelles activités sont prévues pour les enfants ?\
+Est-ce un lieu sécurisé ?\
+Qui s’occupera des enfants sur place ?\
+Y aura-t-il des sorties organisées ?\
+Comment se fera le transport ?\
+Y a-t-il une assurance prévue ?\
+Que faire en cas de problème de santé ?\
+Quel est le budget approximatif ?\
+Mon enfant a-t-il déjà voyagé avec vous ?"}},{"id":17555,"tache":3,"title":"Les transports en commun devraient être gratuits pour tous dans  les grandes villes. Qu’en pensez-vous ? ","description":"$undefined","question":"","correction":{"exemple":"$41"}},{"id":17472,"tache":2,"title":"Je suis votre voisin(e). Je suis bénévole dans une association qui protège l’environnement. Vous souhaitez participer aux activités de cette association. Vous me posez des questions pour obtenir des informations (types d’activités, horaires, autres participants, etc.).","description":"","question":"$undefined","correction":{"exemple":"🔹 Sujet 3 – Association de protection de l’environnement\
+\
+Quel est l’objectif principal de l’association ?\
+Depuis quand existe cette association ?\
+Quels types d’activités proposez-vous ?\
+À quelle fréquence ont lieu les activités ?\
+Quels sont les horaires habituels ?\
+Où se déroulent les actions ?\
+Faut-il des compétences particulières ?\
+Peut-on participer occasionnellement ?\
+Y a-t-il beaucoup de bénévoles ?\
+Quel est le profil des participants ?\
+Les activités sont-elles gratuites ?\
+Est-ce ouvert aux jeunes ?\
+Fournissez-vous le matériel nécessaire ?\
+Comment s’inscrire à une activité ?\
+En quoi consiste ton rôle dans l’association ?"}},{"id":17556,"tache":3,"title":"Pour rester en bonne santé, tout le monde devrait consommer des  produits biologiques. Êtes-vous d’accord avec cette affirmation ? ","description":"$undefined","question":"","correction":{"exemple":"$42"}},{"id":17473,"tache":2,"title":"Je travaille dans une agence de voyages. L’agence organise des excursions à la journée. Vous êtes intéressé(e). Vous me posez des questions sur les journées proposées (lieux visités, prix, organisation, etc.).","description":"","question":"$undefined","correction":{"exemple":"🔹 Sujet 4 – Excursions à la journée (agence de voyages)\
+\
+Quels types d’excursions proposez-vous ?\
+Quels lieux sont visités ?\
+Combien de temps dure une excursion ?\
+À quelles dates sont-elles organisées ?\
+Quel est le prix par personne ?\
+Le transport est-il inclus ?\
+Les repas sont-ils compris ?\
+Combien de personnes participent en général ?\
+Y a-t-il un guide accompagnateur ?\
+Est-ce adapté aux familles ?\
+Faut-il réserver à l’avance ?\
+Quelle est la politique d’annulation ?\
+Les excursions sont-elles fatigantes ?\
+Quel équipement faut-il prévoir ?\
+Quelle excursion recommandez-vous le plus ?"}},{"id":17557,"tache":3,"title":"Pour réussir sa vie, faut-il avoir fait de longues études ? ","description":"$undefined","question":"","correction":{"exemple":"$43"}},{"id":17474,"tache":2,"title":"Je travaille à l’accueil d’un musée. Vous voulez organiser une sortie familiale. Vous me posez des questions pour obtenir des informations utiles sur le musée (expositions, prix, horaires, etc.).","description":"","question":"$undefined","correction":{"exemple":"🔹 Sujet 5 – Sortie familiale au musée\
+\
+Quelles expositions sont actuellement proposées ?\
+Le musée est-il adapté aux enfants ?\
+Quels sont les horaires d’ouverture ?\
+Le musée est-il ouvert le week-end ?\
+Quel est le prix d’entrée ?\
+Y a-t-il des tarifs familiaux ?\
+L’entrée est-elle gratuite pour les enfants ?\
+Combien de temps dure la visite en moyenne ?\
+Proposez-vous des visites guidées ?\
+Y a-t-il des activités pédagogiques ?\
+Peut-on réserver à l’avance ?\
+Le musée est-il accessible aux poussettes ?\
+Y a-t-il un espace de repos ou un café ?\
+Où se situe le musée exactement ?\
+Quelle exposition conseillez-vous pour une famille ?"}}]},{"id":2108,"jour":6,"date":"Janvier 2026","sujets":[{"id":17475,"tache":2,"title":"Je suis un(e) ami(e). Vous cherchez un emploi. Vous allez à un entretien professionnel la semaine prochaine. Demandez-moi des conseils pour réussir votre entretien (comportement, vêtements, préparatifs, etc.).","description":"","question":"$undefined","correction":{"exemple":"Sujet 1 – Entretien professionnel\
+\
+Comment dois-je me présenter à l’entretien ?\
+Quelle attitude est la plus appropriée ?\
+Quels vêtements dois-je porter ?\
+Est-ce préférable d’être très formel ?\
+Dois-je arriver en avance ?\
+Combien de temps avant l’heure prévue ?\
+Dois-je apporter mon CV ?\
+Faut-il préparer des réponses à l’avance ?\
+Quelles questions sont souvent posées ?\
+Comment parler de mes qualités ?\
+Comment répondre à une question difficile ?"}},{"id":17558,"tache":3,"title":"Certaines personnes choisissent de ne jamais regarder la télévision. Qu’en pensez-vous ?","description":"$undefined","question":"","correction":{"exemple":"$44"}},{"id":17559,"tache":3,"title":"Certaines personnes pensent que les sportifs gagnent trop d’argent. Êtes-vous d’accord ?","description":"$undefined","question":"","correction":{"exemple":"$45"}},{"id":17476,"tache":2,"title":"Je suis votre voisin(e). Je pars en vacances. J’aimerais que vous vous occupiez de mon animal de compagnie pendant mon absence. Vous me posez des questions pour décider si vous allez accepter (dates, habitudes de l’animal, règles, etc.).","description":"","question":"$undefined","correction":{"exemple":"Sujet 2 – Garde d’un animal\
+\
+Quelles sont les dates de ton absence ?\
+Combien de jours dois-je garder l’animal ?\
+Quel type d’animal est-ce ?\
+Est-il calme ou actif ?\
+A-t-il des habitudes particulières ?\
+À quelle heure doit-il manger ?\
+Quelle nourriture dois-je lui donner ?\
+Faut-il le sortir souvent ?\
+Est-il habitué aux autres personnes ?\
+A-t-il des problèmes de santé ?"}},{"id":17477,"tache":2,"title":"Je travaille dans un office de tourisme. Vous voulez partir en week-end mais vous ne voulez pas dépenser beaucoup d’argent. Demandez-moi des conseils (lieux, activités, transports, etc.).","description":"","question":"$undefined","correction":{"exemple":"Sujet 3 – Week-end pas cher\
+\
+Quels lieux peu chers me conseillez-vous ?\
+Y a-t-il des destinations proches ?\
+Quelle est la meilleure période pour partir ?\
+Peut-on voyager avec un petit budget ?\
+Quels transports sont les moins chers ?\
+Y a-t-il des activités gratuites ?\
+Où peut-on se loger à bas prix ?\
+Existe-t-il des auberges ou des hôtels économiques ?\
+Est-ce une destination calme ?\
+Peut-on visiter des sites naturels ?\
+Y a-t-il des événements gratuits ?\
+Combien de jours sont suffisants ?"}},{"id":17560,"tache":3,"title":"Pensez-vous que les enfants passent trop de temps devant les écrans (ordinateurs, tablettes, téléphones, télévisions, etc.) ? Pourquoi ?","description":"$undefined","question":"","correction":{"exemple":"$46"}},{"id":17561,"tache":3,"title":"Quand on s’installe dans un nouveau pays, est-ce qu’il faut changer ses habitudes de vie (alimentation, vacances, vêtements, etc.) ?","description":"$undefined","question":"","correction":{"exemple":"$47"}},{"id":17478,"tache":2,"title":"Je travaille à l’accueil d’un club sportif de votre ville. Vous voulez pratiquer du sport. Vous me posez des questions pour décider si vous allez vous inscrire (cours, tarifs, horaires, etc.).","description":"","question":"$undefined","correction":{"exemple":"Sujet 4 – Club sportif\
+\
+Quels sports propose votre club ?\
+Y a-t-il des cours pour débutants ?\
+Quels sont les horaires d’ouverture ?\
+Les cours sont-ils en groupe ou individuels ?\
+Combien coûte l’inscription ?\
+Y a-t-il des abonnements mensuels ?\
+Le matériel est-il inclus ?\
+Puis-je faire une séance d’essai ?\
+Y a-t-il des coachs professionnels ?\
+Combien de fois par semaine peut-on venir ?"}},{"id":17479,"tache":2,"title":"Nous sommes amis. Vous voulez vous installer au Canada. J’habite dans un appartement en colocation à Toronto, je vous propose de partager mon appartement. Vous","description":"","question":"$undefined","correction":{"exemple":"Sujet 5 – Colocation au Canada (Toronto)\
+\
+Où se situe l’appartement à Toronto ?\
+Quel est le montant du loyer ?\
+Les charges sont-elles incluses ?\
+Combien de personnes vivent déjà ici ?\
+Quelle est la taille de la chambre ?\
+La chambre est-elle meublée ?\
+Y a-t-il une cuisine équipée ?\
+Quelles sont les règles de la colocation ?\
+Peut-on recevoir des invités ?\
+Le logement est-il proche des transports ?"}},{"id":17562,"tache":3,"title":"Si vous allez vivre au Canada, pensez-vous que vous trouverez facilement du travail ? Pourquoi ?","description":"$undefined","question":"","correction":{"exemple":"$48"}}]},{"id":2109,"jour":7,"date":"Janvier 2026","sujets":[{"id":17480,"tache":2,"title":"Je partage un appartement à Winnipeg avec des colocataires. Une chambre de l’appartement est disponible. Vous êtes intéressé(e). Vous me posez des questions pour obtenir des renseignements sur le logement (chambre et pièces communes, loyer, autres colocataires, etc.).","description":"","question":"$undefined","correction":{"exemple":"1️Colocation à Winnipeg – questions sur le logement\
+\
+Où se situe l’appartement exactement ?\
+La chambre est-elle meublée ?\
+Quel est le montant du loyer ?\
+Les charges sont-elles incluses ?\
+Combien de colocataires vivent dans l’appartement ?\
+Y a-t-il une salle de bain partagée ?\
+Peut-on utiliser librement la cuisine ?\
+Y a-t-il une connexion Internet ?\
+Quelle est la durée minimale du bail ?\
+Les animaux sont-ils acceptés ?"}},{"id":17563,"tache":3,"title":"Consommer des produits bio est réservé aux personnes les plus riches. Êtes-vous d’accord ?","description":"$undefined","question":"","correction":{"exemple":"$49"}},{"id":17564,"tache":3,"title":"⁠Faut-il interdire l’utilisation des voitures dans les centres-villes ? Qu’en pensez-vous ?","description":"$undefined","question":"","correction":{"exemple":"$4a"}},{"id":17481,"tache":2,"title":"Je suis votre ami(e). Mon fils va se marier. Vous êtes invité(e). Vous me posez des questions sur le mariage (organisation, invités, cadeau, etc.).","description":"","question":"$undefined","correction":{"exemple":"Mariage du fils d’un(e) ami(e)\
+\
+Où aura lieu le mariage ?\
+À quelle date est prévu l’événement ?\
+Combien d’invités sont attendus ?\
+Le mariage dure-t-il une journée ou plusieurs jours ?\
+Y aura-t-il une cérémonie religieuse ?\
+Est-ce qu’un code vestimentaire est prévu ?\
+Quel type de cadeau préférez-vous ?\
+Y aura-t-il un repas ou une réception ?\
+Dois-je confirmer ma présence ?\
+Puis-je venir accompagné(e) ?"}},{"id":17482,"tache":2,"title":"⁠Je suis votre collègue. Je prends des cours de langue payés par l’entreprise. Cela vous intéresse. Vous me posez des questions sur les cours (langues proposées, horaires, qualité, etc.).","description":"","question":"$undefined","correction":{"exemple":"3️ Cours de langue payés par l’entreprise\
+\
+Quelles langues sont proposées ?\
+Les cours ont lieu pendant ou après le travail ?\
+À quelle fréquence ont lieu les cours ?\
+Les cours sont-ils en ligne ou en présentiel ?\
+Quel est le niveau requis pour s’inscrire ?\
+Les professeurs sont-ils qualifiés ?\
+Y a-t-il un test de niveau au départ ?\
+Combien de temps dure la formation ?\
+Est-ce vraiment utile pour le travail ?\
+Comment peut-on s’inscrire ?"}},{"id":17565,"tache":3,"title":"⁠La chose la plus importante dans un travail est le salaire. Qu’en pensez-vous ?","description":"$undefined","question":"","correction":{"exemple":"$4b"}},{"id":17566,"tache":3,"title":"La télévision participe au développement des enfants. Qu’en pensez-vous ?","description":"$undefined","question":"","correction":{"exemple":"$4c"}},{"id":17483,"tache":2,"title":"⁠Je travaille dans une agence de location de voitures. Vous avez besoin de louer un véhicule. Vous me posez des questions sur les offres de location (types de véhicules, prix, options, etc.).","description":"","question":"$undefined","correction":{"exemple":"Location de voiture – agence\
+\
+Quels types de véhicules proposez-vous ?\
+Quel est le prix de location par jour ?\
+Le carburant est-il inclus ?\
+Y a-t-il une assurance comprise ?\
+Peut-on louer une voiture automatique ?\
+Y a-t-il une limite de kilométrage ?\
+Quelles options sont disponibles ?\
+Faut-il une carte de crédit ?\
+Peut-on rendre la voiture dans une autre ville ?\
+Y a-t-il des réductions pour plusieurs jours ?"}},{"id":17567,"tache":3,"title":"On peut connaître les autres cultures sans voyager. Qu’en pensez-vous ?","description":"$undefined","question":"","correction":{"exemple":"$4d"}},{"id":17484,"tache":2,"title":"⁠Je travaille dans une auto-école. Vous souhaitez apprendre à conduire. Vous me posez des questions pour avoir plus d’informations (tarifs, durée de la formation, documents nécessaires, etc.).","description":"","question":"$undefined","correction":{"exemple":"5️ Auto-école – apprendre à conduire\
+\
+Quels sont vos tarifs ?\
+Combien d’heures de conduite sont nécessaires ?\
+La formation dure combien de temps ?\
+Proposez-vous des cours théoriques ?\
+Quels documents sont nécessaires ?\
+Peut-on choisir ses horaires ?\
+Les moniteurs sont-ils certifiés ?\
+Le permis est-il inclus dans la formation ?\
+Y a-t-il des facilités de paiement ?\
+Quand puis-je commencer les cours ?"}}]}]}],"$L4e"]}]
+
+
+=== CHUNK 76 (len=4844) ===
+4e:["$","section",null,{"className":"py-4 sm:py-8","children":["$","div",null,{"className":"max-w-4xl mx-auto px-4 sm:px-6 lg:px-8","children":[["$","div",null,{"className":"mb-4 sm:mb-6 space-y-3 sm:space-y-4","children":[["$","div",null,{"className":"bg-blue-50 p-3 sm:p-4 rounded-lg","children":[["$","h3",null,{"className":"text-base sm:text-lg font-bold text-blue-900 mb-1 sm:mb-2","children":"Attention !"}],["$","p",null,{"className":"text-sm text-blue-800","children":"Ces contenus sont basés sur des sujets réels ! Ils ne sont pas les originaux. Tous les contenus partagés ici sont protégés. Toute reproduction, même partielle ou reformulée, est strictement interdite sans autorisation écrite."}]]}],["$","div",null,{"className":"grid grid-cols-3 gap-2 sm:gap-3","children":[["$","$L6",null,{"href":"/epreuve/expression-orale/astuces","className":"px-2 py-2 sm:p-3 bg-linear-to-r from-yellow-400 to-orange-500 text-white rounded-lg font-semibold text-xs sm:text-base shadow-md hover:shadow-xl hover:scale-105 transition-all duration-300 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2","children":[["$","svg",null,{"ref":"$undefined","xmlns":"http://www.w3.org/2000/svg","width":24,"height":24,"viewBox":"0 0 24 24","fill":"none","stroke":"currentColor","strokeWidth":2,"strokeLinecap":"round","strokeLinejoin":"round","className":"lucide lucide-book-open w-4 h-4 sm:w-5 sm:h-5","children":[["$","path","1akyts",{"d":"M12 7v14"}],["$","path","ruj8y",{"d":"M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"}],"$undefined"]}],["$","span",null,{"children":"Méthodologie"}]]}],["$","$L6",null,{"href":"/formations","className":"px-2 py-2 sm:p-3 bg-linear-to-r from-blue-500 to-blue-600 text-white rounded-lg font-semibold text-xs sm:text-base shadow-md hover:shadow-xl hover:scale-105 transition-all duration-300 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2","children":[["$","svg",null,{"ref":"$undefined","xmlns":"http://www.w3.org/2000/svg","width":24,"height":24,"viewBox":"0 0 24 24","fill":"none","stroke":"currentColor","strokeWidth":2,"strokeLinecap":"round","strokeLinejoin":"round","className":"lucide lucide-graduation-cap w-4 h-4 sm:w-5 sm:h-5","children":[["$","path","j76jl0",{"d":"M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"}],["$","path","1lu8f3",{"d":"M22 10v6"}],["$","path","1r8lef",{"d":"M6 12.5V16a6 3 0 0 0 12 0v-3.5"}],"$undefined"]}],["$","span",null,{"children":"Formation"}]]}],["$","a",null,{"href":"https://www.youtube.com/@AYOUBTCF","target":"_blank","rel":"noopener noreferrer","className":"px-2 py-2 sm:p-3 bg-[#FF0000] hover:bg-[#CC0000] text-white rounded-lg font-semibold text-xs sm:text-base shadow-md hover:shadow-xl hover:scale-105 transition-all duration-300 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2","children":[["$","svg",null,{"ref":"$undefined","xmlns":"http://www.w3.org/2000/svg","width":24,"height":24,"viewBox":"0 0 24 24","fill":"none","stroke":"currentColor","strokeWidth":2,"strokeLinecap":"round","strokeLinejoin":"round","className":"lucide lucide-play w-4 h-4 sm:w-5 sm:h-5","children":[["$","polygon","1oa8hb",{"points":"6 3 20 12 6 21 6 3"}],"$undefined"]}],["$","span",null,{"children":"YouTube"}]]}]]}]]}],["$","div",null,{"className":"space-y-4 sm:space-y-6","children":[["$","$L4f","2103",{"party":{"id":2103,"jour":1,"monthSlug":"httpsstaging-tcf-canada-nextbendevaiepreuveexpression-oralesujets-actualitesjanvier-2026","sujets":"$1a:props:children:1:props:parties:0:sujets"},"isAdmin":false}],["$","$L4f","2104",{"party":{"id":2104,"jour":2,"monthSlug":"httpsstaging-tcf-canada-nextbendevaiepreuveexpression-oralesujets-actualitesjanvier-2026","sujets":"$1a:props:children:1:props:parties:1:sujets"},"isAdmin":false}],["$","$L4f","2105",{"party":{"id":2105,"jour":3,"monthSlug":"httpsstaging-tcf-canada-nextbendevaiepreuveexpression-oralesujets-actualitesjanvier-2026","sujets":"$1a:props:children:1:props:parties:2:sujets"},"isAdmin":false}],["$","$L4f","2106",{"party":{"id":2106,"jour":4,"monthSlug":"httpsstaging-tcf-canada-nextbendevaiepreuveexpression-oralesujets-actualitesjanvier-2026","sujets":"$1a:props:children:1:props:parties:3:sujets"},"isAdmin":false}],"$L50","$L51","$L52"]}]]}]}]
+
+
+=== CHUNK 77 (len=753) ===
+50:["$","$L4f","2107",{"party":{"id":2107,"jour":5,"monthSlug":"httpsstaging-tcf-canada-nextbendevaiepreuveexpression-oralesujets-actualitesjanvier-2026","sujets":"$1a:props:children:1:props:parties:4:sujets"},"isAdmin":false}]
+51:["$","$L4f","2108",{"party":{"id":2108,"jour":6,"monthSlug":"httpsstaging-tcf-canada-nextbendevaiepreuveexpression-oralesujets-actualitesjanvier-2026","sujets":"$1a:props:children:1:props:parties:5:sujets"},"isAdmin":false}]
+52:["$","$L4f","2109",{"party":{"id":2109,"jour":7,"monthSlug":"httpsstaging-tcf-canada-nextbendevaiepreuveexpression-oralesujets-actualitesjanvier-2026","sujets":"$1a:props:children:1:props:parties:6:sujets"},"isAdmin":false}]

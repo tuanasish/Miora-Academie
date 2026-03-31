@@ -1,0 +1,28 @@
+{
+  "total": 320,
+  "keys": [
+    "id",
+    "titre",
+    "monthId",
+    "monthName",
+    "monthYear",
+    "orderIndex",
+    "tache1Sujet",
+    "tache1Correction",
+    "tache2Sujet",
+    "tache2Correction",
+    "tache3Titre",
+    "tache3Document1",
+    "tache3Document2",
+    "tache3Correction"
+  ],
+  "id": 241,
+  "titre": "Combinaison 1",
+  "month": "Août 2025",
+  "t1_sujet": "Vous voulez aller à un festival de films dans votre ville. Rédigez un message à un ami pour lui proposer de vous accompagner. Indiquez clairement les détails de l’événement (films, horaires, dates et ",
+  "t2_sujet": "Vous êtes allé à un festival de cinéma et vous avez regardé un film qui vous a laissé une forte impression. Rédigez un message à vos amis pour partager votre expérience et leur donner votre avis sur c",
+  "t3_titre": "Les maisons de retraite, pour ou contre ?",
+  "t3_doc1_type": "object",
+  "t3_doc1": "{\"contenu\":\"Les maisons de retraite représentent une solution adaptée pour les personnes âgées. Elles y bénéficient de soins appropriés et d’un encadrement professionnel. En plus, elles ont la possibi",
+  "t3_doc2": "{\"contenu\":\"Les maisons de retraite peuvent priver les personnes âgées de la présence de leur famille et donner l’impression d’être abandonné. De plus, les conditions de vie ne sont pas toujours satis"
+}

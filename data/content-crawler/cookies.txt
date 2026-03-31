@@ -1,0 +1,66 @@
+[
+    {
+        "domain": "app.formation-tcfcanada.com",
+        "expirationDate": 1806369420,
+        "hostOnly": true,
+        "httpOnly": false,
+        "name": "__session",
+        "path": "/",
+        "sameSite": "lax",
+        "secure": true,
+        "session": false,
+        "storeId": null,
+        "value": "eyJhbGciOiJSUzI1NiIsImNhdCI6ImNsX0I3ZDRQRDExMUFBQSIsImtpZCI6Imluc18zQW92OUVLd3ZZZUYxVHQ3djM4OHd5VU14SVkiLCJ0eXAiOiJKV1QifQ.eyJhenAiOiJodHRwczovL2FwcC5mb3JtYXRpb24tdGNmY2FuYWRhLmNvbSIsImV4cCI6MTc3NDgzMzQ3OSwiZnZhIjpbMiwtMV0sImlhdCI6MTc3NDgzMzQxOSwiaXNzIjoiaHR0cHM6Ly9jbGVyay5hcHAuZm9ybWF0aW9uLXRjZmNhbmFkYS5jb20iLCJuYmYiOjE3NzQ4MzM0MDksInNpZCI6InNlc3NfM0JkeVhRU2t1alVWYVpGMUR3VHpUVjdQNXVlIiwic3RzIjoiYWN0aXZlIiwic3ViIjoidXNlcl8zQXRVUkVJTFMxRzNJeFlGaTJHd1FVOGZseU0iLCJ2IjoyfQ.phJblJ0mc7C2NulZ6bRT5jo0BiuMvQ9b77VsjNii-OWxk30J6N7b5y9WRw0Lk2M3NDN0aGQsOaRu7dVAkP0hH3fOHNucvfdox__2DPAnHqhrIAASf38-x9OndsvM7VPTKo8wVB6XSLwXAlswLOgHMhGmGFyu0OWQ3d94VcnJiRANraJxDjL6varvGdEW9AaqwGpkr3sECdvHgWFXftJRynGHNSM2aGnds6xqBV3JtofUBFAZ6o0J-2OZvUJwQQzaXAUUwwcK0H09I9neXrwWmn4WjzdEc_h9TCJ5p6jLO-40pYePs6b6D5eQ8ECwBQSQuQNNpEZNsfxiZRVNPwwEkg"
+    },
+    {
+        "domain": "app.formation-tcfcanada.com",
+        "expirationDate": 1806369420,
+        "hostOnly": true,
+        "httpOnly": false,
+        "name": "__session_jkVcnK1L",
+        "path": "/",
+        "sameSite": "lax",
+        "secure": true,
+        "session": false,
+        "storeId": null,
+        "value": "eyJhbGciOiJSUzI1NiIsImNhdCI6ImNsX0I3ZDRQRDExMUFBQSIsImtpZCI6Imluc18zQW92OUVLd3ZZZUYxVHQ3djM4OHd5VU14SVkiLCJ0eXAiOiJKV1QifQ.eyJhenAiOiJodHRwczovL2FwcC5mb3JtYXRpb24tdGNmY2FuYWRhLmNvbSIsImV4cCI6MTc3NDgzMzQ3OSwiZnZhIjpbMiwtMV0sImlhdCI6MTc3NDgzMzQxOSwiaXNzIjoiaHR0cHM6Ly9jbGVyay5hcHAuZm9ybWF0aW9uLXRjZmNhbmFkYS5jb20iLCJuYmYiOjE3NzQ4MzM0MDksInNpZCI6InNlc3NfM0JkeVhRU2t1alVWYVpGMUR3VHpUVjdQNXVlIiwic3RzIjoiYWN0aXZlIiwic3ViIjoidXNlcl8zQXRVUkVJTFMxRzNJeFlGaTJHd1FVOGZseU0iLCJ2IjoyfQ.phJblJ0mc7C2NulZ6bRT5jo0BiuMvQ9b77VsjNii-OWxk30J6N7b5y9WRw0Lk2M3NDN0aGQsOaRu7dVAkP0hH3fOHNucvfdox__2DPAnHqhrIAASf38-x9OndsvM7VPTKo8wVB6XSLwXAlswLOgHMhGmGFyu0OWQ3d94VcnJiRANraJxDjL6varvGdEW9AaqwGpkr3sECdvHgWFXftJRynGHNSM2aGnds6xqBV3JtofUBFAZ6o0J-2OZvUJwQQzaXAUUwwcK0H09I9neXrwWmn4WjzdEc_h9TCJ5p6jLO-40pYePs6b6D5eQ8ECwBQSQuQNNpEZNsfxiZRVNPwwEkg"
+    },
+    {
+        "domain": ".formation-tcfcanada.com",
+        "expirationDate": 1809393418.519302,
+        "hostOnly": false,
+        "httpOnly": false,
+        "name": "__client_uat",
+        "path": "/",
+        "sameSite": "lax",
+        "secure": true,
+        "session": false,
+        "storeId": null,
+        "value": "1774833280"
+    },
+    {
+        "domain": "app.formation-tcfcanada.com",
+        "hostOnly": true,
+        "httpOnly": false,
+        "name": "clerk_active_context",
+        "path": "/",
+        "sameSite": null,
+        "secure": true,
+        "session": true,
+        "storeId": null,
+        "value": "sess_3BdyXQSkujUVaZF1DwTzTV7P5ue:"
+    },
+    {
+        "domain": ".formation-tcfcanada.com",
+        "expirationDate": 1809393418.519645,
+        "hostOnly": false,
+        "httpOnly": false,
+        "name": "__client_uat_jkVcnK1L",
+        "path": "/",
+        "sameSite": "lax",
+        "secure": true,
+        "session": false,
+        "storeId": null,
+        "value": "1774833280"
+    }
+]

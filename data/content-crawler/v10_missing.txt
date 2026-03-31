@@ -1,0 +1,119 @@
+Total: 2745 | Resolved: 2726 | Missing: 19
+
+================================================================================
+DANH S├üCH C├éU THIß║╛U ─É├üP ├üN (─æß╗â kiß╗âm tra thß╗º c├┤ng tr├¬n web):
+================================================================================
+
+[1/19] Janvier 2025 | Jour 6 | T├óche 3
+   ID: 15513
+   ─Éß╗ü b├ái: Travailler jusquΓÇÖ├á 70 ans. QuΓÇÖen pensez-vous ?
+   Gi├í trß╗ï hiß╗çn tß║íi: "$44"
+   URL: https://app.formation-tcfcanada.com/epreuve/expression-orale/sujets-actualites/janvier-2025
+
+[2/19] F├⌐vrier 2025 | Jour 6 | T├óche 2
+   ID: 15487
+   ─Éß╗ü b├ái: Je suis un(e) employ├⌐(e) de lΓÇÖagence de transports en commun de la ville. CΓÇÖest votre premi├¿re visite. Vous mΓÇÖinterrogez pour savoir comment fonctionnent les transports en commun ici (type de transports, tarifs, horaires,
+   Gi├í trß╗ï hiß╗çn tß║íi: "$4f"
+   URL: https://app.formation-tcfcanada.com/epreuve/expression-orale/sujets-actualites/fevrier-2025
+
+[3/19] Septembre 2024 | Jour 1 | T├óche 3
+   ID: 15794
+   ─Éß╗ü b├ái: Quand on sΓÇÖinstalle dans un nouveau pays, est-ce quΓÇÖil faut changer ses habitudes de vie (alimentation, vacances, v├¬tements, etc.)?
+   Gi├í trß╗ï hiß╗çn tß║íi: ""
+   URL: https://app.formation-tcfcanada.com/epreuve/expression-orale/sujets-actualites/septembre-2024
+
+[4/19] D├⌐cembre 2024 | Jour 8 | T├óche 3
+   ID: 15607
+   ─Éß╗ü b├ái: ├Ç votre avis, lΓÇÖusage des t├⌐l├⌐phones portables devrait-il ├¬tre interdit aux enfants ? Pourquoi ?
+   Gi├í trß╗ï hiß╗çn tß║íi: "$52"
+   URL: https://app.formation-tcfcanada.com/epreuve/expression-orale/sujets-actualites/decembre-2024
+
+[5/19] Janvier 2023 | Jour 4 | T├óche 2
+   ID: 17347
+   ─Éß╗ü b├ái: Je suis votre ami, vous recevrez un groupe d'amis chez vous et vous avez besoin de conseils. Posez-moi des questions.
+   Gi├í trß╗ï hiß╗çn tß║íi: "$35"
+   URL: https://app.formation-tcfcanada.com/epreuve/expression-orale/sujets-actualites/janvier-2023
+
+[6/19] Janvier 2023 | Jour 4 | T├óche 2
+   ID: 17351
+   ─Éß╗ü b├ái: Je suis votre ami, nous allons rendre visite ├á notre ami dans une autre ville. Posez-moi des questions.
+   Gi├í trß╗ï hiß╗çn tß║íi: "$36"
+   URL: https://app.formation-tcfcanada.com/epreuve/expression-orale/sujets-actualites/janvier-2023
+
+[7/19] Avril 2023 | Jour 3 | T├óche 2
+   ID: 17271
+   ─Éß╗ü b├ái: Je suis votre ami(e), vous venez d'arriver au Canada et vous cherchez un parc de divertissement pour vos enfants. Posez-moi des questions.
+   Gi├í trß╗ï hiß╗çn tß║íi: "$32"
+   URL: https://app.formation-tcfcanada.com/epreuve/expression-orale/sujets-actualites/avril-2023
+
+[8/19] Mai 2023 | Jour 12 | T├óche 2
+   ID: 17256
+   ─Éß╗ü b├ái: je suis votre voisin, vous cherchez une baby-sitter, j'en connais une. Posez-moi des questions
+   Gi├í trß╗ï hiß╗çn tß║íi: "$4f"
+   URL: https://app.formation-tcfcanada.com/epreuve/expression-orale/sujets-actualites/mai-2023
+
+[9/19] Mai 2023 | Jour 12 | T├óche 2
+   ID: 17257
+   ─Éß╗ü b├ái: Je travaille ├á l'accueil d'un centre de formation. Vous souhaitez commencer une nouvelle formation professionnelle, Vous me posez des questions pour obtenir des informations (dur├⌐e, organisation, tarif, ..)
+   Gi├í trß╗ï hiß╗çn tß║íi: "$50"
+   URL: https://app.formation-tcfcanada.com/epreuve/expression-orale/sujets-actualites/mai-2023
+
+[10/19] Juin 2023 | Jour 4 | T├óche 2
+   ID: 17190
+   ─Éß╗ü b├ái: Je travaille dans un office de tourisme. Vous voulez partir en week-end mais vous ne voulez pas d├⌐penser beaucoup d'argent. Demandez-moi des conseils (lieux, activit├⌐s, transports, etc.).
+   Gi├í trß╗ï hiß╗çn tß║íi: "$31"
+   URL: https://app.formation-tcfcanada.com/epreuve/expression-orale/sujets-actualites/juin-2023
+
+[11/19] Juin 2023 | Jour 4 | T├óche 2
+   ID: 17191
+   ─Éß╗ü b├ái: Je travaille ├á l'accueil d'un club sportif de votre ville. Vous voulez faire du sport. Vous me posez des questions pour d├⌐cider si vous allez vous inscrire (cours, tarifs, horaires etc)
+   Gi├í trß╗ï hiß╗çn tß║íi: "$32"
+   URL: https://app.formation-tcfcanada.com/epreuve/expression-orale/sujets-actualites/juin-2023
+
+[12/19] Juin 2023 | Jour 4 | T├óche 2
+   ID: 17192
+   ─Éß╗ü b├ái: Nous sommes amis. Vous voulez vous installer au Canada. J'habite dans un appartement en colocation ├á Toronto vous propose de partager mon appartement. Vous me posez des questions pour d├⌐cider si vous allez accepter (appartement, quartier, habitudes de vie, etc.).
+   Gi├í trß╗ï hiß╗çn tß║íi: "$33"
+   URL: https://app.formation-tcfcanada.com/epreuve/expression-orale/sujets-actualites/juin-2023
+
+[13/19] Ao├╗t 2023 | Jour 4 | T├óche 2
+   ID: 17151
+   ─Éß╗ü b├ái: Je suis votre coll├¿gue. C'est votre premier jour de travail dans une entreprise canadienne. Vous me posez des questions sur l'entreprise (organisation, coll├¿gues, repas, etc.).
+   Gi├í trß╗ï hiß╗çn tß║íi: "$2e"
+   URL: https://app.formation-tcfcanada.com/epreuve/expression-orale/sujets-actualites/aout-2023
+
+[14/19] Ao├╗t 2023 | Jour 4 | T├óche 2
+   ID: 17152
+   ─Éß╗ü b├ái: Je travaille au secr├⌐tariat d'une universit├⌐ ├á Calgary. Vous ├¬tes int├⌐ress├⌐(e) par nos cours de langues pour adultes. Vous me posez des questions pour avoir des informations sur les offres de cours propos├⌐s (langues, prix, horaires, etc.).
+   Gi├í trß╗ï hiß╗çn tß║íi: "$2f"
+   URL: https://app.formation-tcfcanada.com/epreuve/expression-orale/sujets-actualites/aout-2023
+
+[15/19] Octobre 2023 | Jour 12 | T├óche 2
+   ID: 17065
+   ─Éß╗ü b├ái: Je travaille dans une agence de voyage, vous voulez passer des vacances au bord de la mer. Posez-moi des questions
+   Gi├í trß╗ï hiß╗çn tß║íi: "$7f"
+   URL: https://app.formation-tcfcanada.com/epreuve/expression-orale/sujets-actualites/octobre-2023
+
+[16/19] Octobre 2023 | Jour 12 | T├óche 2
+   ID: 17069
+   ─Éß╗ü b├ái: Je suis votre voisin, vous venez de vous installer ├á la ville de Vancouver. Posez-moi des questions sur les moyens de transports disponibles (type, horaire, prix)
+   Gi├í trß╗ï hiß╗çn tß║íi: "$80"
+   URL: https://app.formation-tcfcanada.com/epreuve/expression-orale/sujets-actualites/octobre-2023
+
+[17/19] Novembre 2023 | Jour 3 | T├óche 2
+   ID: 16823
+   ─Éß╗ü b├ái: Je suis votre ami. Vous venez dΓÇÖarriver au Canada et vous avez un entretien dΓÇÖembauche. Posez-moi des questions pour vous renseigner sur son d├⌐roulement.
+   Gi├í trß╗ï hiß╗çn tß║íi: ""
+   URL: https://app.formation-tcfcanada.com/epreuve/expression-orale/sujets-actualites/novembre-2023
+
+[18/19] Novembre 2023 | Jour 9 | T├óche 2
+   ID: 16887
+   ─Éß╗ü b├ái: Vous voulez visiter une r├⌐gion qu├⌐b├⌐coise. Vous allez ├á lΓÇÖoffice du tourisme pour vous renseigner sur les h├⌐bergements dans cette r├⌐gion (type dΓÇÖh├⌐bergement, situation, prix, etc.). Je suis lΓÇÖemploy├⌐(e) de lΓÇÖoffice du tourisme qui vous accueille.
+   Gi├í trß╗ï hiß╗çn tß║íi: ""
+   URL: https://app.formation-tcfcanada.com/epreuve/expression-orale/sujets-actualites/novembre-2023
+
+[19/19] Novembre 2023 | Jour 14 | T├óche 3
+   ID: 16939
+   ─Éß╗ü b├ái: Certaines personnes pr├⌐f├¿rent voyager seules. QuΓÇÖen pensez vous
+   Gi├í trß╗ï hiß╗çn tß║íi: ""
+   URL: https://app.formation-tcfcanada.com/epreuve/expression-orale/sujets-actualites/novembre-2023

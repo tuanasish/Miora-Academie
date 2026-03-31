@@ -1,0 +1,22 @@
+{
+  "months": 38,
+  "month0_name": "Mars 2026",
+  "month0_parties": 12,
+  "partie0_sujets": 10,
+  "tache_distribution": {
+    "2": 5,
+    "3": 5
+  },
+  "sujet0": {
+    "tache": 2,
+    "title": "Je suis un(e) de vos collègues. Vous êtes nouveau (nouvelle) dans l’entreprise. Vous me posez des questions pour obtenir des informations sur l’entreprise (organisation du travail, collègues, restauration, etc.).",
+    "description": "",
+    "question": null
+  },
+  "sujet1": {
+    "tache": 3,
+    "title": "La gentillesse permet toujours d’être entendu et respecté. Êtes-vous d’accord avec cette affirmation ?",
+    "description": null,
+    "question": ""
+  }
+}

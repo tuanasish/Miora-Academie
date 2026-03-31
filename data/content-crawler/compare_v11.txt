@@ -1,0 +1,35 @@
+
+Γ¥î LOST: Mars 2023 | Partie 5 | T2 | ID:17375
+   OLD (3977 chars): "guise de remerciement ?33:T4b0,1. Dans quelle ville se trouve notre ami que nous..."
+   OLD END: "...8. Comment est-ce que je peux divertir ton enfant et lui fai"
+   NEW (3 chars): "$30"
+
+Γ¥î LOST: Mars 2023 | Partie 5 | T2 | ID:17376
+   OLD (3977 chars): "guise de remerciement ?33:T4b0,1. Dans quelle ville se trouve notre ami que nous..."
+   OLD END: "...8. Comment est-ce que je peux divertir ton enfant et lui fai"
+   NEW (3 chars): "$31"
+
+Γ¥î LOST: Mars 2023 | Partie 6 | T2 | ID:17377
+   OLD (3977 chars): "guise de remerciement ?33:T4b0,1. Dans quelle ville se trouve notre ami que nous..."
+   OLD END: "...8. Comment est-ce que je peux divertir ton enfant et lui fai"
+   NEW (3 chars): "$32"
+
+Γ¥î LOST: Mai 2023 | Partie 7 | T2 | ID:17229
+   OLD (3928 chars): "e prendre une d├⌐cision dΓÇÖachat ?41:T4e1,1. Quelles sont les dates pr├⌐cises auxqu..."
+   OLD END: "...es dΓÇÖanimaux de compagnie?
+7. Quels sont les avantages et le"
+   NEW (3 chars): "$3e"
+
+Γ¥î LOST: Mai 2023 | Partie 7 | T2 | ID:17230
+   OLD (3928 chars): "e prendre une d├⌐cision dΓÇÖachat ?41:T4e1,1. Quelles sont les dates pr├⌐cises auxqu..."
+   OLD END: "...es dΓÇÖanimaux de compagnie?
+7. Quels sont les avantages et le"
+   NEW (3 chars): "$3f"
+
+Γ¥î LOST: Mai 2023 | Partie 7 | T2 | ID:17232
+   OLD (3928 chars): "e prendre une d├⌐cision dΓÇÖachat ?41:T4e1,1. Quelles sont les dates pr├⌐cises auxqu..."
+   OLD END: "...es dΓÇÖanimaux de compagnie?
+7. Quels sont les avantages et le"
+   NEW (3 chars): "$40"
+
+Total lost: 6

@@ -1,0 +1,346 @@
+"use client";
+import { useState, useEffect } from "react";
+import {
+  PenLine, ChevronLeft, Clock, Hash, Timer, Send, Play, Pause, RotateCcw, AlignLeft, CheckCircle2, Loader2,
+} from "lucide-react";
+import { useCountdown, useStopwatch } from "@/hooks/useTimer";
+import Link from "next/link";
+import { useParams } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
+import { submitExam } from "@/lib/submitExam";
+
+const frenchKeys = [
+  "à","â","ç","é","è","ê","ë","î","ï","ô","ù","û","ü","œ","æ",
+  "À","Â","Ç","É","È","Ê","Ë","Î","Ï","Ô","Ù","Û","Ü","Œ","Æ",
+];
+
+interface WritingItem {
+  id: number;
+  titre: string;
+  monthName: string;
+  tache1Sujet: string;
+  tache2Sujet: string;
+  tache3Titre: string;
+  tache3Document1: { contenu: string } | string | null;
+  tache3Document2: { contenu: string } | string | null;
+}
+
+interface WritingData {
+  data: { items: WritingItem[] };
+}
+
+function getDoc(v: { contenu: string } | string | null): string {
+  if (!v) return "";
+  if (typeof v === "string") return v;
+  return v.contenu || "";
+}
+
+export default function WritingExamPage() {
+  const params = useParams();
+  const combinaisonId = Number(params.combinaisonId);
+
+  const [item, setItem] = useState<WritingItem | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [activeTask, setActiveTask] = useState(0);
+  const [texts, setTexts] = useState(["", "", ""]);
+  const [taskTimes, setTaskTimes] = useState([0, 0, 0]);
+  const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  const globalTimer = useCountdown(60 * 60, true);
+  const stopwatch = useStopwatch(true);
+
+  useEffect(() => {
+    fetch("/data/writing.json")
+      .then((r) => r.json())
+      .then((json: WritingData) => {
+        const found = json.data.items.find((x) => x.id === combinaisonId);
+        setItem(found || null);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, [combinaisonId]);
+
+  const tasks = item
+    ? [
+        { id: 0, label: "Tâche 1", prompt: item.tache1Sujet, minWords: 60 },
+        { id: 1, label: "Tâche 2", prompt: item.tache2Sujet, minWords: 80 },
+        {
+          id: 2,
+          label: "Tâche 3",
+          prompt: item.tache3Titre,
+          doc1: getDoc(item.tache3Document1),
+          doc2: getDoc(item.tache3Document2),
+          minWords: 120,
+        },
+      ]
+    : [];
+
+  const handleTaskSwitch = (idx: number) => {
+    if (idx === activeTask) return;
+    const saved = [...taskTimes];
+    saved[activeTask] = stopwatch.seconds;
+    setTaskTimes(saved);
+    stopwatch.reset();
+    setTimeout(() => stopwatch.start(), 50);
+    setActiveTask(idx);
+  };
+
+  const wordCount = (text: string) =>
+    text.trim() === "" ? 0 : text.trim().split(/\s+/).length;
+
+  const insertChar = (char: string) => {
+    setTexts((prev) => { const n = [...prev]; n[activeTask] += char; return n; });
+  };
+
+  if (loading) return (
+    <div className="h-screen flex items-center justify-center">
+      <div className="w-10 h-10 border-4 border-violet-300 border-t-violet-600 rounded-full animate-spin" />
+    </div>
+  );
+
+  if (!item) return (
+    <div className="h-screen flex flex-col items-center justify-center gap-4">
+      <p className="text-slate-500">Combinaison không tồn tại.</p>
+      <Link href="/exam/writing" className="text-violet-600 hover:underline">← Quay lại</Link>
+    </div>
+  );
+
+  if (submitted) {
+    const wc = texts.map(wordCount);
+    return (
+      <div className="h-screen flex items-center justify-center bg-slate-50">
+        <div className="bg-white rounded-2xl shadow-xl p-10 max-w-md text-center space-y-5">
+          <CheckCircle2 className="w-16 h-16 text-emerald-500 mx-auto" />
+          <h2 className="text-2xl font-bold text-slate-900">Bài đã nộp!</h2>
+          <p className="text-slate-500 text-sm">{item.titre} — {item.monthName}</p>
+          <div className="bg-slate-50 rounded-xl p-4 space-y-2 text-left">
+            {["Tâche 1", "Tâche 2", "Tâche 3"].map((t, i) => (
+              <div key={i} className="flex justify-between text-sm">
+                <span className="text-slate-600">{t}</span>
+                <span className={`font-bold ${wc[i] >= [60,80,120][i] ? "text-emerald-600" : "text-orange-500"}`}>
+                  {wc[i]} mots {wc[i] < [60,80,120][i] ? `(min ${[60,80,120][i]})` : "✓"}
+                </span>
+              </div>
+            ))}
+          </div>
+          <Link href="/exam/writing" className="block text-violet-600 hover:underline text-sm">← Chọn Combinaison khác</Link>
+        </div>
+      </div>
+    );
+  }
+
+  const task = tasks[activeTask];
+  const wc = wordCount(texts[activeTask]);
+  const minWords = task?.minWords || 60;
+  const timerColor = globalTimer.seconds < 300
+    ? "bg-red-50 border-red-300 text-red-700"
+    : globalTimer.seconds < 600
+    ? "bg-orange-50 border-orange-200 text-orange-600"
+    : "bg-violet-50 border-violet-200 text-violet-700";
+
+  return (
+    <div className="h-screen flex flex-col bg-slate-100 overflow-hidden">
+      {/* Header */}
+      <header className="bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between shrink-0 gap-4">
+        <div className="flex items-center gap-3 min-w-0">
+          <Link href="/exam/writing" className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-800 shrink-0 transition-colors">
+            <ChevronLeft className="w-4 h-4" />Danh sách
+          </Link>
+          <span className="text-slate-300 shrink-0">|</span>
+          <PenLine className="w-4 h-4 text-violet-500 shrink-0" />
+          <h1 className="font-bold text-slate-800 truncate">
+            Expression Écrite — <span className="text-violet-600">{item.titre}</span>
+            <span className="text-slate-400 font-normal ml-2 text-sm">{item.monthName}</span>
+          </h1>
+        </div>
+        <div className={`flex items-center gap-2 border font-mono font-bold px-4 py-1.5 rounded-full text-sm shrink-0 ${timerColor}`}>
+          <Clock className="w-4 h-4" />
+          {globalTimer.formatted}
+          {globalTimer.isExpired && <span className="text-xs font-sans font-normal animate-pulse">Hết giờ!</span>}
+        </div>
+      </header>
+
+      <div className="flex flex-1 overflow-hidden">
+        {/* LEFT Nav */}
+        <aside className="w-48 bg-white border-r border-slate-200 flex flex-col shrink-0">
+          <div className="p-3 border-b border-slate-100">
+            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Các Tâches</p>
+          </div>
+          <div className="flex flex-col p-3 gap-2">
+            {tasks.map((t, idx) => {
+              const thisTime = idx === activeTask ? stopwatch.seconds : taskTimes[idx];
+              const mins = String(Math.floor(thisTime / 60)).padStart(2, "0");
+              const secs = String(thisTime % 60).padStart(2, "0");
+              const wc2 = wordCount(texts[idx]);
+              return (
+                <button
+                  key={t.id}
+                  onClick={() => handleTaskSwitch(idx)}
+                  className={`w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                    activeTask === idx ? "bg-violet-600 text-white shadow" : "text-slate-600 hover:bg-slate-100"
+                  }`}
+                >
+                  <div className="font-semibold">{t.label}</div>
+                  <div className={`text-xs mt-0.5 font-mono ${activeTask === idx ? "text-violet-200" : "text-slate-400"}`}>
+                    ⏱ {mins}:{secs} · {wc2} mots
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+          <div className="mt-auto p-3 space-y-2">
+            {submitError && (
+              <p className="text-xs text-red-500 text-center">{submitError}</p>
+            )}
+            <button
+              onClick={async () => {
+                setSubmitting(true);
+                setSubmitError(null);
+                // Save final task time
+                const finalTimes = [...taskTimes];
+                finalTimes[activeTask] = stopwatch.seconds;
+                const supabase = createClient();
+                const { data: { user } } = await supabase.auth.getUser();
+                const wc = texts.map((t) => t.trim() === "" ? 0 : t.trim().split(/\s+/).length);
+                const elapsed = 60 * 60 - globalTimer.seconds;
+                const result = await submitExam({
+                  exam_type: "writing",
+                  combinaison_id: combinaisonId,
+                  student_email: user?.email ?? "anonymous",
+                  student_id: user?.id ?? "",
+                  writing_task1: texts[0],
+                  writing_task2: texts[1],
+                  writing_task3: texts[2],
+                  word_counts: { t1: wc[0], t2: wc[1], t3: wc[2] },
+                  task_times: { t1: finalTimes[0], t2: finalTimes[1], t3: finalTimes[2] },
+                  time_spent_seconds: elapsed,
+                });
+                setSubmitting(false);
+                if (result.success) setSubmitted(true);
+                else setSubmitError("Lỗi lưu bài: " + result.error);
+              }}
+              disabled={submitting}
+              className="w-full flex items-center justify-center gap-2 bg-violet-600 hover:bg-violet-700 disabled:opacity-60 text-white text-sm font-semibold py-2.5 px-4 rounded-xl transition-colors"
+            >
+              {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+              {submitting ? "Đang lưu..." : "Nộp bài"}
+            </button>
+          </div>
+        </aside>
+
+        {/* CENTER */}
+        <main className="flex-1 flex flex-col overflow-hidden">
+          {/* Prompt area */}
+          <div className="bg-amber-50 border-b border-amber-200 p-4 shrink-0">
+            <div className="flex items-center gap-2 mb-2">
+              <AlignLeft className="w-4 h-4 text-amber-600" />
+              <span className="text-xs font-bold text-amber-700 uppercase tracking-wider">
+                Sujet — {task?.label}
+              </span>
+              <span className="ml-auto text-xs text-amber-600 font-semibold bg-amber-100 px-2 py-0.5 rounded-full">
+                min {minWords} mots
+              </span>
+            </div>
+            <p className="text-sm text-slate-800 leading-relaxed font-medium">
+              {activeTask === 2 ? (
+                <span className="font-bold text-slate-900">{task?.prompt}</span>
+              ) : (
+                task?.prompt
+              )}
+            </p>
+            {/* Task 3 documents */}
+            {activeTask === 2 && tasks[2] && (
+              <div className="grid grid-cols-2 gap-3 mt-3">
+                {tasks[2].doc1 && (
+                  <div className="bg-white border border-amber-200 rounded-xl p-3 text-xs text-slate-700 leading-relaxed">
+                    <p className="font-bold text-emerald-700 mb-1">📄 Document POUR</p>
+                    {tasks[2].doc1}
+                  </div>
+                )}
+                {tasks[2].doc2 && (
+                  <div className="bg-white border border-amber-200 rounded-xl p-3 text-xs text-slate-700 leading-relaxed">
+                    <p className="font-bold text-red-600 mb-1">📄 Document CONTRE</p>
+                    {tasks[2].doc2}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Text area */}
+          <div className="flex-1 p-4 overflow-hidden">
+            <textarea
+              className="w-full h-full resize-none border border-slate-200 rounded-xl p-4 text-slate-800 text-sm leading-relaxed bg-white focus:outline-none focus:ring-2 focus:ring-violet-300"
+              placeholder="Commencez à écrire ici..."
+              value={texts[activeTask]}
+              onChange={(e) => {
+                setTexts((prev) => { const n = [...prev]; n[activeTask] = e.target.value; return n; });
+              }}
+            />
+          </div>
+        </main>
+
+        {/* RIGHT Panel */}
+        <aside className="w-56 bg-white border-l border-slate-200 flex flex-col shrink-0 overflow-y-auto">
+          {/* Stopwatch */}
+          <div className="p-4 border-b border-slate-100">
+            <div className="flex items-center gap-2 mb-3">
+              <Timer className="w-4 h-4 text-violet-600" />
+              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Bấm giờ task</span>
+            </div>
+            <div className="text-2xl font-mono font-bold text-violet-700 text-center bg-violet-50 rounded-xl py-2">
+              {stopwatch.formatted}
+            </div>
+            <div className="flex gap-2 mt-2">
+              <button
+                onClick={stopwatch.isRunning ? stopwatch.pause : stopwatch.start}
+                className="flex-1 flex items-center justify-center gap-1 text-xs py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-600 transition-colors"
+              >
+                {stopwatch.isRunning ? <><Pause className="w-3 h-3" />Dừng</> : <><Play className="w-3 h-3" />Tiếp</>}
+              </button>
+              <button onClick={stopwatch.reset} className="px-2 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-400 transition-colors">
+                <RotateCcw className="w-3 h-3" />
+              </button>
+            </div>
+          </div>
+
+          {/* Word count */}
+          <div className="p-4 border-b border-slate-100">
+            <div className="flex items-center gap-2 mb-2">
+              <Hash className="w-4 h-4 text-emerald-600" />
+              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Số từ</span>
+            </div>
+            <div className={`text-3xl font-bold text-center ${wc >= minWords ? "text-emerald-600" : "text-orange-500"}`}>
+              {wc}
+            </div>
+            <div className="mt-1.5 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+              <div
+                className={`h-full rounded-full transition-all ${wc >= minWords ? "bg-emerald-500" : "bg-orange-400"}`}
+                style={{ width: `${Math.min(100, (wc / minWords) * 100)}%` }}
+              />
+            </div>
+            <p className="text-xs text-center text-slate-400 mt-1">objectif: {minWords} mots</p>
+          </div>
+
+          {/* French keyboard */}
+          <div className="p-4">
+            <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Clavier français</p>
+            <div className="grid grid-cols-4 gap-1.5">
+              {frenchKeys.map((char) => (
+                <button
+                  key={char}
+                  onClick={() => insertChar(char)}
+                  className="bg-slate-100 hover:bg-violet-100 hover:text-violet-700 text-slate-700 font-medium text-sm py-2 rounded-lg transition-colors"
+                >
+                  {char}
+                </button>
+              ))}
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  );
+}

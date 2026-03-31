@@ -1,0 +1,269 @@
+{
+  "crawledAt": "2026-03-30T02:15:05.728Z",
+  "source": "https://app.formation-tcfcanada.com",
+  "categories": {
+    "expression_ecrite": {
+      "label": "✍️ Expression Écrite",
+      "totalItems": 12,
+      "items": [
+        {
+          "id": 479,
+          "monthId": 38,
+          "monthName": "Mars 2026",
+          "orderIndex": 1,
+          "titre": "Combinaison 1",
+          "tache1Sujet": "Vous avez invité votre ami Cédric à votre mariage au Château de Chombony et\nil vous a répondu qu’il ne connait pas ce château. Décrivez à votre ami (lieu,\nlocalisation, transports, etc.).",
+          "tache1Correction": "Salut Cédric,\n\nJe comprends que tu ne connaisses pas le Château de Chombony. Il se situe à environ 30 minutes du centre-ville, dans un cadre magnifique entouré de verdure et de jardins. C’est un lieu très élégant, parfait pour célébrer un mariage. Le château se trouve près de l’autoroute principale et il est facilement accessible en voiture. Il y a un grand parking gratuit pour les invités. Si tu préfères les transports en commun, une gare se trouve à proximité et nous organiserons des navettes jusqu’au château. Tu verras, l’endroit est vraiment charmant et idéal pour une belle fête.\n\nA bientôt",
+          "tache2Sujet": "Dans votre blog, Racontez votre expérience de l’apprentissage d’une langue étrangère (vous écrivez sur un forum internet en racontant votre expérience en apprenant une langue étrangère).",
+          "tache2Correction": "Chers lecteurs,\nApprendre une langue étrangère a été pour moi un véritable défi, mais aussi une aventure passionnante. Au début, j’étais motivé(e), mais je me sentais un peu perdu(e) face à la grammaire et à la prononciation. J’avais surtout peur de faire des erreurs en parlant. Pour progresser, j’ai adopté une méthode simple : pratiquer chaque jour. J’ai commencé par regarder des vidéos et écouter des podcasts adaptés à mon niveau. Ensuite, j’ai rejoint un groupe de conversation en ligne. Même si c’était difficile au début, cela m’a permis de gagner en confiance. Avec le temps, j’ai constaté des progrès importants. Aujourd’hui, je comprends mieux et je peux m’exprimer plus facilement.\nJe recommande vivement de rester régulier, de ne pas avoir peur des erreurs et de pratiquer le plus possible avec des locuteurs natifs. La clé du succès est la persévérance.",
+          "tache3Titre": "Cuisinier Amateur Ou Cuisinier Professionnel ?",
+          "tache3Document1": {
+            "contenu": "Les amateurs ont fait des recettes réussies, mais ils manquent toujours des compétences et des technique, c’est pourquoi la formations et l’expérience sont nécessaires pour être un vrai cuisinier",
+            "opinion": "pour"
+          },
+          "tache3Document2": {
+            "contenu": "Il parle des cuisiniers qui ont appris le métier de cuisiniers sur internet et qui ont le buzz sur les réseaux sociaux il raconte aussi l’histoire d’une amatrice qui est\ndevenue professionnelle et qui a rédigé plusieurs livres sur la cuisine pour les\namateurs de cuisine à la maison.",
+            "opinion": "contre"
+          },
+          "tache3Correction": "T43a,Cuisinier amateur ou cuisinier professionnel : quelle est la différence ?"
+        },
+        {
+          "id": 481,
+          "monthId": 38,
+          "monthName": "Mars 2026",
+          "orderIndex": 2,
+          "titre": "Combinaison 2",
+          "tache1Sujet": "Votre ami Mehdi vient de d’emménager dans votre ville et cherche des\nrenseignements sur les moyens de transports. Écrivez un message en lui\ndonnant les informations nécessaires (types de transport, abonnement, tarif,\netc.)",
+          "tache1Correction": "Salut Mehdi,\nBienvenue dans ma ville ! Pour te déplacer facilement, tu as plusieurs options. Il y a des bus et un métro qui couvrent presque tous les quartiers. Les bus passent régulièrement, surtout aux heures de pointe. Le métro est rapide et pratique pour traverser la ville. Tu peux acheter un ticket à l’unité, mais je te conseille de prendre un abonnement mensuel si tu utilises souvent les transports. C’est plus économique. Il existe aussi une carte rechargeable qui permet de payer moins cher chaque trajet. Enfin, il y a des vélos en libre-service et des applications de covoiturage si tu préfères. N’hésite pas si tu as d’autres questions !",
+          "tache2Sujet": "Exprimez votre admiration pour une personnalité, célèbre ou non, en vous\nappuyant sur ses actions spécifiques. Rédigez un article de blog en détaillant\nles actions remarquables de cette personne et expliquez pourquoi vous l’aimez.",
+          "tache2Correction": "Une source d’inspiration au quotidien\nAujourd’hui, j’aimerais partager mon admiration pour une personne qui m’inspire\nprofondément : ma mère. Elle n’est pas célèbre, mais ses actions parlent d’elles-mêmes. Depuis toujours, elle travaille avec détermination pour assurer le bien-être de notre famille. Malgré les difficultés, elle n’a jamais abandonné ses objectifs et a toujours trouvé des solutions avec calme et courage.\nElle s’implique aussi dans des actions solidaires dans notre quartier, notamment en aidant des familles dans le besoin et en participant à des collectes de dons. Sa générosité et son sens du partage sont remarquables. Ce que j’admire le plus chez elle, c’est sa capacité à rester positive et à encourager les autres, même dans les moments difficiles. Elle m’a appris la persévérance, la patience et l’importance\nde croire en soi. Pour toutes ces raisons, elle reste mon plus grand modèle.",
+          "tache3Titre": "Vivre En Colocation",
+          "tache3Document1": {
+            "contenu": "La vie en colocation offre de nombreux avantages. Partager un logement avec\nd’autres personnes permet de réduire les dépenses, que ce soit le loyer, les factures ou les frais généraux. De plus, cela favorise les interactions sociales et les échanges culturels. Vivre avec des colocataires permet de rencontrer des individus de différents horizons, de nouer des amitiés et de partager des expériences enrichissantes.",
+            "opinion": "pour"
+          },
+          "tache3Document2": {
+            "contenu": "La colocation peut cependant présenter des défis. Les différences de personnalité et\nde mode de vie entre les colocataires peuvent entraîner des tensions. La gestion des\nresponsabilités et des tâches ménagères peut également être source de conflits. De\nplus, la colocation peut limiter l’intimité et l’espace personnel. Il est important d’établir une communication ouverte et respectueuse, ainsi que des règles de vie commune, pour favoriser une cohabitation harmonieuse.",
+            "opinion": "contre"
+          },
+          "tache3Correction": "Vivre en colocation : une bonne solution ?\nLa colocation est une option de logement de plus en plus populaire, notamment chez les étudiants et les jeunes travailleurs. Selon le document 1, elle permet de réduire les dépenses et favorise les échanges sociaux et culturels. Le document 2 souligne toutefois que des différences de personnalité et un manque d’intimité peuvent créer des tensions. À mon avis, la colocation présente plus d’avantages que d’inconvénients, surtout lorsqu’on a un budget limité. Partager le loyer et les factures permet de faire des économies importantes. De plus, vivre avec d’autres personnes peut être enrichissant sur le plan humain. On apprend à respecter les différences, à communiquer et à collaborer. Cependant, pour éviter les conflits, il\nest essentiel d’établir des règles claires dès le départ, notamment concernant le ménage et les responsabilités. Une bonne communication est la clé d’une cohabitation réussie."
+        },
+        {
+          "id": 482,
+          "monthId": 38,
+          "monthName": "Mars 2026",
+          "orderIndex": 3,
+          "titre": "Combinaison 3",
+          "tache1Sujet": "Vous voulez partir en week-end avec vos amis le mois prochain. Vous leur\nécrivez un message pour décrire votre projet (lieu, transport, activités, etc.).",
+          "tache1Correction": "Salut les amis,\nJe vous propose qu’on parte en week-end le mois prochain à Québec. C’est une ville magnifique avec beaucoup de choses à découvrir. On pourrait y aller en voiture, cela prendra environ trois heures et ce sera plus pratique pour se déplacer sur place. Sur place, on pourra visiter le Vieux-Québec, se promener près du fleuve et découvrir les petits cafés typiques. J’ai aussi vu qu’il y a des activités comme des visites guidées et des balades en bateau. Dites-moi si vous êtes disponibles et si l’idée vous plaît afin qu’on puisse réserver l’hébergement rapidement !",
+          "tache2Sujet": "COURRIER DES LECTEURS\nTout quitter pour partir en voyage pendant un an: bonne ou mauvaise idée ?\nRépondez sur notre site Internet : “voyage.internaute.fr”. Vous écrivez un\nmessage sur ce site internet, vous répondez à la question posée en prenant des\nexemples de votre vie personnelle.",
+          "tache2Correction": "Tout quitter pour voyager un an : une décision courageuse\nÀ mon avis, tout quitter pour partir en voyage pendant un an peut être une excellente idée, à condition d’être bien préparé. J’ai moi-même pris une pause dans mes études pour voyager plusieurs mois à l’étranger. Au début, j’avais peur de perdre du temps, mais cette expérience m’a énormément apporté.\nVoyager m’a permis de découvrir de nouvelles cultures, d’améliorer mes compétences linguistiques et de gagner en autonomie. J’ai appris à m’adapter à des situations imprévues et à sortir de ma zone de confort. Cette année m’a aidé à mieux comprendre mes objectifs professionnels. Cependant, il est important de planifier son budget et de réfléchir aux conséquences sur sa carrière. Selon moi, si le projet est réfléchi et organisé, partir un an peut être une expérience enrichissante et formatrice.",
+          "tache3Titre": "Le Travail : Favorable ou Défavorable ?",
+          "tache3Document1": {
+            "contenu": "Le travail est au centre de notre vie. Dès l’enfance, on entend souvent la question: «Qu’est-ce que tu veux faire quand tu seras grand ? ». Le travail devrait être synonyme de réussite et de satisfaction, mais il est trop souvent synonyme de fatigue et d’emprisonnement. Aujourd’hui, beaucoup pensent que l’on ne passe pas assez de temps avec sa famille, ses amis. Il est urgent de revoir la place occupée par le travail dans notre société. Certains pensent que travailler moins permettrait d’avoir plus de temps libre pour mieux vivre.",
+            "opinion": "pour"
+          },
+          "tache3Document2": {
+            "contenu": "Certaines personnes ont décidé d’arrêter de travailler pour changer de mode de vie.\nPourtant, aujourd’hui, travailler, c’est exister La question : «Qu’est-ce que tu fais dans\nla vie ?» revient souvent lors d’une première rencontre. Elle prouve que l’emploi fait\npartie de notre identité. D’après le spécialiste Jean-Daniel Remond, la vie en\nentreprise est très importante. Les contacts quotidiens, les réseaux, les amitiés,\nl’impression d’être utile, mais aussi les difficultés, tout cela contribue à construire\nnotre personnalité et notre identité.",
+            "opinion": "contre"
+          },
+          "tache3Correction": "T430,Le travail : favorable ou défavorable ?"
+        },
+        {
+          "id": 483,
+          "monthId": 38,
+          "monthName": "Mars 2026",
+          "orderIndex": 4,
+          "titre": "Combinaison 4",
+          "tache1Sujet": "“Bonjour, ça y est, j’ai obtenu mon visa pour le Canada. Je vais arriver le 3 mars.\nEst-ce que tu pourras m’aider à trouver un hôtel pour la première semaine ?\nMerci d’avance pour ton aide.”\nMatthias.\nVous avez trouvé un hôtel pour Matthias. Vous lui écrivez un courriel. Dans ce\nmessage vous décrivez l’hôtel et vous lui donnez toutes les informations utiles\n(situation, tarif…).",
+          "tache1Correction": "Salut Matthias,\nFélicitations pour ton visa ! J’ai trouvé un hôtel qui devrait te convenir pour ta première semaine. Il s’appelle “Hôtel Central Montréal” et il est situé près du centre-ville, à quelques minutes du métro. Tu pourras facilement te déplacer vers les principaux quartiers et les services administratifs. La chambre coûte environ 110 dollars par nuit, petit-déjeuner inclus. L’hôtel propose le Wi-Fi gratuit, une réception ouverte 24h/24 et un service de bagagerie. Les avis sont très positifs, surtout pour la propreté et l’accueil.\nSi tu es d’accord, je peux faire la réservation rapidement pour les dates du 3 au 10 mars. Dis moi ce que tu en penses !",
+          "tache2Sujet": "Vous êtes allés voir un spectacle (film, pièce de théâtre, concert, etc.) avec des\namis. Vous l’avez aimé. Sur votre blog, vous racontez votre soirée et vous\nexpliquez pourquoi vous avez aimé le spectacle.",
+          "tache2Correction": "Une soirée inoubliable au théâtre\nChers lecteurs,\nHier soir, je suis allé(e) voir une pièce de théâtre avec des amis, et je dois dire que j’ai passé un moment exceptionnel. La salle était pleine et l’ambiance très chaleureuse dès notre arrivée. La pièce racontait une histoire à la fois touchante et drôle, ce qui a captivé le public du début à la fin. J’ai particulièrement aimé le jeu des acteurs. Ils étaient très expressifs et naturels, ce qui rendait l’histoire encore plus réaliste. Les décors et les lumières étaient également bien réalisés et contribuaient à créer une atmosphère immersive.Ce spectacle m’a plu parce qu’il m’a fait rire, réfléchir et ressentir de vraies émotions. Partager\ncette expérience avec mes amis a rendu la soirée encore plus agréable. C’est une sortie que je recommande vivement !",
+          "tache3Titre": "Les Relations Amicales Au Travail",
+          "tache3Document1": {
+            "contenu": "Les amitiés entre collègues au travail peuvent être extrêmement bénéfiques. Elles favorisent un climat de travail agréable et une ambiance positive au sein de l’équipe. Avoir des amis parmi ses collègues permet de renforcer les liens professionnels et de créer un sentiment de camaraderie. Cela peut contribuer à une meilleure communication, une collaboration plus étroite et une résolution plus efficace des problèmes. De plus, partager des moments de convivialité en dehors du travail, comme des déjeuners ou des activités après le bureau peut renforcer les liens et créer une dynamique de groupe solide.",
+            "opinion": "pour"
+          },
+          "tache3Document2": {
+            "contenu": "Il est important de trouver un équilibre entre amitié et professionnalisme au travail. Les amitiés excessivement proches peuvent parfois créer des tensions ou des conflits lorsque des décisions professionnelles doivent être prises. De plus, les amitiés exclusives entre certains collègues peuvent exclure les autres membres de l’équipe, ce qui peut nuire à la cohésion et à la collaboration. Il est essentiel de maintenir des limites claires et de veiller à ce que les amitiés ne compromettent pas le professionnalisme, la hiérarchie ou la productivité au sein de l’organisation.",
+            "opinion": "contre"
+          },
+          "tache3Correction": "T437,Les relations amicales au travail : un atout ou un risque ?"
+        },
+        {
+          "id": 495,
+          "monthId": 38,
+          "monthName": "Mars 2026",
+          "orderIndex": 5,
+          "titre": "Combinaison 5",
+          "tache1Sujet": "Vous avez passé un week-end à la campagne. Écrivez un message à votre ami(e) pour \nlui décrire ce qui s’est passé. \n(60 mots minimum/120 mots maximum) ",
+          "tache1Correction": "Salut, \nJ’espère que tu vas bien. Je voulais te raconter mon week-end à la campagne. C’était vraiment reposant \net très agréable. Nous avons passé du temps dans un petit village entouré de nature. Nous avons fait une \nlongue promenade, puis un pique-nique près d’un champ. J’ai aussi vu des animaux comme des vaches \net des chevaux, ce qui m’a beaucoup plu. L’air était frais et l’ambiance très calme, loin du bruit de la \nville. Le soir, nous avons mangé un bon repas et discuté longtemps. Ce week-end m’a fait beaucoup de \nbien et j’aimerais y retourner bientôt. \nÀ bientôt, \nAyoub",
+          "tache2Sujet": "Votre direction est à la recherche d’une salle pour la fête de fin d’année, capable \nd’accueillir 100 invités. Rédigez un message à la direction pour leur dire que vous \navez trouvé un local idéal. (lieu, tarifs, services, etc.). \n(120 mots minimum/150 mots maximum)",
+          "tache2Correction": "Bonjour, \nJ’espère que vous allez bien. Je vous écris pour vous informer que j’ai trouvé une salle idéale pour \norganiser la fête de fin d’année. Il s’agit de la salle « Le Grand Salon », située en centre-ville, facilement \naccessible en transport en commun et disposant d’un parking à proximité. Elle peut accueillir jusqu’à \n120 personnes, ce qui correspond parfaitement à notre besoin de 100 invités. Le tarif de location est de \n950 $ pour la soirée, incluant les tables, les chaises, le service de nettoyage et un espace pour la musique. \nLa salle propose également un service traiteur en option, ainsi qu’un équipement audio et un \nvidéoprojecteur. \nSi vous le souhaitez, je peux organiser une visite cette semaine afin de confirmer la réservation. \nCordialement, \nAyoub",
+          "tache3Titre": "Utilisation des nouvelles technologies ",
+          "tache3Document1": {
+            "contenu": "Jean : Je suis fermement convaincu que l’intégration des nouvelles technologies dans les \nécoles est cruciale pour préparer les élèves à un avenir numérique. Je pense que l’usage \ndes tablettes et des ordinateurs stimule non seulement l’engagement des élèves mais \nenrichit également leur expérience éducative en leur offrant un accès facile à une variété de \nressources, encourageant ainsi leur créativité et autonomie",
+            "opinion": "pour"
+          },
+          "tache3Document2": {
+            "contenu": "Sara : Je suis sceptique quant à l’usage intensif des technologies dans l’enseignement. Je \ncrois que cela peut réduire les interactions humaines essentielles et favoriser une \ndépendance préoccupante aux écrans. À mon avis, les méthodes d’enseignement \ntraditionnelles et le contact direct entre enseignants et élèves restent indispensables pour un \ndéveloppement équilibré et complet des compétences des jeunes.",
+            "opinion": "contre"
+          },
+          "tache3Correction": "T554,Utilisation des nouvelles technologies à l’école : pour ou contre ? "
+        },
+        {
+          "id": 496,
+          "monthId": 38,
+          "monthName": "Mars 2026",
+          "orderIndex": 6,
+          "titre": "Combinaison 6",
+          "tache1Sujet": "Vous avez commandé un objet sur Internet et après réception du colis, vous constatez \nque l’objet est cassé. Rédigez un e-mail au service clientèle pour signaler le problème, \ndécrivez le dommage de l’objet et précisez ce que vous attendez comme solution. \n(60 mots minimum/120 mots maximum)",
+          "tache1Correction": "Objet : Article reçu cassé – demande de remplacement ou remboursement \nBonjour, \nJe vous contacte concernant une commande reçue aujourd’hui. Après ouverture du colis, j’ai constaté \nque l’objet était cassé. En effet, l’article présente une fissure importante et une partie est complètement \ndétachée, ce qui le rend inutilisable. Le carton semblait intact, mais l’objet était mal protégé à l’intérieur. \nJe vous remercie de bien vouloir me proposer une solution rapidement. Je souhaite soit un remplacement \ndu produit, soit un remboursement complet. Je peux vous envoyer des photos du dommage si nécessaire. \nCordialement, \nAyoub",
+          "tache2Sujet": "Vous avez visité une exposition de votre artiste préféré. Rédigez un article exprimant \nvotre expérience lors de la visite. Décrivez ce que vous avez vu et vos impressions. \n(120 mots minimum/150 mots maximum)",
+          "tache2Correction": "Une exposition inoubliable de mon artiste préféré \nJ’ai récemment visité une exposition consacrée à mon artiste préféré, et cette expérience m’a vraiment \nmarqué. Dès l’entrée, j’ai été impressionné par l’organisation et l’ambiance calme du lieu. Les œuvres \nétaient bien présentées, avec des explications claires qui permettaient de mieux comprendre le style et \nl’histoire de chaque création. \nJ’ai surtout apprécié les tableaux, car les couleurs étaient très expressives et les détails étaient \nincroyables. Certaines œuvres représentaient des scènes de la vie quotidienne, tandis que d’autres étaient \nplus modernes et abstraites. Ce mélange rendait la visite très intéressante. J’ai aussi été touché par \nl’émotion que l’artiste réussissait à transmettre à travers ses œuvres. \nEn sortant, je me sentais inspiré et heureux d’avoir découvert cette exposition.  \nJe recommande vivement cette visite à tous les amateurs d’art.",
+          "tache3Titre": " Les Devoirs À La Maison. ",
+          "tache3Document1": {
+            "contenu": "Selon des associations des parents d’élèves, les devoirs à la maison sont utiles, car ils \npermettent aux élèves d’apprendre à organiser leur temps de manière autonome. Pour les \nparents, les devoirs sont lien quotidien avec l’école. Même s’il est parfois difficile de suivre \nles devoirs après une journée de travail fatigant, ils apprécient ce moment partagé avec leurs \nenfants parce que ceux-ci sont contents que leurs parents s’intéressent à eux. C’est \nvalorisant !",
+            "opinion": "pour"
+          },
+          "tache3Document2": {
+            "contenu": "Nous protestons depuis longtemps contre les devoirs à la maison pour plusieurs raisons. \nPersonne ne jamais prouve leur utilité pour améliorer les résultats des élèves. Beaucoup de \nparents ont peu de temps pour encadrer les devoirs de leurs enfants et certains parents ne \nsavent pas le faire. Quant aux élèves, ceux qui ont réussi les exercices en classe perdent \nleurs temps à faire à la maison. Ceux qui ne sont pas aidés à la maison ne réussissent \ntoujours pas, ils sont défavorisés. C’est pourquoi nous pensons qu’il faut supprimer les \ndevoirs à la maison.",
+            "opinion": "contre"
+          },
+          "tache3Correction": "T4fb,Les devoirs à la maison : utiles ou inutiles ? "
+        },
+        {
+          "id": 497,
+          "monthId": 38,
+          "monthName": "Mars 2026",
+          "orderIndex": 7,
+          "titre": "Combinaison 7",
+          "tache1Sujet": "France Télévision prépare un reportage sur le sport amateur. \nEt vous, quel sportif êtes-vous ? Envoyez-nous vos témoignages \nsur francetélévision.fr. \n(60 mots minimum/120 mots maximum) ",
+          "tache1Correction": "Je pratique un sport amateur depuis plusieurs années, principalement pour rester en forme et réduire le \nstress du quotidien. Je fais surtout du jogging et un peu de fitness, deux à trois fois par semaine. Ce que \nj’aime dans le sport amateur, c’est qu’il permet de se dépasser sans pression, à son rythme. Par exemple, \ncourir en plein air me donne une sensation de liberté et m’aide à garder une bonne énergie. \nJe pense que le sport amateur est essentiel, car il améliore la santé, le moral et la confiance en soi. Même \navec un emploi du temps chargé, il est possible de trouver du temps pour bouger régulièrement.",
+          "tache2Sujet": "Vous avez passé des vacances dans une belle région de votre pays. Vous écrivez un \nmessage à vos amis dans lequel vous décrivez votre expérience, vous expliquer \npourquoi vous avez beaucoup aimé ce séjour. \n(120 mots minimum/150 mots maximum) ",
+          "tache2Correction": "Salut les amis, \nJ’espère que vous allez bien. Je voulais vous raconter mes dernières vacances dans une très \nbelle région de mon pays. J’ai passé quelques jours dans un endroit calme, entouré de nature, \navec des paysages magnifiques. Il y avait des montagnes, des petits villages traditionnels et \nune ambiance très chaleureuse. Chaque jour, je faisais des promenades, je prenais des photos \net je profitais de l’air frais. \nCe que j’ai le plus aimé, c’est la tranquillité et la beauté du lieu. J’ai aussi découvert des \nspécialités locales délicieuses et rencontré des habitants très accueillants. Ce séjour m’a \nvraiment permis de me reposer, de changer d’air et d’oublier le stress. Franchement, c’était \nune expérience incroyable que je recommande à tout le monde. \nÀ bientôt, \nAyoub",
+          "tache3Titre": " Les Écoles Privées Ou Publiques ? ",
+          "tache3Document1": {
+            "contenu": "À la rentrée, le nombre d’élèves inscrits dans des écoles privées a augmenté en France. Le \nsuccès des établissements privés n’est pas directement lié aux bons résultats scolaires de \nleurs élèves. C’est la réputation de ces lieux qui explique un tel enthousiasme. Aux yeux de \nnombreux parents, les élèves y sont mieux encadrés, mieux surveillés et les professeurs \nsont plus présents. Les parents sont aussi rassurés parce que les classes sont homogènes : \nelles accueillent généralement des élèves de milieux sociaux favorisés. En effet, les études \ndans ces établissements sont payantes, ce qui n’est pas le cas dans les écoles publiques. ",
+            "opinion": "pour"
+          },
+          "tache3Document2": {
+            "contenu": "Dans les collèges privés, il y a peu d’élèves de milieux sociaux défavorisés. Comme les \nétudes dans ces établissements sont payantes, certaines catégories de population en sont \nexclues. Ce système qui oppose écoles publiques et écoles privées ne facilite pas la mixité \nsociale. Ainsi, les élèves du privé ont rarement l’occasion de rencontrer d’autres jeunes issus \nde milieux sociaux moins favorisés qu’eux et inversement. Ce modèle scolaire reproduit les \ninégalités sociales et renforce le sentiment d’exclusion de certains jeunes. ",
+            "opinion": "contre"
+          },
+          "tache3Correction": "T490,Écoles privées ou publiques : quel choix pour les familles ? "
+        },
+        {
+          "id": 498,
+          "monthId": 38,
+          "monthName": "Mars 2026",
+          "orderIndex": 8,
+          "titre": "Combinaison 8",
+          "tache1Sujet": "Salut, \nJe sais que tu vas dans une salle de sport. Qu’est-ce que tu penses de cette salle ? \nPeux-tu m’en dire un peu plus ? Je voudrais savoir si elle est bien ! \nMerci d’avance ! \nJoanna \nVous répondez à votre amie Joanna. Dans votre message, vous décrivez la salle de \nsport que vous fréquentez (activités, horaires, prix, etc.) (60 mots minimum / 120 mots \nmaximum). ",
+          "tache1Correction": "Salut Joanna, \nJ’espère que tu vas bien. Oui, je vais dans une salle de sport près de chez moi et je la trouve \nvraiment très bien. Elle est propre, moderne et l’ambiance est agréable. On y trouve une salle \nde musculation, des machines de cardio et plusieurs cours collectifs comme le fitness, le yoga \net la zumba. \nLa salle est ouverte tous les jours, de 6 h à 22 h, ce qui est pratique. Le prix est raisonnable : \nenviron 40 $ par mois, avec possibilité d’abonnement sans engagement. Il y a aussi des \ncoachs disponibles pour aider les débutants. Si tu veux, on peut y aller ensemble pour une \nséance d’essai. \nÀ bientôt, \nAyoub",
+          "tache2Sujet": "Vous avez suivi une formation (cours de langue, informatique, etc.). Sur un site Internet, \nvous écrivez un message pour raconter votre expérience (cours, participants, professeurs, \netc.). Vous expliquez ce que vous avez aimé ou pas aimé pendant cette formation. \n(120 mots minimum / 150 mots maximum)",
+          "tache2Correction": "J’ai récemment suivi une formation de langue française et je souhaite partager mon expérience. La \nformation a duré quatre semaines, avec des cours quatre fois par semaine. Les participants venaient de \nplusieurs pays, ce qui rendait les échanges très intéressants. L’ambiance en classe était agréable et tout \nle monde était motivé. \nLes professeurs étaient compétents, patients et très pédagogues. Ils expliquaient clairement et nous \nfaisaient pratiquer beaucoup à l’oral, ce que j’ai particulièrement apprécié. Les activités étaient variées \n: exercices, jeux de rôle, compréhension orale et production écrite. \nCependant, j’ai moins aimé le rythme parfois trop rapide, surtout pour les débutants. Malgré cela, cette \nformation m’a permis de progresser et de gagner en confiance. Je la recommande à ceux qui veulent \naméliorer leur niveau dans un bon cadre.",
+          "tache3Titre": "Les produits Fait maison : Pour ou contre?  ",
+          "tache3Document1": {
+            "contenu": "Il est aujourd’hui possible de fabriquer soi-même tout type de produits à la maison : des \nshampooings, des savons, des crèmes, du maquillage mais aussi des produits d’entretien \npour faire le ménage. C’est formidable car on peut ainsi contrôler leur composition. Il est \npréférable de sélectionner des ingrédients et des parfums naturels qui ne contiennent pas \nd’éléments chimiques. Par ailleurs, la fabrication maison permet de réduire les emballages et \ndonc les déchets. \nN’hésitez plus : fabriquez vos propres produits ! ",
+            "opinion": "pour"
+          },
+          "tache3Document2": {
+            "contenu": "Vous préférez fabriquer vous-même votre savon au lieu de l’acheter ? Attention, il y a des \nrisques pour la santé si vous ne choisissez pas les bons ingrédients ou si les règles \nd’hygiène ne sont pas respectées. Ainsi, avant de vous lancer, il est nécessaire de bien se \nrenseigner et de suivre les règles strictes de fabrication et de conservation. \nDe plus, même si ces produits coûtent moins cher et représentent une économie d’argent au \nquotidien, la fabrication « maison » prend souvent beaucoup de temps.",
+            "opinion": "contre"
+          },
+          "tache3Correction": "T512,Fabriquer ses produits à la maison : une bonne idée ? "
+        },
+        {
+          "id": 587,
+          "monthId": 38,
+          "monthName": "Mars 2026",
+          "orderIndex": 9,
+          "titre": "Combinaison 9",
+          "tache1Sujet": "Votre ami souhaite commencer à faire du sport. Rédigez un message pour lui \nrecommander une salle de sport située dans votre quartier (localisation, tarifs, \ntypes d’activités, etc.). ",
+          "tache1Correction": "Salut, \nJ’espère que tu vas bien. Je suis très content que tu veuilles commencer le sport ! Je te \nconseille une salle que j’aime beaucoup dans mon quartier : Fitness Center Verdier. Elle est \nsituée près du métro, à seulement 5 minutes à pied, donc c’est très pratique. \nLes tarifs sont raisonnables : environ 35 dollars par mois, avec un abonnement sans \nengagement. La salle est propre, bien équipée et il y a plusieurs activités : musculation, \ncardio, cours collectifs (zumba, yoga, spinning) et même un espace étirements. \nSi tu veux, on peut y aller ensemble une première fois pour te montrer comment ça \nfonctionne.",
+          "tache2Sujet": "Vous avez participé à un événement qui vous a marqué (anniversaire, mariage, \netc.). Racontez votre souvenir en décrivant ce qui vous a le plus marqué.",
+          "tache2Correction": "Un anniversaire inoubliable \nL’événement qui m’a le plus marqué est l’anniversaire surprise que nous avons organisé pour \nmon meilleur ami. Ce jour-là, nous nous sommes retrouvés chez moi en fin d’après-midi pour \npréparer la décoration, la musique et le gâteau. Tout le monde était très motivé et l’ambiance \nétait joyeuse. \nCe qui m’a le plus marqué, c’est le moment où mon ami est arrivé. Lorsqu’il a ouvert la porte \net qu’il a vu tous ses proches réunis, il est resté quelques secondes sans parler, puis il a souri \navec émotion. On voyait clairement qu’il ne s’attendait pas à cette surprise. \nEnsuite, nous avons partagé un bon repas, dansé et pris beaucoup de photos. Cette soirée m’a \nvraiment rappelé l’importance de l’amitié et des moments simples passés ensemble.",
+          "tache3Titre": " La Lecture Pour Les Enfants.",
+          "tache3Document1": {
+            "contenu": "Avec l’avancée technologique et les produits high-tech qui envahissent de plus en \nplus notre quotidien, nos enfants oublient la lecture et s’intéressent davantage aux \njeux vidéo, aux sports, à la musique… Contrairement à nous les adultes, dont \nbeaucoup d’entre-nous ont lu des milliers de pages, la génération actuelle est \ntoujours occupée par les réseaux sociaux et le gaming ou prennent du plaisir à \npratiquer du sport qui attirent davantage de jeunes grâce aux stars internationales du \nfootball, du tennis, de l’athlétisme… alors avec tout ça, pourquoi devons-nous forcer \nles enfants à lire un bouquin ? Et comme le dit un proverbe, ‘’ le goût de la lecture ne \npeut pas s’imposer’’… il faut laisser l’enfant choisir ce qu’il veut lire et surtout ne pas \nl’obliger à lire quand il n’a pas envie. ",
+            "opinion": "pour"
+          },
+          "tache3Document2": {
+            "contenu": "L’amour de la lecture se transmet de génération en génération bien que, ces \ndernières années, on ne trouve plus beaucoup de bouquins entre les mains des \nenfants, laissant la place aux smartphones et aux tablettes. En apprenant à lire \nrégulièrement, l’enfant acquiert le langage plus aisément tout en développant sa \ncapacité d’audition et de concentration. De plus, et pour prendre du plaisir ensemble, \nles parents peuvent consacrer quotidiennement 10 minutes à leurs enfants pour lire \ndes bouquins ; une activité qui renforcera à coup sûr la complicité parent/enfant ",
+            "opinion": "contre"
+          },
+          "tache3Correction": "La lecture chez les enfants : faut-il insister ? \nLe premier texte explique que les enfants s’intéressent davantage aux écrans et aux loisirs \nmodernes qu’à la lecture, et qu’il ne faut pas les forcer à lire, car le goût ne s’impose pas. En \nrevanche, le second souligne que lire régulièrement développe le langage, la concentration et \nrenforce le lien entre parents et enfants. \nÀ mon avis, la lecture est essentielle pour le développement des enfants, mais elle ne doit pas \nêtre imposée de manière autoritaire. Lire permet d’enrichir le vocabulaire, d’améliorer \nl’expression orale et écrite et de stimuler l’imagination. Cependant, si l’enfant se sent obligé, il \nrisque de rejeter totalement les livres. Je pense qu’il vaut mieux l’encourager doucement, en \nchoisissant des histoires adaptées à son âge et à ses centres d’intérêt. Les parents peuvent aussi \ndonner l’exemple en lisant eux-mêmes. Ainsi, la lecture devient un moment agréable et partagé, \net non une contrainte."
+        },
+        {
+          "id": 588,
+          "monthId": 38,
+          "monthName": "Mars 2026",
+          "orderIndex": 10,
+          "titre": "Combinaison 10",
+          "tache1Sujet": "Écrivez un message à votre ami(e) qui souhaite suivre des cours de langue \ndans votre école. Donnez les détails spécifiques pour aider votre ami(e) à faire \nson choix. (lieu, tarifs, types de cours disponible, etc.).",
+          "tache1Correction": "Salut, \nJ’espère que tu vas bien. Je suis très content que tu veuilles suivre des cours de langue dans \nmon école ! Elle est située en centre-ville, près de la station de métro, donc c’est facile \nd’accès. \nLes tarifs sont raisonnables : environ 120 dollars par mois, avec possibilité de payer par \nsession. Il y a plusieurs types de cours : cours de français général, cours intensifs, cours du \nsoir pour les personnes qui travaillent, et aussi des ateliers de conversation pour améliorer \nl’oral. Les groupes sont petits, donc le professeur peut bien suivre chaque étudiant. \nSi tu veux, je peux aussi t’accompagner le premier jour pour t’aider à t’inscrire.",
+          "tache2Sujet": "Vous travaillez dans une association qui aident les personnes âgées. Rédigez \nun un article de blog pour raconter vos expériences et convaincre d'autres \npersonnes de rejoindre l'association.",
+          "tache2Correction": "Une expérience humaine inoubliable : rejoignez notre association ! \nDepuis plusieurs mois, je travaille dans une association qui aide les personnes âgées, et cette \nexpérience m’a profondément marqué. Chaque semaine, nous rendons visite à des seniors isolés \npour leur apporter du soutien, de la compagnie et parfois une aide pratique. Nous les \naccompagnons aussi pour faire des courses, aller à un rendez-vous médical ou simplement sortir \nprendre l’air. \nCe que j’aime le plus, c’est le lien humain que nous créons. Beaucoup de personnes âgées ont \nsurtout besoin d’écoute. Un simple moment de discussion peut illuminer leur journée. \nPersonnellement, j’ai appris à être plus patient, plus attentif et plus reconnaissant. \nJe conseille vraiment à tout le monde de rejoindre cette association. Même avec peu de temps, \non peut faire une grande différence. En plus, l’ambiance entre bénévoles est très chaleureuse. \nSi vous cherchez une activité utile et enrichissante, n’hésitez pas : venez nous rejoindre !",
+          "tache3Titre": "Les animaux de compagnie pour les enfants, pour ou contre ?",
+          "tache3Document1": {
+            "contenu": "Offrir un animal de compagnie à un enfant présente de nombreux avantages, comme \nle soulignent beaucoup de psychologues. Pour des enfants qui n’ont pas des frères \net/ou des sœurs, l’animal est un compagnon qui leur évitera la solitude. Grâce à lui, \nun enfant prendra confiance en lui et il apprendra vite qu’un animal est un être vivant \nqui a besoin d’attention et de respect. En sa présence, l’enfant se sentira en sécurité \net pourra agir de manière autonome, sans l’aide de ses parents.",
+            "opinion": "pour"
+          },
+          "tache3Document2": {
+            "contenu": "Beaucoup d’enfants demandent, un jour ou l’autre, un animal à leurs parents, le plus \nsouvent un chien ou un chat. Mais même si vous avez envie de faire plaisir à votre \nenfant, il vaut mieux réfléchir sérieusement avant d’acheter un animal domestique. \nL’animal devient un nouveau membre de la famille et représente un engagement sur \nde nombreuses années. Or, avoir un animal coûte souvent très cher, et c’est une \ngrande responsabilité. On ne peut pas le traiter comme un jouet que l’on met à la \npoubelle quand l’enfant s’en désintéresse.",
+            "opinion": "contre"
+          },
+          "tache3Correction": "T45b,Les animaux de compagnie pour les enfants : bonne ou mauvaise idée ? "
+        },
+        {
+          "id": 589,
+          "monthId": 38,
+          "monthName": "Mars 2026",
+          "orderIndex": 11,
+          "titre": "Combinaison 11",
+          "tache1Sujet": "Répondez au courriel de votre ami Lucas pour lui donner des informations sur \nles nouveaux locaux de votre entreprise (lieu, disposition des pièces, \néquipements, etc.).",
+          "tache1Correction": "Salut Lucas, \nMerci pour ton message ! Je suis content de te parler de nos nouveaux locaux. Ils sont situés au \ncentre-ville, près de la station de métro, ce qui est très pratique pour tout le monde. \nLes bureaux sont beaucoup plus spacieux qu’avant. Il y a un grand espace ouvert pour le travail \nen équipe, plusieurs salles de réunion bien équipées avec des écrans et du matériel de \nvisioconférence, ainsi qu’une salle de détente avec une petite cuisine. Nous avons aussi une \nterrasse où l’on peut prendre une pause quand il fait beau. \nL’ambiance est moderne et agréable, on s’y sent vraiment bien pour travailler.",
+          "tache2Sujet": "Vous avez assisté à un événement intitulé “Une semaine sans voiture”. \nRacontez votre expérience et donnez votre impression sur cette initiative. \nDécrivez le déroulement de l’événement (dates, lieu, activités proposées). ",
+          "tache2Correction": "Une semaine sans voiture : une initiative à refaire ! \nLa semaine dernière, j’ai participé à un événement intitulé « Une semaine sans voiture », \norganisé du 5 au 11 février dans le centre-ville. Pendant cette période, plusieurs rues principales \nont été fermées aux voitures afin de favoriser les déplacements à pied, à vélo et en transports \nen commun. \nChaque jour, des activités étaient proposées : balades à vélo, ateliers de réparation, animations \npour les enfants, et stands d’information sur l’environnement. Il y avait aussi des conférences \nsur la pollution et des démonstrations de transports écologiques. \nJ’ai beaucoup apprécié cette initiative, car la ville était plus calme, l’air semblait plus propre et \nil y avait moins de stress. Cette expérience m’a permis de redécouvrir ma ville autrement. À \nmon avis, ce type d’événement devrait être organisé plus souvent.",
+          "tache3Titre": "Les Vêtements de Grandes Marques",
+          "tache3Document1": {
+            "contenu": "Les vêtements de marques sont très importants pour les enfants et les adolescents. \nC’est un moyen de s’exprimer et de se rattacher à un groupe social. Cette attirance \npour les marques est très présente chez les adolescents qui se cherchent et \nmontrent leur personnalité. Les enfants aiment également porter des vêtements de \nmarques avec des images des dessins animés qu’ils regardent ou des logos qu’ils \napprécient. ",
+            "opinion": "pour"
+          },
+          "tache3Document2": {
+            "contenu": "Les enfants grandissent très vite et les vêtements sont portés pendant une courte \npériode. Ainsi, les vêtements deviennent rapidement trop petits. Mais il y a aussi le \nfait que les enfants usent assez rapidement les vêtements en jouant à l’extérieur \navec les copains, en s’amusant dans l’herbe ou à l’aire de jeux. Les habits sont très \nvite sales ou troués. ",
+            "opinion": "contre"
+          },
+          "tache3Correction": "T4ae,Les vêtements de grandes marques : nécessaires pour les enfants ? "
+        },
+        {
+          "id": 590,
+          "monthId": 38,
+          "monthName": "Mars 2026",
+          "orderIndex": 12,
+          "titre": "Combinaison 12",
+          "tache1Sujet": "Vous voulez organiser une visite culturelle dans votre ville. Vous envoyez un message pour \ninviter vos amis. Vous leur donner toutes les informations nécessaires (activités, date, lieu, \netc.).",
+          "tache1Correction": null,
+          "tache2Sujet": "Vous avez assisté à une soirée écologique pour protéger la planète qui avait lieu dans votre \nuniversité. Racontez-là dans votre blog et expliquez pourquoi vous l’avez aimée.",
+          "tache2Correction": null,
+          "tache3Titre": "Les Devoirs À La Maison ",
+          "tache3Document1": {
+            "contenu": "Selon des associations des parents d’élèves, les devoirs à la maison sont utiles, car ils \npermettent aux élèves d’apprendre à organiser leur temps de manière autonome. Pour les \nparents, les devoirs sont lien quotidien avec l’école. Même s’il est parfois difficile de suivre \nles devoirs après une journée de travail fatigant, ils apprécient ce moment partagé avec leurs \nenfants parce que ceux-ci sont contents que leurs parents s’intéressent à eux. C’est \nvalorisant !",
+            "opinion": "pour"
+          },
+          "tache3Document2": {
+            "contenu": "Nous protestons depuis longtemps contre les devoirs à la maison pour plusieurs raisons. \nPersonne ne jamais prouve leur utilité pour améliorer les résultats des élèves. Beaucoup de \nparents ont peu de temps pour encadrer les devoirs de leurs enfants et certains parents ne \nsavent pas le faire. Quant aux élèves, ceux qui ont réussi les exercices en classe perdent \nleurs temps à faire à la maison. Ceux qui ne sont pas aidés à la maison ne réussissent \ntoujours pas, ils sont défavorisés. C’est pourquoi nous pensons qu’il faut supprimer les \ndevoirs à la maison. \n",
+            "opinion": "contre"
+          },
+          "tache3Correction": null
+        }
+      ]
+    },
+    "expression_orale": {
+      "label": "🗣️ Expression Orale",
+      "totalItems": 0,
+      "items": []
+    }
+  }
+}

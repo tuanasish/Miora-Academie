@@ -1,0 +1,34 @@
+ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
+≡ƒôè DATA QUALITY REPORT - V11
+ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
+Total Sujets: 2745
+Corrections OK: 2735
+Empty/Missing: 10
+Short (<50 chars): 0
+Garbage (RSC artifacts): 0
+Quality Rate: 100%
+
+ΓÜá∩╕Å  ISSUES FOUND: 76
+By type: {"FEW_TACHES":76}
+
+First 15 issues:
+  Γä╣∩╕Å [FEW_TACHES] Janvier 2025 | Partie 1 | taches=[3] | 5 sujets
+  Γä╣∩╕Å [FEW_TACHES] Janvier 2025 | Partie 2 | taches=[3] | 5 sujets
+  Γä╣∩╕Å [FEW_TACHES] Janvier 2025 | Partie 3 | taches=[3] | 5 sujets
+  Γä╣∩╕Å [FEW_TACHES] Janvier 2025 | Partie 4 | taches=[3] | 5 sujets
+  Γä╣∩╕Å [FEW_TACHES] Janvier 2025 | Partie 5 | taches=[3] | 5 sujets
+  Γä╣∩╕Å [FEW_TACHES] Janvier 2025 | Partie 6 | taches=[3] | 5 sujets
+  Γä╣∩╕Å [FEW_TACHES] Janvier 2025 | Partie 7 | taches=[3] | 5 sujets
+  Γä╣∩╕Å [FEW_TACHES] Janvier 2025 | Partie 8 | taches=[3] | 5 sujets
+  Γä╣∩╕Å [FEW_TACHES] Mai 2025 | Partie 5 | taches=[2] | 5 sujets
+  Γä╣∩╕Å [FEW_TACHES] Juin 2025 | Partie 9 | taches=[2] | 5 sujets
+  Γä╣∩╕Å [FEW_TACHES] Septembre 2025 | Partie 2 | taches=[2] | 5 sujets
+  Γä╣∩╕Å [FEW_TACHES] Octobre 2025 | Partie 4 | taches=[2] | 5 sujets
+  Γä╣∩╕Å [FEW_TACHES] Octobre 2025 | Partie 5 | taches=[2] | 5 sujets
+  Γä╣∩╕Å [FEW_TACHES] Octobre 2025 | Partie 6 | taches=[2] | 5 sujets
+  Γä╣∩╕Å [FEW_TACHES] Octobre 2025 | Partie 7 | taches=[2] | 5 sujets
+
+≡ƒôè T├óche distribution across parties:
+  T├óches [2,3]: 238 parties
+  T├óches [2]: 68 parties
+  T├óches [3]: 8 parties

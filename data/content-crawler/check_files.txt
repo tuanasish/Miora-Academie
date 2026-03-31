@@ -1,0 +1,24 @@
+
+≡ƒôä tcf_canada_full_2026-03-30.json
+  Top keys: crawledAt, source, categories
+  Categories: comprehension_ecrite,comprehension_orale
+
+≡ƒôä tcf_canada_2026-03-30.json
+  Top keys: crawledAt, source, categories
+  Categories: comprehension_ecrite,comprehension_orale,expression_ecrite,expression_orale
+
+≡ƒôä comprehension_orale.json
+  Top keys: crawledAt, type, totalTests, totalQuestions, tests
+  Tests: 10
+
+≡ƒôä tcf_expression_orale_v11_FINAL.json
+  Top keys: crawledAt, type, source, months, stats
+  Months: 38
+
+≡ƒôä tcf_expression_full_2026-03-30 (1).json
+  Top keys: crawledAt, source, categories
+  Categories: expression_ecrite,expression_orale
+
+≡ƒôä tcf_expression_2026-03-30.json
+  Top keys: crawledAt, source, categories
+  Categories: expression_ecrite,expression_orale

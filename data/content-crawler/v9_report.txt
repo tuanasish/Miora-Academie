@@ -1,0 +1,75 @@
+Γ¥î Janvier 2026: 69Γ£à 1Γ¥î
+Γ¥î Janvier 2025: 39Γ£à 1Γ¥î
+Γ¥î Mars 2025: 29Γ£à 1Γ¥î
+Γ¥î Avril 2025: 15Γ£à 5Γ¥î
+Γ¥î Mai 2025: 25Γ£à 20Γ¥î
+Γ¥î Juin 2025: 80Γ£à 3Γ¥î
+Γ¥î Ao├╗t 2025: 30Γ£à 10Γ¥î
+Γ¥î Janvier 2024: 85Γ£à 3Γ¥î
+Γ¥î F├⌐vrier 2024: 119Γ£à 1Γ¥î
+Γ¥î Juin 2024: 89Γ£à 1Γ¥î
+Γ¥î Septembre 2024: 119Γ£à 1Γ¥î
+Γ¥î Novembre 2024: 85Γ£à 3Γ¥î
+Γ¥î F├⌐vrier 2023: 59Γ£à 1Γ¥î
+Γ¥î Novembre 2023: 154Γ£à 3Γ¥î
+
+ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
+≡ƒôè V9 RESULTS: 2691Γ£à / 2745 (98.0%)
+   Missing: 54
+ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
+
+Missing details:
+  - Janvier 2026 | jour 1 | tache 3 | exemple="Alors, est-il possible de vivre sans m├⌐dicaments ?" | "Il est possible de vivre sans m├⌐dicaments. ├ètes-vous dΓÇÖaccord avec cette affirma"
+  - Janvier 2025 | jour 6 | tache 3 | exemple="$44" | "Travailler jusquΓÇÖ├á 70 ans. QuΓÇÖen pensez-vous ?"
+  - Mars 2025 | jour 3 | tache 3 | exemple="Avec Internet, on vit mieux. QuΓÇÖen pensez-vous ?" | "Avec Internet, on vit mieux. QuΓÇÖen pensez-vous ?"
+  - Avril 2025 | jour 2 | tache 3 | exemple="Bonjour madame, bonjour monsieur." | "Il faut faire de longues ├⌐tudes pour gagner beaucoup dΓÇÖargent. QuΓÇÖen pensez-vous"
+  - Avril 2025 | jour 2 | tache 3 | exemple="Bonjour madame, bonjour monsieur." | "Les loisirs culturels (mus├⌐es, th├⌐├ótres, etc.) devraient ├¬tre gratuits. QuΓÇÖen pe"
+  - Avril 2025 | jour 2 | tache 3 | exemple="Bonjour madame, bonjour monsieur." | "LΓÇÖacc├¿s aux soins m├⌐dicaux doit ├¬tre gratuit pour tous. QuΓÇÖen pensez-vous ?"
+  - Avril 2025 | jour 2 | tache 3 | exemple="Bonjour madame, bonjour monsieur." | "Pour prot├⌐ger lΓÇÖenvironnement, les ├ëtats doivent limiter les voyages en avion de"
+  - Avril 2025 | jour 2 | tache 3 | exemple="Bonjour madame, bonjour monsieur." | "Selon vous, quelle est la place du v├¬tement dans nos soci├⌐t├⌐s modernes ? QuΓÇÖen p"
+  - Mai 2025 | jour 1 | tache 3 | exemple="Bonjour madame, bonjour monsieur." | "De nos jours, les gens ne sΓÇÖenvoient presque plus de courrier (cartes de v┼ôux, l"
+  - Mai 2025 | jour 1 | tache 3 | exemple="Bonjour madame, bonjour monsieur." | "Est-ce que vous pensez quΓÇÖaujourdΓÇÖhui on peut vivre sans voiture ?"
+  - Mai 2025 | jour 1 | tache 3 | exemple="Bonjour madame, bonjour monsieur." | "Il est plus facile de vivre seul(e) quΓÇÖen famille. QuΓÇÖen pensez-vous ?"
+  - Mai 2025 | jour 1 | tache 3 | exemple="Bonjour madame, bonjour monsieur." | "Pensez-vous que faire travailler les gens jusquΓÇÖ├á 70 ans est une mesure acceptab"
+  - Mai 2025 | jour 1 | tache 3 | exemple="Bonjour madame, bonjour monsieur." | "Une exp├⌐rience de vie ├á lΓÇÖ├⌐tranger est toujours positive. ├ètes-vous dΓÇÖaccord ave"
+  - Mai 2025 | jour 2 | tache 3 | exemple="Bonjour madame, bonjour monsieur." | "Avec Internet, on vit mieux. QuΓÇÖen pensez-vous ?"
+  - Mai 2025 | jour 2 | tache 3 | exemple="Bonjour madame, bonjour monsieur." | "Est-il bon de faire plusieurs m├⌐tiers dans sa carri├¿re ? QuΓÇÖen pensez-vous ?"
+  - Mai 2025 | jour 2 | tache 3 | exemple="Bonjour madame, bonjour monsieur." | "Faut-il interdire aux enfants lΓÇÖutilisation du t├⌐l├⌐phone portable ? QuΓÇÖen pensez"
+  - Mai 2025 | jour 2 | tache 3 | exemple="Bonjour madame, bonjour monsieur." | "Il faut aimer son travail pour ├¬tre productif. QuΓÇÖen pensez-vous ?"
+  - Mai 2025 | jour 2 | tache 3 | exemple="Bonjour madame, bonjour monsieur." | "Vivre dans un pays ├⌐tranger est difficile. ├ètes-vous dΓÇÖaccord avec cette affirma"
+  - Mai 2025 | jour 3 | tache 3 | exemple="Bonjour madame, bonjour monsieur," | "La gentillesse aide-t-elle toujours ├á se faire ├⌐couter et respecter ? ├ètes-vous "
+  - Mai 2025 | jour 3 | tache 3 | exemple="Bonjour madame, bonjour monsieur," | "Pensez-vous quΓÇÖon puisse ├¬tre heureux m├¬me en restant c├⌐libataire ? Quelle est v"
+  - Mai 2025 | jour 3 | tache 3 | exemple="Bonjour madame, bonjour monsieur," | "Selon vous, est-il important de d├⌐dier une journ├⌐e aux droits des femmes ? Pourq"
+  - Mai 2025 | jour 3 | tache 3 | exemple="Bonjour madame, bonjour monsieur," | "Regarder la t├⌐l├⌐vision, est-ce un bon moyen pour apprendre de nouvelles choses ?"
+  - Mai 2025 | jour 3 | tache 3 | exemple="Bonjour madame, bonjour monsieur," | "├Ç votre avis, est-ce indispensable dΓÇÖaimer son travail pour r├⌐ussir sa carri├¿re "
+  - Mai 2025 | jour 4 | tache 3 | exemple="Bonjour madame, bonjour monsieur," | "Quelles mati├¿res devraient ├¬tre enseign├⌐es ├á lΓÇÖ├⌐cole pour capter davantage lΓÇÖint"
+  - Mai 2025 | jour 4 | tache 3 | exemple="Bonjour madame, bonjour monsieur," | "Selon vous, est-il pr├⌐f├⌐rable dΓÇÖavoir une grande famille ou des amis proches ? Q"
+  - Mai 2025 | jour 4 | tache 3 | exemple="Bonjour madame, bonjour monsieur," | "Pensez-vous que les entreprises doivent accompagner les nouveaux employ├⌐s pour f"
+  - Mai 2025 | jour 4 | tache 3 | exemple="Bonjour madame, bonjour monsieur," | "Quel ├⌐tait votre cours favori ├á lΓÇÖ├⌐cole ? Expliquez pourquoi vous lΓÇÖaimiez."
+  - Mai 2025 | jour 4 | tache 3 | exemple="Bonjour madame, bonjour monsieur," | "├Ç votre avis, vivre ├á lΓÇÖ├⌐tranger garantit-il une r├⌐ussite professionnelle ? Pour"
+  - Juin 2025 | jour 4 | tache 3 | exemple="Sujet 1 ΓÇô Vivre sans technologie" | "Certaines personnes choisissent de vivre sans utiliser la technologie (t├⌐l├⌐phone"
+  - Juin 2025 | jour 4 | tache 3 | exemple="Sujet 2 ΓÇô Chirurgie esth├⌐tique" | "Beaucoup de gens ont recours ├á la chirurgie esth├⌐tique pour para├«tre plus jeunes"
+  - Juin 2025 | jour 4 | tache 3 | exemple="Sujet 3 ΓÇô Trouver un emploi quand on est jeune" | "Trouver un emploi peut ├¬tre plus compliqu├⌐ quand on est jeune. ├ètes-vous dΓÇÖaccor"
+  - Ao├╗t 2025 | jour 3 | tache 3 | exemple="Bonjour madame, bonjour monsieur," | "Quelles mati├¿res devraient ├¬tre enseign├⌐es ├á lΓÇÖ├⌐cole pour capter davantage lΓÇÖint"
+  - Ao├╗t 2025 | jour 3 | tache 3 | exemple="Bonjour madame, bonjour monsieur," | "Selon vous, est-il pr├⌐f├⌐rable dΓÇÖavoir une grande famille ou des amis proches ? Q"
+  - Ao├╗t 2025 | jour 3 | tache 3 | exemple="Bonjour madame, bonjour monsieur," | "Pensez-vous que les entreprises doivent accompagner les nouveaux employ├⌐s pour f"
+  - Ao├╗t 2025 | jour 3 | tache 3 | exemple="Bonjour madame, bonjour monsieur," | "Quel ├⌐tait votre cours favori ├á lΓÇÖ├⌐cole ? Expliquez pourquoi vous lΓÇÖaimiez."
+  - Ao├╗t 2025 | jour 3 | tache 3 | exemple="Bonjour madame, bonjour monsieur," | "├Ç votre avis, vivre ├á lΓÇÖ├⌐tranger garantit-il une r├⌐ussite professionnelle ? Pour"
+  - Ao├╗t 2025 | jour 4 | tache 3 | exemple="Bonjour madame, bonjour monsieur," | "La gentillesse aide-t-elle toujours ├á se faire ├⌐couter et respecter ? ├ètes-vous "
+  - Ao├╗t 2025 | jour 4 | tache 3 | exemple="Bonjour madame, bonjour monsieur," | "Pensez-vous quΓÇÖon puisse ├¬tre heureux m├¬me en restant c├⌐libataire ? Quelle est v"
+  - Ao├╗t 2025 | jour 4 | tache 3 | exemple="Bonjour madame, bonjour monsieur," | "Selon vous, est-il important de d├⌐dier une journ├⌐e aux droits des femmes ? Pourq"
+  - Ao├╗t 2025 | jour 4 | tache 3 | exemple="Bonjour madame, bonjour monsieur," | "Regarder la t├⌐l├⌐vision, est-ce un bon moyen pour apprendre de nouvelles choses ?"
+  - Ao├╗t 2025 | jour 4 | tache 3 | exemple="Bonjour madame, bonjour monsieur," | "├Ç votre avis, est-ce indispensable dΓÇÖaimer son travail pour r├⌐ussir sa carri├¿re "
+  - Janvier 2024 | jour 1 | tache 3 | exemple="Changer de pays: Une Exploration Culturelle" | "Changer de pays, cΓÇÖest changer de culture. QuΓÇÖen pensez-vous ?"
+  - Janvier 2024 | jour 1 | tache 3 | exemple="Vivre seul(e) : Entre D├⌐fis et Autonomie" | "Il est difficile de vivre seul(e). ├ètes-vous dΓÇÖaccord ?"
+  - Janvier 2024 | jour 1 | tache 3 | exemple="*Vivre sans Internet : Entre D├⌐fi et Possibilit├⌐*" | "├Ç votre avis, peut-on vivre sans Internet ? Pourquoi ?"
+  - F├⌐vrier 2024 | jour 6 | tache 3 | exemple="### LΓÇÖAutorit├⌐ Parentale : Un ├ëquilibre D├⌐licat" | "Il faut ├¬tre autoritaire avec ses enfants. QuΓÇÖen pensez-vous ?"
+  - Juin 2024 | jour 7 | tache 3 | exemple="Les Principales Motivations ├á lΓÇÖImmigration" | "Quelles sont les principales motivations qui incitent les gens ├á immigrer vers d"
+  - Septembre 2024 | jour 1 | tache 3 | exemple="" | "Quand on sΓÇÖinstalle dans un nouveau pays, est-ce quΓÇÖil faut changer ses habitude"
+  - Novembre 2024 | jour 7 | tache 3 | exemple="2. Adaptation ├á lΓÇÖ├⌐tranger : Facilit├⌐ et d├⌐fis" | "Adaptation ├á lΓÇÖ├⌐tranger : ├ëvoquez les facilit├⌐s et les d├⌐fis de lΓÇÖint├⌐gration dΓÇÖ"
+  - Novembre 2024 | jour 7 | tache 3 | exemple="3. T├⌐l├⌐travail : Avantages et d├⌐fis" | "T├⌐l├⌐travail : Analysez les avantages et les d├⌐fis du t├⌐l├⌐travail, notamment en t"
+  - Novembre 2024 | jour 9 | tache 2 | exemple="1. Combien de personnes devrais-je inviter ?" | "Je suis votre voisin (e). Vous souhaitez organiser une f├¬te entre voisins. Vous "
+  - F├⌐vrier 2023 | jour 11 | tache 2 | exemple="1. Quels types dΓÇÖanimaux de comp" | "Je travaille dans une animalerie. vous souhaitez adopter un animal de compagnie."
+  - Novembre 2023 | jour 3 | tache 2 | exemple="" | "Je suis votre ami. Vous venez dΓÇÖarriver au Canada et vous avez un entretien dΓÇÖem"
+  - Novembre 2023 | jour 9 | tache 2 | exemple="" | "Vous voulez visiter une r├⌐gion qu├⌐b├⌐coise. Vous allez ├á lΓÇÖoffice du tourisme pou"
+  - Novembre 2023 | jour 14 | tache 3 | exemple="" | "Certaines personnes pr├⌐f├¿rent voyager seules. QuΓÇÖen pensez vous"

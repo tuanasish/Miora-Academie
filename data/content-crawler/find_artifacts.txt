@@ -1,0 +1,52 @@
+
+#1: F├⌐vrier 2025 | P6 | T2 | ID:15487
+  Length: 1111
+  Pattern ""div"" at pos 1096/1111 (99%)
+  Context: "... dans les transports ?1a:["$",<<<"div">>>,null,{"cl..."
+
+#2: D├⌐cembre 2024 | P8 | T3 | ID:15607
+  Length: 1197
+  Pattern "className" at pos 1166/1197 (97%)
+  Context: "... risques.1a:["$","div",null,{"<<<className>>>":"min-h-screen flex f..."
+  Pattern ""div"" at pos 1153/1197 (96%)
+  Context: "...inimisant les risques.1a:["$",<<<"div">>>,null,{"className":"min-h-scre..."
+
+#3: Janvier 2023 | P4 | T2 | ID:17351
+  Length: 1274
+  Pattern ""div"" at pos 1253/1274 (98%)
+  Context: "...ouvenirs sp├⌐cifiques ?1a:["$",<<<"div">>>,null,{"classNam..."
+
+#4: Avril 2023 | P3 | T2 | ID:17271
+  Length: 1219
+  Pattern "className" at pos 1200/1219 (98%)
+  Context: "...ssement ?1a:["$","div",null,{"<<<className>>>":"min-h-s..."
+  Pattern ""div"" at pos 1187/1219 (97%)
+  Context: "...rc de divertissement ?1a:["$",<<<"div">>>,null,{"className":"min-h-s..."
+
+#5: Mai 2023 | P12 | T2 | ID:17257
+  Length: 1287
+  Pattern "className" at pos 1274/1287 (99%)
+  Context: "...ersonne ?1a:["$","div",null,{"<<<className>>>":"m..."
+  Pattern ""div"" at pos 1261/1287 (98%)
+  Context: "...ux cours en personne ?1a:["$",<<<"div">>>,null,{"className":"m..."
+
+#6: Juin 2023 | P4 | T2 | ID:17192
+  Length: 1215
+  Pattern "className" at pos 1181/1215 (97%)
+  Context: "...ocation ?1a:["$","div",null,{"<<<className>>>":"min-h-screen flex flex..."
+  Pattern ""div"" at pos 1168/1215 (96%)
+  Context: "...on sur la colocation ?1a:["$",<<<"div">>>,null,{"className":"min-h-scre..."
+
+#7: Ao├╗t 2023 | P4 | T2 | ID:17152
+  Length: 1174
+  Pattern "className" at pos 1159/1174 (99%)
+  Context: "... niveau ?1a:["$","div",null,{"<<<className>>>":"min..."
+  Pattern ""div"" at pos 1146/1174 (98%)
+  Context: "...ue session ou niveau ?1a:["$",<<<"div">>>,null,{"className":"min..."
+
+#8: Octobre 2023 | P12 | T2 | ID:17069
+  Length: 1179
+  Pattern ""div"" at pos 1160/1179 (98%)
+  Context: "...ce dans les transports1a:["$",<<<"div">>>,null,{"classN..."
+
+Total: 8

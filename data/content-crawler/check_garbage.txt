@@ -1,0 +1,27 @@
+
+Septembre 2024 | P5 | T3 | ID:15832
+  Length: 3925, Pattern "43:T564," at position 834 (21%)
+  Before: "...iner passion, comp├⌐tences et r├⌐silience."
+  After:  "43:T564,La question de savoir si les enf..."
+
+Septembre 2024 | P5 | T3 | ID:15833
+  Length: 3925, Pattern "43:T564," at position 834 (21%)
+  Before: "...iner passion, comp├⌐tences et r├⌐silience."
+  After:  "43:T564,La question de savoir si les enf..."
+
+Septembre 2024 | P5 | T3 | ID:15834
+  Length: 3925, Pattern "43:T564," at position 834 (21%)
+  Before: "...iner passion, comp├⌐tences et r├⌐silience."
+  After:  "43:T564,La question de savoir si les enf..."
+
+Septembre 2024 | P5 | T3 | ID:15835
+  Length: 3925, Pattern "43:T564," at position 834 (21%)
+  Before: "...iner passion, comp├⌐tences et r├⌐silience."
+  After:  "43:T564,La question de savoir si les enf..."
+
+Janvier 2023 | P2 | T2 | ID:17337
+  Length: 3977, Pattern "32:T4de," at position 888 (22%)
+  Before: "...t de la baby-sitter envers les enfants ?"
+  After:  "32:T4de,1. Quelles sont les destinations..."
+
+Total GARBAGE: 74
