@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Miora Académie - Thi tiếng Pháp TCF",
-  description: "Hệ thống thi và luyện thi tiếng Pháp TCF",
+  title: "Miora Académie - Examen de français TCF",
+  description: "Plateforme d'examen et de préparation TCF",
 };
 
 export default function RootLayout({
@@ -24,10 +24,11 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="fr"
+      suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body suppressHydrationWarning className="min-h-full flex flex-col">{children}</body>
     </html>
   );
 }

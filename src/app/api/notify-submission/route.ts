@@ -7,10 +7,10 @@ const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? "admin@mioraacademie.com";
 const FROM_EMAIL = process.env.FROM_EMAIL ?? "Miora Académie <notifications@mioraacademie.com>";
 
 const EXAM_LABELS: Record<string, string> = {
-  listening: "Compréhension de l'oral (Nghe)",
-  reading:   "Compréhension des écrits (Đọc)",
-  writing:   "Expression écrite (Viết)",
-  speaking:  "Expression orale (Nói)",
+  listening: "Compréhension de l'oral",
+  reading:   "Compréhension de l'écrit",
+  writing:   "Expression écrite",
+  speaking:  "Expression orale",
 };
 
 const EXAM_COLORS: Record<string, string> = {
@@ -195,7 +195,7 @@ export async function POST(req: NextRequest) {
     const seconds = (time_spent_seconds ?? 0) % 60;
     const timeStr = time_spent_seconds ? `${minutes} min ${seconds} sec` : "—";
 
-    const submittedAt = new Date().toLocaleString("vi-VN", {
+    const submittedAt = new Date().toLocaleString("fr-FR", {
       timeZone: "Asia/Ho_Chi_Minh",
       day: "2-digit", month: "2-digit", year: "numeric",
       hour: "2-digit", minute: "2-digit",

@@ -68,8 +68,8 @@ export default function ListeningSerieExamPage() {
 
   if (notFound) return (
     <div className="h-screen flex flex-col items-center justify-center gap-4">
-      <p className="text-slate-500">Série {serieId} không tồn tại.</p>
-      <Link href="/exam/listening" className="text-sky-600 hover:underline">← Quay lại danh sách</Link>
+      <p className="text-slate-500">La série {serieId} n'existe pas.</p>
+      <Link href="/exam/listening" className="text-sky-600 hover:underline">← Retour à la liste</Link>
     </div>
   );
 
@@ -80,13 +80,13 @@ export default function ListeningSerieExamPage() {
         <div className="bg-white rounded-2xl shadow-xl p-10 max-w-md text-center space-y-4">
           <CheckCircle2 className="w-16 h-16 text-emerald-500 mx-auto" />
           <h2 className="text-2xl font-bold text-slate-900">Série {serieId} — Terminée!</h2>
-          <p className="text-slate-500 text-sm">Kết quả (tạm tính)</p>
+          <p className="text-slate-500 text-sm">Résultat (provisoire)</p>
           <div className="text-5xl font-bold text-sky-600">{correctCount}/{total}</div>
-          <p className="text-sm text-slate-400">câu đúng</p>
+          <p className="text-sm text-slate-400">bonnes réponses</p>
           <div className="flex gap-3 justify-center pt-2">
             <Link href="/exam/listening"
               className="flex items-center gap-2 text-sm text-slate-600 border border-slate-200 rounded-xl px-4 py-2 hover:bg-slate-50">
-              <ArrowLeft className="w-4 h-4" />Danh sách Séries
+              <ArrowLeft className="w-4 h-4" />Liste des séries
             </Link>
             {serieId < 40 && (
               <Link href={`/exam/listening/${serieId + 1}`}
@@ -109,7 +109,7 @@ export default function ListeningSerieExamPage() {
         <div className="flex items-center gap-3">
           <Link href="/exam/listening"
             className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-800 transition-colors">
-            <ChevronLeft className="w-4 h-4" />Danh sách
+            <ChevronLeft className="w-4 h-4" />Liste
           </Link>
           <span className="text-slate-300">|</span>
           <Headphones className="w-4 h-4 text-sky-500" />
@@ -120,7 +120,7 @@ export default function ListeningSerieExamPage() {
         <div className={`flex items-center gap-2 font-mono font-bold text-sm ${timerColor}`}>
           <Clock className="w-4 h-4" />
           {timer.formatted}
-          {timer.isExpired && <span className="text-xs font-sans animate-pulse ml-1">⏰ Hết giờ!</span>}
+          {timer.isExpired && <span className="text-xs font-sans animate-pulse ml-1">⏰ Temps écoulé!</span>}
         </div>
       </header>
 
@@ -134,7 +134,7 @@ export default function ListeningSerieExamPage() {
         <aside className="w-48 bg-white border-r border-slate-200 overflow-y-auto shrink-0">
           <div className="p-3 border-b border-slate-100">
             <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-              {answered}/{total} đã trả lời
+              {answered}/{total} répondues
             </p>
           </div>
           <div className="p-2 grid grid-cols-5 gap-1">
@@ -215,16 +215,16 @@ export default function ListeningSerieExamPage() {
           <div className="flex flex-col gap-2 mt-auto">
             <button onClick={() => setCurrentQ((c) => Math.max(0, c - 1))} disabled={currentQ === 0}
               className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border border-slate-200 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-40 transition-colors">
-              <ChevronLeft className="w-4 h-4" />Câu trước
+              <ChevronLeft className="w-4 h-4" />Question précédente
             </button>
             <button onClick={() => setCurrentQ((c) => Math.min(total - 1, c + 1))} disabled={currentQ === total - 1}
               className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border border-slate-200 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-40 transition-colors">
-              Câu sau<ChevronRight className="w-4 h-4" />
+              Question suivante<ChevronRight className="w-4 h-4" />
             </button>
             <div className="border-t border-slate-100 my-1" />
             <button onClick={() => setSubmitted(true)}
               className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-sm font-semibold transition-colors">
-              <Send className="w-4 h-4" />Nộp bài
+              <Send className="w-4 h-4" />Soumettre
             </button>
           </div>
         </aside>

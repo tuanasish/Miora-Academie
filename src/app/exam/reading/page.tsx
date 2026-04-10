@@ -41,7 +41,7 @@ export default function ReadingSeriesPage() {
       <header className="bg-white border-b border-slate-200 px-6 py-4 sticky top-0 z-10">
         <div className="max-w-5xl mx-auto flex items-center gap-4">
           <Link href="/dashboard" className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-800 transition-colors">
-            <ChevronLeft className="w-4 h-4" />Quay lại
+            <ChevronLeft className="w-4 h-4" />Retour
           </Link>
           <span className="text-slate-300">|</span>
           <div>

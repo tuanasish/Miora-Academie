@@ -95,7 +95,7 @@ export default function WritingSelectionPage() {
             href="/dashboard"
             className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-800 transition-colors"
           >
-            <ChevronLeft className="w-4 h-4" />Quay lại
+            <ChevronLeft className="w-4 h-4" />Retour
           </Link>
           <span className="text-slate-300">|</span>
           <PenLine className="w-5 h-5 text-violet-500" />

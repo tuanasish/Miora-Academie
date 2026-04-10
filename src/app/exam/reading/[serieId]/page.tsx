@@ -61,8 +61,8 @@ export default function ReadingSerieExamPage() {
 
   if (notFound) return (
     <div className="h-screen flex flex-col items-center justify-center gap-4">
-      <p className="text-slate-500">Série {serieId} không tồn tại.</p>
-      <Link href="/exam/reading" className="text-emerald-600 hover:underline">← Quay lại danh sách</Link>
+      <p className="text-slate-500">La série {serieId} n'existe pas.</p>
+      <Link href="/exam/reading" className="text-emerald-600 hover:underline">← Retour à la liste</Link>
     </div>
   );
 
@@ -74,11 +74,11 @@ export default function ReadingSerieExamPage() {
           <CheckCircle2 className="w-16 h-16 text-emerald-500 mx-auto" />
           <h2 className="text-2xl font-bold text-slate-900">Série {serieId} — Terminée!</h2>
           <div className="text-5xl font-bold text-emerald-600">{correctCount}/{total}</div>
-          <p className="text-sm text-slate-400">câu đúng</p>
+          <p className="text-sm text-slate-400">bonnes réponses</p>
           <div className="flex gap-3 justify-center pt-2">
             <Link href="/exam/reading"
               className="flex items-center gap-2 text-sm text-slate-600 border border-slate-200 rounded-xl px-4 py-2 hover:bg-slate-50">
-              <ArrowLeft className="w-4 h-4" />Danh sách
+              <ArrowLeft className="w-4 h-4" />Liste
             </Link>
             {serieId < 40 && (
               <Link href={`/exam/reading/${serieId + 1}`}
@@ -99,7 +99,7 @@ export default function ReadingSerieExamPage() {
       <header className="bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3">
           <Link href="/exam/reading" className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-800 transition-colors">
-            <ChevronLeft className="w-4 h-4" />Danh sách
+            <ChevronLeft className="w-4 h-4" />Liste
           </Link>
           <span className="text-slate-300">|</span>
           <BookOpen className="w-4 h-4 text-emerald-500" />
@@ -110,7 +110,7 @@ export default function ReadingSerieExamPage() {
         <div className={`flex items-center gap-2 font-mono font-bold text-sm ${timerColor}`}>
           <Clock className="w-4 h-4" />
           {timer.formatted}
-          {timer.isExpired && <span className="text-xs font-sans animate-pulse ml-1">⏰ Hết giờ!</span>}
+          {timer.isExpired && <span className="text-xs font-sans animate-pulse ml-1">⏰ Temps écoulé!</span>}
         </div>
       </header>
 
@@ -121,7 +121,7 @@ export default function ReadingSerieExamPage() {
       <div className="flex flex-1 overflow-hidden">
         <aside className="w-48 bg-white border-r border-slate-200 overflow-y-auto shrink-0">
           <div className="p-3 border-b border-slate-100">
-            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{answered}/{total} đã trả lời</p>
+            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{answered}/{total} répondues</p>
           </div>
           <div className="p-2 grid grid-cols-5 gap-1">
             {questions.map((q2, idx) => (
@@ -181,16 +181,16 @@ export default function ReadingSerieExamPage() {
           <div className="flex flex-col gap-2 mt-auto">
             <button onClick={() => setCurrentQ((c) => Math.max(0, c - 1))} disabled={currentQ === 0}
               className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border border-slate-200 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-40">
-              <ChevronLeft className="w-4 h-4" />Câu trước
+              <ChevronLeft className="w-4 h-4" />Question précédente
             </button>
             <button onClick={() => setCurrentQ((c) => Math.min(total - 1, c + 1))} disabled={currentQ === total - 1}
               className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border border-slate-200 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-40">
-              Câu sau<ChevronRight className="w-4 h-4" />
+              Question suivante<ChevronRight className="w-4 h-4" />
             </button>
             <div className="border-t border-slate-100 my-1" />
             <button onClick={() => setSubmitted(true)}
               className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold">
-              <Send className="w-4 h-4" />Nộp bài
+              <Send className="w-4 h-4" />Soumettre
             </button>
           </div>
         </aside>

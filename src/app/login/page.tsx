@@ -41,7 +41,7 @@ export default function LoginPage() {
           </div>
           <div className="text-center">
             <h1 className="text-2xl font-bold text-slate-900">Miora Académie</h1>
-            <p className="text-slate-500 text-sm mt-1">Hệ thống Luyện thi TCF Chuyên nghiệp</p>
+            <p className="text-slate-500 text-sm mt-1">Plateforme professionnelle de préparation au TCF</p>
           </div>
         </div>
 
@@ -50,26 +50,26 @@ export default function LoginPage() {
           <div className="text-center space-y-4">
             <div className="bg-emerald-50 rounded-2xl p-6 flex flex-col items-center gap-3">
               <CheckCircle className="w-12 h-12 text-emerald-500" />
-              <h2 className="font-bold text-slate-800 text-lg">Kiểm tra email của bạn!</h2>
+              <h2 className="font-bold text-slate-800 text-lg">Vérifiez votre e-mail</h2>
               <p className="text-sm text-slate-600 leading-relaxed">
-                Em đã gửi link đăng nhập tới <strong>{email}</strong>.<br />
-                Bấm vào link đó để vào hệ thống. Link có hiệu lực trong 10 phút.
+                Un lien de connexion a été envoyé à <strong>{email}</strong>.<br />
+                Ouvrez ce lien pour accéder à la plateforme. Il est valide 10 minutes.
               </p>
             </div>
             <button
               onClick={() => { setStatus("idle"); setEmail(""); }}
               className="text-sm text-blue-600 hover:underline"
             >
-              Dùng email khác
+              Utiliser un autre e-mail
             </button>
           </div>
         ) : (
           /* Form state */
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <h2 className="text-lg font-semibold text-slate-800 mb-1">Đăng nhập</h2>
+              <h2 className="text-lg font-semibold text-slate-800 mb-1">Connexion</h2>
               <p className="text-sm text-slate-500">
-                Nhập email được cấp quyền để nhận link đăng nhập.
+                Saisissez votre e-mail autorisé pour recevoir le lien de connexion.
               </p>
             </div>
 
@@ -93,7 +93,7 @@ export default function LoginPage() {
 
             {status === "error" && (
               <p className="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">
-                ⚠️ {errorMsg || "Có lỗi xảy ra. Thử lại sau."}
+                ⚠️ {errorMsg || "Une erreur est survenue. Veuillez réessayer plus tard."}
               </p>
             )}
 
@@ -103,14 +103,14 @@ export default function LoginPage() {
               className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-semibold py-3 px-6 rounded-xl transition-colors"
             >
               {status === "loading" ? (
-                <><Loader2 className="w-5 h-5 animate-spin" />Đang gửi...</>
+                <><Loader2 className="w-5 h-5 animate-spin" />Envoi en cours...</>
               ) : (
-                <><ArrowRight className="w-5 h-5" />Gửi link đăng nhập</>
+                <><ArrowRight className="w-5 h-5" />Envoyer le lien de connexion</>
               )}
             </button>
 
             <p className="text-xs text-center text-slate-400">
-              Hệ thống đóng — Bạn cần được Admin cấp quyền trước khi đăng nhập.
+              Plateforme fermée: une autorisation administrateur est requise.
             </p>
           </form>
         )}

@@ -93,14 +93,14 @@ export default function SpeakingSelectionPage() {
             href="/dashboard"
             className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-800 transition-colors"
           >
-            <ChevronLeft className="w-4 h-4" />Quay lại
+            <ChevronLeft className="w-4 h-4" />Retour
           </Link>
           <span className="text-slate-300">|</span>
           <Mic className="w-5 h-5 text-rose-500" />
           <div>
             <h1 className="font-bold text-slate-900">Expression Orale</h1>
             <p className="text-xs text-slate-400">
-              {years.length} ans · {years.reduce((s, y) => s + y.totalParties, 0)} parties · Tâche 2 (2:30) + Tâche 3 (4:30)
+              {years.length} ans · {years.reduce((s, y) => s + y.totalParties, 0)} parties · Tâche 2 (2:00 + 3:30) + Tâche 3 (4:30)
             </p>
           </div>
         </div>
@@ -208,7 +208,7 @@ export default function SpeakingSelectionPage() {
                           <span className="text-sm font-bold text-slate-700">Jour {partie.jour}</span>
                         </div>
                         <div className="flex items-center gap-1.5">
-                          <span className="text-xs bg-blue-50 text-blue-600 font-semibold px-2 py-0.5 rounded-lg">2:30</span>
+                          <span className="text-xs bg-blue-50 text-blue-600 font-semibold px-2 py-0.5 rounded-lg">2:00 + 3:30</span>
                           <span className="text-xs text-slate-300">+</span>
                           <span className="text-xs bg-orange-50 text-orange-600 font-semibold px-2 py-0.5 rounded-lg">4:30</span>
                         </div>

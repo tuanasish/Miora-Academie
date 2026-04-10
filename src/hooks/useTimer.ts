@@ -51,8 +51,12 @@ export function useStopwatch(autoStart = false) {
   const start = useCallback(() => setIsRunning(true), []);
   const pause = useCallback(() => { clear(); setIsRunning(false); }, [clear]);
   const reset = useCallback(() => { clear(); setSeconds(0); setIsRunning(false); }, [clear]);
+  const setElapsed = useCallback((value: number) => {
+    clear();
+    setSeconds(Math.max(0, Math.floor(value)));
+  }, [clear]);
 
   const formatted = `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
 
-  return { seconds, formatted, isRunning, start, pause, reset };
+  return { seconds, formatted, isRunning, start, pause, reset, setElapsed };
 }

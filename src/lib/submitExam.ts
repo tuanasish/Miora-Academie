@@ -22,6 +22,8 @@ export interface WritingPayload extends BasePayload {
 export interface SpeakingPayload extends BasePayload {
   exam_type: "speaking";
   partie_id: number;
+  speaking_task1_video_url?: string;
+  speaking_task2_video_url?: string;
 }
 
 export interface ListeningPayload extends BasePayload {

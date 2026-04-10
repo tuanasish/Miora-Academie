@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Headphones, ChevronLeft, Play, CheckCircle2, Lock } from "lucide-react";
+import { Headphones, ChevronLeft, Play, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 
 interface TestMeta {
@@ -55,7 +55,7 @@ export default function ListeningSeriesPage() {
             className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-800 transition-colors"
           >
             <ChevronLeft className="w-4 h-4" />
-            Quay lại
+            Retour
           </Link>
           <span className="text-slate-300">|</span>
           <div>
