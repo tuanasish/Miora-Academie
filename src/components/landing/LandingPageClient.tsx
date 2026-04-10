@@ -73,8 +73,8 @@ export function LandingPageClient() {
   return (
     <main id="top" className="min-h-screen bg-white text-[#121212]">
       <header className="sticky top-0 z-30 border-b border-black/5 bg-[#f3efe6] shadow-[0_4px_4px_rgba(0,0,0,0.15)]">
-        <div className="mx-auto flex min-h-[95px] w-full max-w-[1440px] flex-wrap items-center justify-between gap-4 px-4 py-3 lg:px-[120px]">
-          <nav className="hidden flex-1 items-center justify-end gap-2 lg:flex xl:gap-4">
+        <div className="mx-auto flex min-h-[95px] w-full max-w-[1440px] flex-wrap items-center justify-between gap-4 px-4 py-3 xl:px-[120px]">
+          <nav className="hidden flex-1 items-center justify-end gap-2 xl:flex xl:gap-4">
             {navLeft.map((item) => (
               <a
                 key={item.href}
@@ -85,11 +85,11 @@ export function LandingPageClient() {
               </a>
             ))}
           </nav>
-          <a href="#top" className="order-first flex shrink-0 justify-center lg:order-none lg:px-6">
-            <img src={ASSETS.logo} alt="Miora" className="h-12 w-auto object-contain lg:h-[54px]" />
+          <a href="#top" className="order-first flex shrink-0 justify-center xl:order-none xl:px-6">
+            <img src={ASSETS.logo} alt="Miora" className="h-12 w-auto object-contain xl:h-[54px]" />
           </a>
-          <div className="flex flex-1 items-center justify-between gap-3 lg:justify-start">
-            <nav className="hidden items-center gap-2 lg:flex xl:gap-4">
+          <div className="flex flex-1 items-center justify-between gap-3 xl:justify-start">
+            <nav className="hidden items-center gap-2 xl:flex xl:gap-4">
               {navRight.map((item) => (
                 <a
                   key={item.href}
@@ -109,7 +109,7 @@ export function LandingPageClient() {
             </Link>
           </div>
         </div>
-        <nav className="flex flex-wrap justify-center gap-2 border-t border-black/5 px-4 py-2 lg:hidden">
+        <nav className="flex flex-wrap justify-center gap-2 border-t border-black/5 px-4 py-2 xl:hidden">
           {[...navLeft, ...navRight].map((item) => (
             <a key={item.href + item.label} href={item.href} className="text-sm font-semibold text-[#3d3d3d]">
               {item.label}
