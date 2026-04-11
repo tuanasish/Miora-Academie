@@ -22,13 +22,28 @@ export default function AdminLayout({
         </div>
         <nav className="mt-6 flex flex-col gap-1 px-4">
           <Link href="/admin" className="flex items-center gap-3 px-4 py-3 text-gray-700 bg-gray-50 rounded-md font-medium hover:bg-blue-50 hover:text-blue-600 transition-colors">
-            Tổng quan
+            📊 Tổng quan
           </Link>
           <Link href="/admin/posts" className="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-md font-medium hover:bg-blue-50 hover:text-blue-600 transition-colors">
-            Quản lý Bài viết
+            📝 Quản lý Bài viết
           </Link>
+
+          {/* Student Hub section */}
+          <div className="mt-4 mb-1 px-4">
+            <p className="text-xs font-bold uppercase tracking-wider text-gray-400">Góc Học Viên</p>
+          </div>
+          <Link href="/admin/resources" className="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-md font-medium hover:bg-blue-50 hover:text-blue-600 transition-colors">
+            📚 Tài liệu
+          </Link>
+          <Link href="/admin/testimonials" className="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-md font-medium hover:bg-blue-50 hover:text-blue-600 transition-colors">
+            💬 Feedback
+          </Link>
+          <Link href="/admin/achievements" className="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-md font-medium hover:bg-blue-50 hover:text-blue-600 transition-colors">
+            🏆 Thành tựu
+          </Link>
+
           <Link href="/" className="flex items-center gap-3 px-4 py-3 text-gray-500 rounded-md font-medium hover:bg-gray-100 transition-colors mt-8">
-            Quay lại Website
+            ← Quay lại Website
           </Link>
         </nav>
       </aside>

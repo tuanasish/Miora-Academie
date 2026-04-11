@@ -17,6 +17,7 @@ export default function PostForm({ initialData }: { initialData?: Post }) {
     excerpt: initialData?.excerpt || '',
     content: initialData?.content || '',
     thumbnail_url: initialData?.thumbnail_url || '',
+    category: initialData?.category || 'blog',
     status: initialData?.status || 'draft'
   })
 
@@ -96,6 +97,15 @@ export default function PostForm({ initialData }: { initialData?: Post }) {
         </div>
 
         <div className="space-y-6 bg-gray-50 p-6 rounded-xl border border-gray-100 h-fit">
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Phân loại bài viết</label>
+            <select className="w-full text-gray-900 border border-gray-300 p-3 rounded-lg outline-none bg-white focus:ring-2 focus:ring-blue-500" value={form.category} onChange={e => setForm({ ...form, category: e.target.value as any })}>
+              <option value="blog">📰 Blog & Cập nhật</option>
+              <option value="tips">💡 Tips Học Tập</option>
+              <option value="news">📢 Tin tức</option>
+            </select>
+          </div>
+
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">Trạng thái xuất bản</label>
             <select className="w-full text-gray-900 border border-gray-300 p-3 rounded-lg outline-none bg-white focus:ring-2 focus:ring-blue-500" value={form.status} onChange={e => setForm({ ...form, status: e.target.value as any })}>

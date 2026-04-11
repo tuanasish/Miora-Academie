@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { Post, CreatePostDTO } from '@/lib/types/post';
+import { PostCategory } from '@/lib/types/student-hub';
 import { revalidatePath } from 'next/cache';
 
 export async function getPosts(adminView = false): Promise<Post[]> {
@@ -15,6 +16,28 @@ export async function getPosts(adminView = false): Promise<Post[]> {
 
   const { data, error } = await query;
   if (error) throw new Error(`Lỗi lấy dữ liệu: ${error.message}`);
+  return data || [];
+}
+
+/**
+ * Lấy bài viết theo category (chỉ published)
+ * Dùng cho Góc Học Viên: filter blog, tips, news
+ */
+export async function getPostsByCategory(category: PostCategory, limit?: number): Promise<Post[]> {
+  const supabase = await createClient();
+  let query = supabase
+    .from('posts')
+    .select('*')
+    .eq('status', 'published')
+    .eq('category', category)
+    .order('created_at', { ascending: false });
+
+  if (limit) {
+    query = query.limit(limit);
+  }
+
+  const { data, error } = await query;
+  if (error) throw new Error(`Lỗi lấy bài viết: ${error.message}`);
   return data || [];
 }
 
@@ -60,6 +83,7 @@ export async function createPost(post: CreatePostDTO): Promise<Post> {
   
   revalidatePath('/admin/posts');
   revalidatePath('/blog');
+  revalidatePath('/goc-hoc-vien');
   return data;
 }
 
@@ -76,6 +100,7 @@ export async function updatePost(id: string, post: Partial<CreatePostDTO>): Prom
   
   revalidatePath('/admin/posts');
   revalidatePath('/blog');
+  revalidatePath('/goc-hoc-vien');
   if (data?.slug) {
     revalidatePath(`/blog/${data.slug}`);
   }
@@ -93,6 +118,7 @@ export async function deletePost(id: string): Promise<void> {
   
   revalidatePath('/admin/posts');
   revalidatePath('/blog');
+  revalidatePath('/goc-hoc-vien');
 }
 
 export async function uploadBlogImage(formData: FormData): Promise<string> {

@@ -226,6 +226,6 @@ export const navLeft = [
 
 export const navRight = [
   { href: "#teachers", label: "Về giáo viên" },
-  { href: "/blog", label: "Góc học viên" },
+  { href: "/goc-hoc-vien", label: "Góc học viên" },
   { href: "#consult", label: "Liên hệ ngay" },
 ];
