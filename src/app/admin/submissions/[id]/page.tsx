@@ -2,12 +2,16 @@ import Link from 'next/link';
 import { getSubmission, gradeSubmission } from '@/app/actions/submission.actions';
 import { notFound } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
+import {
+  Headphones, BookOpen, PenLine, Mic, ArrowLeft, CheckCircle, MessageSquare,
+  Clock, Target, Save, Download, Library,
+} from 'lucide-react';
 
-const TYPE_META: Record<string, { label: string; icon: string; color: string }> = {
-  listening: { label: 'Compréhension Orale', icon: '🎧', color: 'text-sky-600' },
-  reading:   { label: 'Compréhension Écrite', icon: '📖', color: 'text-emerald-600' },
-  writing:   { label: 'Expression Écrite',    icon: '✍️', color: 'text-violet-600' },
-  speaking:  { label: 'Expression Orale',     icon: '🎤', color: 'text-rose-600' },
+const TYPE_META: Record<string, { label: string; Icon: React.ComponentType<{ className?: string }>; color: string }> = {
+  listening: { label: 'Compréhension Orale', Icon: Headphones, color: 'text-sky-600' },
+  reading:   { label: 'Compréhension Écrite', Icon: BookOpen,   color: 'text-emerald-600' },
+  writing:   { label: 'Expression Écrite',    Icon: PenLine,    color: 'text-violet-600' },
+  speaking:  { label: 'Expression Orale',     Icon: Mic,        color: 'text-rose-600' },
 };
 
 function fmtDate(iso: string) {
@@ -58,17 +62,17 @@ export default async function SubmissionDetailPage({ params }: PageProps) {
       <div className="flex items-center gap-3 mb-6">
         <Link
           href="/admin/submissions"
-          className="text-sm text-gray-500 hover:text-blue-600 transition-colors"
+          className="text-sm text-gray-500 hover:text-blue-600 transition-colors flex items-center gap-1"
         >
-          ← Quay lại
+          <ArrowLeft className="w-3.5 h-3.5" /> Quay lại
         </Link>
         <span className="text-gray-300">|</span>
-        <h1 className="text-2xl font-bold text-gray-800">
-          {meta.icon} Chi Tiết Bài Nộp
+        <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+          <meta.Icon className={`w-6 h-6 ${meta.color}`} /> Chi Tiết Bài Nộp
         </h1>
         {isGraded && (
-          <span className="text-xs font-bold bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full ml-auto">
-            ✅ Đã chấm
+          <span className="text-xs font-bold bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full ml-auto flex items-center gap-1">
+            <CheckCircle className="w-3 h-3" /> Đã chấm
           </span>
         )}
       </div>
@@ -82,11 +86,17 @@ export default async function SubmissionDetailPage({ params }: PageProps) {
           </div>
           <div>
             <p className="text-xs text-gray-400 uppercase font-semibold mb-1">Loại bài thi</p>
-            <p className={`text-sm font-bold ${meta.color}`}>{meta.icon} {meta.label}</p>
+            <p className={`text-sm font-bold ${meta.color} flex items-center gap-1.5`}><meta.Icon className="w-4 h-4" /> {meta.label}</p>
           </div>
           <div>
             <p className="text-xs text-gray-400 uppercase font-semibold mb-1">Bài</p>
             <p className="text-sm font-medium text-gray-800">{examRef}</p>
+            <a
+              href={`/admin/exams/${sub.exam_type}`}
+              className="text-[10px] text-blue-600 hover:text-blue-800 font-semibold mt-0.5 inline-flex items-center gap-0.5"
+            >
+              <Library className="w-3 h-3" /> Xem đề gốc →
+            </a>
           </div>
           <div>
             <p className="text-xs text-gray-400 uppercase font-semibold mb-1">Ngày nộp</p>
@@ -131,7 +141,7 @@ export default async function SubmissionDetailPage({ params }: PageProps) {
       {/* Admin Feedback (if graded) */}
       {isGraded && sub.admin_feedback && (
         <div className="bg-violet-50 rounded-xl border border-violet-200 p-5 mb-6">
-          <p className="text-xs text-violet-600 font-semibold uppercase mb-2">💬 Nhận xét của Admin</p>
+          <p className="text-xs text-violet-600 font-semibold uppercase mb-2 flex items-center gap-1"><MessageSquare className="w-3.5 h-3.5" /> Nhận xét của Admin</p>
           <p className="text-sm text-violet-900 whitespace-pre-wrap leading-relaxed">{sub.admin_feedback}</p>
         </div>
       )}
@@ -154,7 +164,7 @@ export default async function SubmissionDetailPage({ params }: PageProps) {
                     {t.wc || 0} mots (obj. {t.range})
                   </span>
                   {t.time !== undefined && (
-                    <span className="text-xs text-gray-400 font-mono">⏱ {fmtTime(t.time)}</span>
+                    <span className="text-xs text-gray-400 font-mono flex items-center gap-1"><Clock className="w-3 h-3" /> {fmtTime(t.time)}</span>
                   )}
                 </div>
               </div>
@@ -176,9 +186,19 @@ export default async function SubmissionDetailPage({ params }: PageProps) {
             { label: 'Tâche 3 — Débat', url: sub.speaking_task2_video_url },
           ].map((t, i) => (
             <div key={i} className="bg-white rounded-xl border border-gray-200 p-6">
-              <h3 className="font-bold text-gray-800 mb-3">{t.label}</h3>
+              <h3 className="font-bold text-gray-800 mb-3 flex items-center gap-2"><Mic className="w-4 h-4 text-rose-500" /> {t.label}</h3>
               {t.url ? (
-                <audio controls src={t.url} className="w-full h-12" />
+                <div className="space-y-2">
+                  <audio controls src={t.url} className="w-full h-12" />
+                  <a
+                    href={t.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-blue-600 hover:text-blue-800 font-semibold"
+                  >
+                    <span className="flex items-center gap-1"><Download className="w-3 h-3" /> Tải file gốc</span>
+                  </a>
+                </div>
               ) : (
                 <p className="text-sm text-gray-400 italic">Pas d&apos;enregistrement</p>
               )}
@@ -213,8 +233,9 @@ export default async function SubmissionDetailPage({ params }: PageProps) {
       {/* ===== GRADING FORM (Writing/Speaking only) ===== */}
       {isGradable && (
         <div className="bg-white rounded-xl border-2 border-violet-200 p-6">
-          <h3 className="font-bold text-gray-800 mb-1">
-            {isGraded ? '✏️ Sửa điểm' : '🎯 Chấm điểm'}
+          <h3 className="font-bold text-gray-800 mb-1 flex items-center gap-2">
+            <Target className="w-4 h-4 text-violet-500" />
+            {isGraded ? 'Sửa điểm' : 'Chấm điểm'}
           </h3>
           <p className="text-xs text-gray-400 mb-4">
             {sub.exam_type === 'writing'
@@ -275,7 +296,7 @@ export default async function SubmissionDetailPage({ params }: PageProps) {
               type="submit"
               className="inline-flex items-center gap-2 px-6 py-2.5 bg-violet-600 hover:bg-violet-700 text-white font-semibold rounded-xl text-sm transition-colors"
             >
-              {isGraded ? '💾 Cập nhật điểm' : '✅ Xác nhận chấm điểm'}
+              {isGraded ? <><Save className="w-4 h-4" /> Cập nhật điểm</> : <><CheckCircle className="w-4 h-4" /> Xác nhận chấm điểm</>}
             </button>
           </form>
         </div>

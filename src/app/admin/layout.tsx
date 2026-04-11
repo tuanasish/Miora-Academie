@@ -1,5 +1,9 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import {
+  LayoutDashboard, FileText, BookOpen, MessageSquare, Award,
+  Library, ClipboardList, FileCheck, Users, ArrowLeft,
+} from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Admin Dashboard',
@@ -22,10 +26,10 @@ export default function AdminLayout({
         </div>
         <nav className="mt-6 flex flex-col gap-1 px-4">
           <Link href="/admin" className="flex items-center gap-3 px-4 py-3 text-gray-700 bg-gray-50 rounded-md font-medium hover:bg-blue-50 hover:text-blue-600 transition-colors">
-            📊 Tổng quan
+            <LayoutDashboard className="w-4 h-4" /> Tổng quan
           </Link>
           <Link href="/admin/posts" className="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-md font-medium hover:bg-blue-50 hover:text-blue-600 transition-colors">
-            📝 Quản lý Bài viết
+            <FileText className="w-4 h-4" /> Quản lý Bài viết
           </Link>
 
           {/* Student Hub section */}
@@ -33,31 +37,34 @@ export default function AdminLayout({
             <p className="text-xs font-bold uppercase tracking-wider text-gray-400">Góc Học Viên</p>
           </div>
           <Link href="/admin/resources" className="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-md font-medium hover:bg-blue-50 hover:text-blue-600 transition-colors">
-            📚 Tài liệu
+            <BookOpen className="w-4 h-4" /> Tài liệu
           </Link>
           <Link href="/admin/testimonials" className="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-md font-medium hover:bg-blue-50 hover:text-blue-600 transition-colors">
-            💬 Feedback
+            <MessageSquare className="w-4 h-4" /> Feedback
           </Link>
           <Link href="/admin/achievements" className="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-md font-medium hover:bg-blue-50 hover:text-blue-600 transition-colors">
-            🏆 Thành tựu
+            <Award className="w-4 h-4" /> Thành tựu
           </Link>
 
           {/* Exam section */}
           <div className="mt-4 mb-1 px-4">
             <p className="text-xs font-bold uppercase tracking-wider text-gray-400">Luyện Thi</p>
           </div>
+          <Link href="/admin/exams" className="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-md font-medium hover:bg-blue-50 hover:text-blue-600 transition-colors">
+            <Library className="w-4 h-4" /> Ngân hàng đề
+          </Link>
           <Link href="/admin/assignments" className="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-md font-medium hover:bg-blue-50 hover:text-blue-600 transition-colors">
-            📋 Gán bài
+            <ClipboardList className="w-4 h-4" /> Gán bài
           </Link>
           <Link href="/admin/submissions" className="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-md font-medium hover:bg-blue-50 hover:text-blue-600 transition-colors">
-            📝 Bài nộp
+            <FileCheck className="w-4 h-4" /> Bài nộp
           </Link>
           <Link href="/admin/students" className="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-md font-medium hover:bg-blue-50 hover:text-blue-600 transition-colors">
-            👥 Học viên
+            <Users className="w-4 h-4" /> Học viên
           </Link>
 
           <Link href="/" className="flex items-center gap-3 px-4 py-3 text-gray-500 rounded-md font-medium hover:bg-gray-100 transition-colors mt-8">
-            ← Quay lại Website
+            <ArrowLeft className="w-4 h-4" /> Quay lại Website
           </Link>
         </nav>
       </aside>

@@ -1,11 +1,15 @@
 import Link from 'next/link';
 import { getAssignments, deleteAssignment, type Assignment } from '@/app/actions/assignment.actions';
+import {
+  ClipboardList, Headphones, BookOpen, PenLine, Mic,
+  Plus, Inbox, Trash2, AlertTriangle, MessageSquare,
+} from 'lucide-react';
 
-const EXAM_META: Record<string, { label: string; color: string; bg: string }> = {
-  listening: { label: 'Compréhension Orale', color: 'text-sky-700', bg: 'bg-sky-100' },
-  reading: { label: 'Compréhension Écrite', color: 'text-emerald-700', bg: 'bg-emerald-100' },
-  writing: { label: 'Expression Écrite', color: 'text-violet-700', bg: 'bg-violet-100' },
-  speaking: { label: 'Expression Orale', color: 'text-rose-700', bg: 'bg-rose-100' },
+const EXAM_META: Record<string, { label: string; color: string; bg: string; Icon: React.ComponentType<{ className?: string }> }> = {
+  listening: { label: 'Compréhension Orale', color: 'text-sky-700', bg: 'bg-sky-100', Icon: Headphones },
+  reading: { label: 'Compréhension Écrite', color: 'text-emerald-700', bg: 'bg-emerald-100', Icon: BookOpen },
+  writing: { label: 'Expression Écrite', color: 'text-violet-700', bg: 'bg-violet-100', Icon: PenLine },
+  speaking: { label: 'Expression Orale', color: 'text-rose-700', bg: 'bg-rose-100', Icon: Mic },
 };
 
 function getExamTarget(a: Assignment): string {
@@ -44,7 +48,9 @@ export default async function AdminAssignmentsPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">📋 Gán Bài Luyện Thi</h1>
+          <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+            <ClipboardList className="w-6 h-6 text-blue-600" /> Gán Bài Luyện Thi
+          </h1>
           <p className="text-gray-500 text-sm mt-1">
             Quản lý bài tập được gán cho học viên · {assignments.length} assignments
           </p>
@@ -53,16 +59,16 @@ export default async function AdminAssignmentsPage() {
           href="/admin/assignments/new"
           className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 transition-colors"
         >
-          + Gán bài mới
+          <Plus className="w-4 h-4" /> Gán bài mới
         </Link>
       </div>
 
       {/* Table */}
       {assignments.length === 0 ? (
         <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
-          <span className="text-4xl block mb-3">📭</span>
+          <Inbox className="w-10 h-10 mx-auto mb-3 text-gray-300" />
           <p className="font-semibold text-gray-700">Chưa có bài nào được gán</p>
-          <p className="text-sm text-gray-400 mt-1">Nhấn "Gán bài mới" để bắt đầu</p>
+          <p className="text-sm text-gray-400 mt-1">Nhấn &quot;Gán bài mới&quot; để bắt đầu</p>
         </div>
       ) : (
         <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
@@ -81,6 +87,7 @@ export default async function AdminAssignmentsPage() {
             <tbody className="divide-y divide-gray-100">
               {assignments.map((a) => {
                 const meta = EXAM_META[a.exam_type] || EXAM_META.listening;
+                const MetaIcon = meta.Icon;
                 const overdue = isOverdue(a.due_date);
 
                 return (
@@ -89,15 +96,15 @@ export default async function AdminAssignmentsPage() {
                     <td className="px-4 py-3">
                       <p className="font-medium text-gray-800">{a.student_email}</p>
                       {a.note && (
-                        <p className="text-xs text-gray-400 mt-0.5 italic truncate max-w-[200px]">
-                          💬 {a.note}
+                        <p className="text-xs text-gray-400 mt-0.5 italic truncate max-w-[200px] flex items-center gap-1">
+                          <MessageSquare className="w-3 h-3 shrink-0" /> {a.note}
                         </p>
                       )}
                     </td>
                     {/* Exam type badge */}
                     <td className="px-4 py-3">
-                      <span className={`inline-block px-2.5 py-1 rounded-full text-xs font-bold ${meta.bg} ${meta.color}`}>
-                        {meta.label}
+                      <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold ${meta.bg} ${meta.color}`}>
+                        <MetaIcon className="w-3 h-3" /> {meta.label}
                       </span>
                     </td>
                     {/* Target */}
@@ -109,8 +116,8 @@ export default async function AdminAssignmentsPage() {
                     {/* Due date */}
                     <td className="px-4 py-3">
                       {a.due_date ? (
-                        <span className={`text-xs font-semibold ${overdue ? 'text-red-600' : 'text-orange-600'}`}>
-                          {overdue && '⚠️ '}{fmtDate(a.due_date)}
+                        <span className={`text-xs font-semibold flex items-center gap-1 ${overdue ? 'text-red-600' : 'text-orange-600'}`}>
+                          {overdue && <AlertTriangle className="w-3 h-3" />}{fmtDate(a.due_date)}
                         </span>
                       ) : (
                         <span className="text-gray-300">—</span>
@@ -130,12 +137,12 @@ export default async function AdminAssignmentsPage() {
                         <input type="hidden" name="id" value={a.id} />
                         <button
                           type="submit"
-                          className="text-xs text-red-500 hover:text-red-700 font-semibold transition-colors"
+                          className="text-xs text-red-500 hover:text-red-700 font-semibold transition-colors inline-flex items-center gap-1"
                           onClick={(e) => {
                             if (!confirm('Xóa assignment này?')) e.preventDefault();
                           }}
                         >
-                          🗑 Xóa
+                          <Trash2 className="w-3 h-3" /> Xóa
                         </button>
                       </form>
                     </td>

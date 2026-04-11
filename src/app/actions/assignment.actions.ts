@@ -100,6 +100,41 @@ export async function createAssignment(dto: CreateAssignmentDTO): Promise<void> 
   revalidatePath('/dashboard');
 }
 
+// --- Bulk create assignments (one exam → many students) ---
+
+export async function bulkCreateAssignments(
+  student_emails: string[],
+  exam_config: Omit<CreateAssignmentDTO, 'student_email'>,
+): Promise<{ success: number; failed: string[] }> {
+  const supabase = await createClient();
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Chưa đăng nhập');
+
+  const rows = student_emails.map((email) => ({
+    student_email: email,
+    exam_type: exam_config.exam_type,
+    serie_id: exam_config.serie_id ?? null,
+    combinaison_id: exam_config.combinaison_id ?? null,
+    partie_id: exam_config.partie_id ?? null,
+    exam_label: exam_config.exam_label ?? null,
+    due_date: exam_config.due_date || null,
+    note: exam_config.note || null,
+    assigned_by: user.id,
+  }));
+
+  const { error } = await supabase
+    .from('exam_assignments')
+    .insert(rows);
+
+  if (error) throw new Error(`Lỗi gán hàng loạt: ${error.message}`);
+
+  revalidatePath('/admin/assignments');
+  revalidatePath('/dashboard');
+
+  return { success: student_emails.length, failed: [] };
+}
+
 // --- Delete assignment ---
 
 export async function deleteAssignment(id: string): Promise<void> {
