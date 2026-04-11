@@ -9,6 +9,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { submitExam } from "@/lib/submitExam";
+import { playExamChime } from "@/lib/playExamChime";
 
 interface Sujet {
   id: number;
@@ -257,9 +258,43 @@ export default function SpeakingExamPage() {
   const tache3Timer = useCountdown(TACHE3_SECONDS, false);
 
   const activeTimer = activeTask === 0 ? tache2Timer : tache3Timer;
-  const activeTotal = activeTask === 0 ? TACHE2_TOTAL_SECONDS : TACHE3_SECONDS;
 
   const isTask2Prep = tache2Timer.seconds > TACHE2_SPEAK_SECONDS;
+  /** Affichage & anneau : temps restant de la phase courante (2:00 puis 3:30), pas le total 5:30 */
+  const task2PhaseRemaining =
+    tache2Timer.seconds <= 0
+      ? 0
+      : isTask2Prep
+        ? tache2Timer.seconds - TACHE2_SPEAK_SECONDS
+        : tache2Timer.seconds;
+  const task2PhaseTotal = isTask2Prep ? TACHE2_PREP_SECONDS : TACHE2_SPEAK_SECONDS;
+
+  const prevT2SecondsRef = useRef(TACHE2_TOTAL_SECONDS);
+  const prevT3SecondsRef = useRef(TACHE3_SECONDS);
+
+  useEffect(() => {
+    const prev = prevT2SecondsRef.current;
+    const s = tache2Timer.seconds;
+    if (prev > TACHE2_SPEAK_SECONDS && s === TACHE2_SPEAK_SECONDS) {
+      void playExamChime("prepEnd");
+    }
+    if (prev === 1 && s === 0) {
+      void playExamChime("sessionEnd");
+    }
+    prevT2SecondsRef.current = s;
+  }, [tache2Timer.seconds]);
+
+  useEffect(() => {
+    const prev = prevT3SecondsRef.current;
+    const s = tache3Timer.seconds;
+    if (prev === 1 && s === 0) {
+      void playExamChime("sessionEnd");
+    }
+    prevT3SecondsRef.current = s;
+  }, [tache3Timer.seconds]);
+
+  const activeTotal = activeTask === 0 ? task2PhaseTotal : TACHE3_SECONDS;
+  const activeDisplaySeconds = activeTask === 0 ? task2PhaseRemaining : tache3Timer.seconds;
   const task2PhaseLabel = tache2Timer.seconds === 0
     ? "Terminé"
     : isTask2Prep
@@ -607,7 +642,9 @@ export default function SpeakingExamPage() {
               {activeTask === 0 ? "Tâche 2 — Simulation de roleplay" : "Tâche 3 — Point de vue & Débat"}
             </span>
             <span className={`text-xs font-semibold px-3 py-1 rounded-full ${activeTask === 0 ? "bg-blue-50 text-blue-600" : "bg-orange-50 text-orange-500"}`}>
-              {activeTask === 0 ? `${task2PhaseLabel} · ${formatSeconds(tache2Timer.seconds)}` : `${formatSeconds(tache3Timer.seconds)} restant`}
+              {activeTask === 0
+                ? `${task2PhaseLabel} · ${formatSeconds(task2PhaseRemaining)}`
+                : `${formatSeconds(tache3Timer.seconds)} restant`}
             </span>
           </div>
 
@@ -718,7 +755,7 @@ export default function SpeakingExamPage() {
 
         <aside className="w-56 bg-white border-l border-slate-200 flex flex-col items-center p-8 gap-6 shrink-0">
           <CircularTimer
-            seconds={activeTimer.seconds}
+            seconds={activeDisplaySeconds}
             total={activeTotal}
             label={activeTask === 0 ? "Tâche 2" : "Tâche 3"}
             subtitle={activeTask === 0 ? task2PhaseLabel : "Parole"}
@@ -763,7 +800,7 @@ export default function SpeakingExamPage() {
           </div>
 
           <p className="text-xs text-slate-400 text-center mt-auto leading-relaxed">
-            Le timer de la Tâche 2 inclut 2:00 de préparation puis 3:30 de parole.
+            Tâche 2 : le cercle affiche le temps de la phase en cours (2:00 puis 3:30). Un signal sonore marque la fin de chaque phase.
           </p>
         </aside>
       </div>

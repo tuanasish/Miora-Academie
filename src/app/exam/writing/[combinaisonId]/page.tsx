@@ -268,8 +268,8 @@ export default function WritingExamPage() {
           </div>
         </aside>
 
-        {/* CENTER */}
-        <main className="flex-1 flex flex-col overflow-hidden px-3 md:px-6">
+        {/* CENTER — min-h-0 + overflow-y-auto so Tâche 3 (long docs) can scroll to the textarea */}
+        <main className="flex-1 flex flex-col min-h-0 overflow-y-auto px-3 md:px-6">
           {/* Prompt area */}
           <div className="shrink-0 pt-3">
             <div className="max-w-[980px] w-full mx-auto bg-amber-50 border border-amber-200 rounded-xl p-4">
@@ -309,11 +309,11 @@ export default function WritingExamPage() {
             </div>
           </div>
 
-          {/* Text area */}
-          <div className="flex-1 py-3 overflow-hidden">
-            <div className="max-w-[980px] w-full h-full mx-auto">
+          {/* Text area — min height so it stays usable after long prompts; main scrolls if needed */}
+          <div className="shrink-0 py-3 pb-8">
+            <div className="max-w-[980px] w-full mx-auto">
               <textarea
-                className="w-full h-full resize-none border border-slate-200 rounded-xl p-5 text-slate-900 text-base md:text-lg font-medium leading-8 bg-white focus:outline-none focus:ring-2 focus:ring-violet-300 selection:bg-violet-200 selection:text-slate-900"
+                className="w-full min-h-[min(52vh,560px)] resize-y border border-slate-200 rounded-xl p-5 text-slate-900 text-base md:text-lg font-medium leading-8 bg-white focus:outline-none focus:ring-2 focus:ring-violet-300 selection:bg-violet-200 selection:text-slate-900"
                 placeholder="Commencez à écrire ici..."
                 value={texts[activeTask]}
                 onChange={(e) => {

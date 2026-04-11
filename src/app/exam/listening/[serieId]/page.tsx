@@ -302,9 +302,13 @@ export default function ListeningSerieExamPage() {
 
           {/* Image */}
           {q.imageUrl && (
-            <div className="rounded-xl overflow-hidden border border-[#e4ddd1] max-w-sm">
+            <div className="shrink-0 w-full max-w-2xl rounded-xl overflow-hidden border border-[#e4ddd1] bg-white">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={q.imageUrl} alt="Question" className="w-full object-cover" />
+              <img
+                src={q.imageUrl}
+                alt="Question"
+                className="block w-full h-auto max-h-[min(85vh,1600px)] object-contain"
+              />
             </div>
           )}
 
