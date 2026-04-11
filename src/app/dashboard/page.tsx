@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import {
   GraduationCap, Headphones, BookOpen, PenLine, Mic,
-  LogOut, ClipboardList, CheckCircle2,
+  LogOut, ClipboardList, CheckCircle2, Play,
   Calendar, AlertCircle, Loader2, FileText, ArrowRight,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
@@ -96,6 +96,7 @@ export default function DashboardPage() {
   const router = useRouter();
   const [userEmail, setUserEmail] = useState("");
   const [userName, setUserName] = useState("");
+  const [userRole, setUserRole] = useState<"admin" | "student">("student");
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(true);
@@ -106,21 +107,36 @@ export default function DashboardPage() {
     if (!user) { router.push("/login"); return; }
     setUserEmail(user.email ?? "");
 
-    const [{ data: profile }, { data: assigns }, { data: subs }] = await Promise.all([
-      supabase.from("profiles").select("full_name").eq("id", user.id).single(),
-      supabase.from("exam_assignments")
-        .select("*")
-        .eq("student_email", user.email ?? "")
-        .order("assigned_at", { ascending: false }),
+    const [{ data: profile }, { data: subs }] = await Promise.all([
+      supabase.from("profiles").select("full_name, role").eq("id", user.id).single(),
       supabase.from("exam_submissions")
         .select("id, exam_type, submitted_at, score, combinaison_id, serie_id, partie_id, word_counts, time_spent_seconds")
         .eq("student_email", user.email ?? "")
         .order("submitted_at", { ascending: false }),
     ]);
 
+    const role = (profile?.role as "admin" | "student") ?? "student";
+    setUserRole(role);
     setUserName(profile?.full_name ?? "");
-    setAssignments(assigns ?? []);
     setSubmissions(subs ?? []);
+
+    // Admin: fetch ALL assignments to see everything
+    // Student: only fetch their own
+    if (role === "admin") {
+      const { data: allAssigns } = await supabase
+        .from("exam_assignments")
+        .select("*")
+        .order("assigned_at", { ascending: false });
+      setAssignments(allAssigns ?? []);
+    } else {
+      const { data: myAssigns } = await supabase
+        .from("exam_assignments")
+        .select("*")
+        .eq("student_email", user.email ?? "")
+        .order("assigned_at", { ascending: false });
+      setAssignments(myAssigns ?? []);
+    }
+
     setLoading(false);
   }, [supabase, router]);
 
@@ -189,8 +205,47 @@ export default function DashboardPage() {
           <h2 className="text-2xl font-bold text-slate-900">
             Bonjour{userName ? `, ${userName}` : ""} 👋
           </h2>
-          <p className="text-slate-500 mt-1">Voici vos examens assignés et votre historique de soumission.</p>
+          <p className="text-slate-500 mt-1">
+            {userRole === "admin"
+              ? "Accédez à toutes les épreuves et consultez les attributions."
+              : "Voici vos examens assignés et votre historique de soumission."
+            }
+          </p>
         </div>
+
+        {/* ── ADMIN: Quick Access to All Exams ── */}
+        {userRole === "admin" && (
+          <section>
+            <div className="flex items-center gap-2 mb-4">
+              <GraduationCap className="w-5 h-5 text-blue-500" />
+              <h3 className="font-bold text-slate-800 text-lg">Accès direct aux épreuves</h3>
+              <span className="ml-1 bg-blue-100 text-blue-700 text-xs font-bold px-2 py-0.5 rounded-full">Admin</span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {(Object.entries(EXAM_META) as [ExamType, typeof EXAM_META[ExamType]][]).map(([type, meta]) => {
+                const Icon = meta.Icon;
+                return (
+                  <Link
+                    key={type}
+                    href={meta.href}
+                    className={`group relative bg-white rounded-2xl border-2 ${meta.border} p-5 hover:shadow-lg transition-all duration-200`}
+                  >
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 ${meta.bg} group-hover:scale-110 transition-transform`}>
+                      <Icon className={`w-5 h-5 ${meta.color}`} />
+                    </div>
+                    <h4 className="font-bold text-slate-800 text-sm">{meta.label}</h4>
+                    <p className="text-xs text-slate-400 mt-1">{meta.detail}</p>
+                    <div className={`mt-3 flex items-center gap-1.5 text-xs font-semibold ${meta.color}`}>
+                      <Play className="w-3.5 h-3.5 fill-current" />
+                      Voir toutes les séries
+                    </div>
+                    <div className={`absolute inset-0 rounded-2xl ${meta.bg.replace('bg-', 'bg-')}/20 opacity-0 group-hover:opacity-100 transition-opacity`} />
+                  </Link>
+                );
+              })}
+            </div>
+          </section>
+        )}
 
         {/* ── ASSIGNED EXAMS ── */}
         {assignments.length > 0 && (
@@ -284,7 +339,7 @@ export default function DashboardPage() {
         )}
 
         {/* ── No assignments ── */}
-        {assignments.length === 0 && (
+        {assignments.length === 0 && userRole !== "admin" && (
           <section>
             <h3 className="font-bold text-slate-800 text-lg mb-4">Examens assignés</h3>
             <div className="bg-white rounded-2xl border border-slate-200 p-8 text-center">
@@ -352,7 +407,7 @@ export default function DashboardPage() {
         )}
 
         {/* Empty state */}
-        {assignments.length === 0 && submissions.length === 0 && (
+        {assignments.length === 0 && submissions.length === 0 && userRole !== "admin" && (
           <div className="text-center py-12 text-slate-400">
             <ClipboardList className="w-10 h-10 mx-auto mb-3 opacity-40" />
             <p className="text-sm">Aucun examen assigné pour le moment. Contactez votre enseignant.</p>
