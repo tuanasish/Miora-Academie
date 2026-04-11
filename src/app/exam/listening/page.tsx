@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { Headphones, ChevronLeft, Play, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
+import { createClient } from "@/lib/supabase/client";
 
 interface TestMeta {
   testNumber: number;
@@ -20,7 +21,7 @@ export default function ListeningSeriesPage() {
   const [tests, setTests] = useState<TestMeta[]>([]);
   const [loading, setLoading] = useState(true);
   // Track done series (per session, resets on refresh — will persist via Supabase later)
-  const [done] = useState<Set<number>>(new Set());
+  const [done, setDone] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     fetch("/data/listening.json")
@@ -37,46 +38,64 @@ export default function ListeningSeriesPage() {
       .catch(() => setLoading(false));
   }, []);
 
+  // Fetch completed séries from Supabase
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) return;
+      supabase
+        .from("exam_submissions")
+        .select("serie_id")
+        .eq("student_email", user.email ?? "")
+        .eq("exam_type", "listening")
+        .then(({ data }) => {
+          if (data) {
+            setDone(new Set(data.map((d) => d.serie_id as number).filter(Boolean)));
+          }
+        });
+    });
+  }, []);
+
   if (loading) {
     return (
-      <div className="h-screen flex items-center justify-center bg-slate-50">
-        <div className="w-10 h-10 border-4 border-sky-300 border-t-sky-600 rounded-full animate-spin" />
+      <div className="h-screen flex items-center justify-center bg-[#f3efe6]">
+        <div className="w-10 h-10 border-4 border-[#f05e23]/30 border-t-[#f05e23] rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-sky-50">
+    <div className="min-h-screen bg-[#f3efe6]">
       {/* Header */}
-      <header className="bg-white border-b border-slate-200 px-6 py-4 sticky top-0 z-10">
+      <header className="bg-[#faf8f5] border-b border-[#e4ddd1] px-6 py-4 sticky top-0 z-10 shadow-[0_2px_8px_rgba(0,0,0,0.06)]">
         <div className="max-w-5xl mx-auto flex items-center gap-4">
           <Link
             href="/dashboard"
-            className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-800 transition-colors"
+            className="flex items-center gap-1.5 text-sm text-[#888] hover:text-[#3d3d3d] transition-colors"
           >
             <ChevronLeft className="w-4 h-4" />
             Retour
           </Link>
-          <span className="text-slate-300">|</span>
+          <span className="text-[#d7c9b8]">|</span>
           <div>
             <div className="flex items-center gap-2">
-              <Headphones className="w-5 h-5 text-sky-500" />
-              <h1 className="font-bold text-slate-900">Compréhension de l&apos;Oral</h1>
+              <Headphones className="w-5 h-5 text-[#f05e23]" />
+              <h1 className="font-bold text-[#3d3d3d]">Compréhension de l&apos;Oral</h1>
             </div>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <p className="text-xs text-[#888] mt-0.5">
               {tests.length} Séries · 39 questions/série · 35 min/série
             </p>
           </div>
 
           {/* Filter tabs  */}
-          <div className="ml-auto flex items-center gap-1 bg-slate-100 rounded-xl p-1">
-            <button className="px-4 py-1.5 rounded-lg bg-white shadow-sm text-sm font-medium text-slate-800">
+          <div className="ml-auto flex items-center gap-1 bg-[#ede8dd] rounded-xl p-1">
+            <button className="px-4 py-1.5 rounded-lg bg-[#faf8f5] shadow-sm text-sm font-medium text-[#3d3d3d]">
               Toutes
             </button>
-            <button className="px-4 py-1.5 rounded-lg text-sm text-slate-500 hover:text-slate-700">
+            <button className="px-4 py-1.5 rounded-lg text-sm text-[#888] hover:text-[#3d3d3d]">
               Terminées
             </button>
-            <button className="px-4 py-1.5 rounded-lg text-sm text-slate-500 hover:text-slate-700">
+            <button className="px-4 py-1.5 rounded-lg text-sm text-[#888] hover:text-[#3d3d3d]">
               Non terminées
             </button>
           </div>
@@ -92,10 +111,10 @@ export default function ListeningSeriesPage() {
               <Link
                 key={test.testNumber}
                 href={`/exam/listening/${test.testNumber}`}
-                className={`group relative bg-white rounded-2xl border-2 p-5 hover:shadow-lg transition-all duration-200 ${
+                className={`group relative bg-[#faf8f5] rounded-2xl border-2 p-5 hover:shadow-lg transition-all duration-200 ${
                   isDone
                     ? "border-emerald-200 hover:border-emerald-300"
-                    : "border-slate-200 hover:border-sky-300"
+                    : "border-[#e4ddd1] hover:border-[#f05e23]/40"
                 }`}
               >
                 {/* Status badge */}
@@ -104,7 +123,7 @@ export default function ListeningSeriesPage() {
                     className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm ${
                       isDone
                         ? "bg-emerald-100 text-emerald-600"
-                        : "bg-sky-100 text-sky-600 group-hover:bg-sky-200 transition-colors"
+                        : "bg-[#f05e23]/10 text-[#f05e23] group-hover:bg-[#f05e23]/20 transition-colors"
                     }`}
                   >
                     {isDone ? <CheckCircle2 className="w-5 h-5" /> : test.testNumber}
@@ -113,20 +132,20 @@ export default function ListeningSeriesPage() {
                     className={`text-xs font-semibold px-2 py-1 rounded-full ${
                       isDone
                         ? "bg-emerald-50 text-emerald-600"
-                        : "bg-slate-50 text-slate-400"
+                        : "bg-[#ede8dd] text-[#888]"
                     }`}
                   >
                     {isDone ? "Terminée ✓" : `${test.questionCount} questions`}
                   </span>
                 </div>
 
-                <h3 className="font-bold text-slate-800 mb-1">Série {test.testNumber}</h3>
-                <p className="text-xs text-slate-400">39 questions · 35 min</p>
+                <h3 className="font-bold text-[#3d3d3d] mb-1">Série {test.testNumber}</h3>
+                <p className="text-xs text-[#888]">39 questions · 35 min</p>
 
                 {/* Play CTA */}
                 <div
                   className={`mt-4 flex items-center gap-2 text-sm font-semibold ${
-                    isDone ? "text-emerald-600" : "text-sky-600"
+                    isDone ? "text-emerald-600" : "text-[#f05e23]"
                   }`}
                 >
                   <Play className="w-4 h-4 fill-current" />
@@ -134,7 +153,7 @@ export default function ListeningSeriesPage() {
                 </div>
 
                 {/* Hover overlay */}
-                <div className="absolute inset-0 rounded-2xl bg-sky-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="absolute inset-0 rounded-2xl bg-[#f05e23]/5 opacity-0 group-hover:opacity-100 transition-opacity" />
               </Link>
             );
           })}

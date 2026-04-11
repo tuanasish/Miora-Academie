@@ -42,6 +42,20 @@ export default function AdminLayout({
             🏆 Thành tựu
           </Link>
 
+          {/* Exam section */}
+          <div className="mt-4 mb-1 px-4">
+            <p className="text-xs font-bold uppercase tracking-wider text-gray-400">Luyện Thi</p>
+          </div>
+          <Link href="/admin/assignments" className="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-md font-medium hover:bg-blue-50 hover:text-blue-600 transition-colors">
+            📋 Gán bài
+          </Link>
+          <Link href="/admin/submissions" className="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-md font-medium hover:bg-blue-50 hover:text-blue-600 transition-colors">
+            📝 Bài nộp
+          </Link>
+          <Link href="/admin/students" className="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-md font-medium hover:bg-blue-50 hover:text-blue-600 transition-colors">
+            👥 Học viên
+          </Link>
+
           <Link href="/" className="flex items-center gap-3 px-4 py-3 text-gray-500 rounded-md font-medium hover:bg-gray-100 transition-colors mt-8">
             ← Quay lại Website
           </Link>
