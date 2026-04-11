@@ -260,7 +260,7 @@ export default function ListeningSerieExamPage() {
         </aside>
 
         {/* CENTER – Question */}
-        <main className="flex-1 flex flex-col p-4 sm:p-6 gap-4 sm:gap-5 overflow-y-auto">
+        <main className="flex-1 flex flex-col overflow-y-auto p-4 sm:p-6 gap-3 sm:gap-4">
           {/* Tags row */}
           <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
             <span className="text-xs font-semibold bg-sky-100 text-sky-700 px-2.5 py-1 rounded-full">
@@ -300,40 +300,40 @@ export default function ListeningSerieExamPage() {
             </div>
           )}
 
-          {/* Image */}
+          {/* Image — khung ôm sát ảnh (w-max), không nền trắng full width */}
           {q.imageUrl && (
-            <div className="shrink-0 w-full max-w-2xl rounded-xl overflow-hidden border border-[#e4ddd1] bg-white">
+            <div className="shrink-0 w-max max-w-full rounded-xl border border-[#e4ddd1] overflow-hidden shadow-sm">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={q.imageUrl}
                 alt="Question"
-                className="block w-full h-auto max-h-[min(85vh,1600px)] object-contain"
+                className="block h-auto w-auto max-w-full max-h-[clamp(9.5rem,22vh,14rem)] object-contain sm:max-h-[clamp(10.5rem,26vh,16rem)] md:max-h-[clamp(11.5rem,28vh,18rem)]"
               />
             </div>
           )}
 
           {/* Prompt */}
-          <div className="bg-[#faf8f5] rounded-xl border border-[#e4ddd1] p-4 sm:p-5">
-            <p className="text-[#3d3d3d] leading-relaxed text-sm sm:text-base">{q.prompt}</p>
+          <div className="bg-[#faf8f5] rounded-xl border border-[#e4ddd1] p-3 sm:p-4">
+            <p className="text-[#3d3d3d] leading-snug text-sm sm:text-base">{q.prompt}</p>
           </div>
 
           {/* Options — with bounce animation */}
-          <div className="grid grid-cols-1 gap-2 sm:gap-3 max-w-2xl">
+          <div className="grid grid-cols-2 gap-2 sm:gap-3 max-w-2xl items-stretch">
             {q.options.map((opt, idx) => {
               const isSelected = answers[q.id] === idx;
               return (
                 <button key={idx} onClick={() => selectAnswer(idx)}
-                  className={`option-btn w-full text-left p-3 sm:p-4 rounded-xl border-2 text-sm font-medium ${
+                  className={`option-btn flex h-full min-h-[2.5rem] w-full items-start gap-2 text-left p-2.5 sm:p-3 rounded-xl border-2 text-sm font-medium ${
                     isSelected
                       ? "border-[#f05e23] bg-[#fffaf6] text-[#3d3d3d] shadow-sm anim-bounce-select"
                       : "border-[#e4ddd1] bg-[#faf8f5] text-[#5d5d5d] hover:border-[#f05e23]/50 hover:bg-[#fffaf6]"
                   }`}>
-                  <span className={`inline-block w-6 h-6 rounded-full text-xs font-bold text-center leading-6 mr-3 ${
+                  <span className={`shrink-0 w-6 h-6 rounded-full text-xs font-bold leading-6 text-center ${
                     isSelected ? "bg-[#f05e23] text-white" : "bg-[#ede8dd] text-[#888]"
                   }`}>
                     {["A","B","C","D"][idx]}
                   </span>
-                  {opt}
+                  <span className="min-w-0 flex-1 leading-snug">{opt}</span>
                 </button>
               );
             })}

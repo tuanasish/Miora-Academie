@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
+import Image from "next/image";
 import { BookOpen, ChevronLeft, ChevronRight, Clock, Send, ArrowLeft, Loader2, Flag } from "lucide-react";
 import { useCountdown } from "@/hooks/useTimer";
 import { useKeyboardNav } from "@/hooks/useKeyboardNav";
@@ -41,6 +42,7 @@ export default function ReadingSerieExamPage() {
   const [notFound, setNotFound] = useState(false);
   const [flagged, setFlagged] = useState<Set<number>>(new Set());
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [readingImageReady, setReadingImageReady] = useState(false);
 
   const timer = useCountdown(TOTAL_SECONDS, true);
 
@@ -57,6 +59,22 @@ export default function ReadingSerieExamPage() {
   }, [serieId]);
 
   const q = questions[currentQ];
+
+  useEffect(() => {
+    setReadingImageReady(false);
+  }, [questions, currentQ]);
+
+  /** Warm cache for câu liền kề (đổi câu thường tới trước/sau). */
+  useEffect(() => {
+    if (questions.length === 0) return;
+    for (const offset of [1, 2, -1]) {
+      const url = questions[currentQ + offset]?.imageUrl;
+      if (!url) continue;
+      const pre = new window.Image();
+      pre.src = url;
+    }
+  }, [currentQ, questions]);
+
   const answered = Object.keys(answers).length;
   const total = questions.length;
   const pct = total > 0 ? Math.round((answered / total) * 100) : 0;
@@ -255,12 +273,26 @@ export default function ReadingSerieExamPage() {
           </div>
 
           {q.imageUrl && (
-            <div className="shrink-0 w-full max-w-2xl rounded-xl overflow-hidden border border-[#e4ddd1] bg-white">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+            <div className="relative shrink-0 w-max max-w-full min-h-[120px] min-w-[8rem] rounded-xl overflow-hidden border border-[#e4ddd1] shadow-sm">
+              {!readingImageReady && (
+                <div
+                  className="absolute inset-0 z-[1] animate-pulse bg-[#ede8dd]"
+                  aria-hidden
+                />
+              )}
+              <Image
                 src={q.imageUrl}
-                alt="Reading"
-                className="block w-full h-auto max-h-[min(85vh,1600px)] object-contain"
+                alt="Document de lecture"
+                width={960}
+                height={1280}
+                priority
+                quality={85}
+                sizes="(max-width: 768px) min(100vw, 42rem), 560px"
+                fetchPriority="high"
+                className={`relative z-[2] block h-auto w-auto max-w-full max-h-[min(85vh,1600px)] object-contain transition-opacity duration-200 ${
+                  readingImageReady ? "opacity-100" : "opacity-0"
+                }`}
+                onLoad={() => setReadingImageReady(true)}
               />
             </div>
           )}
@@ -269,22 +301,22 @@ export default function ReadingSerieExamPage() {
             <p className="text-[#3d3d3d] leading-relaxed text-sm sm:text-base">{q.prompt}</p>
           </div>
 
-          <div className="grid grid-cols-1 gap-2 sm:gap-3 max-w-2xl">
+          <div className="grid grid-cols-2 gap-2 sm:gap-3 max-w-2xl items-stretch">
             {q.options.map((opt, idx) => {
               const isSelected = answers[q.id] === idx;
               return (
                 <button key={idx} onClick={() => selectAnswer(idx)}
-                  className={`option-btn w-full text-left p-3 sm:p-4 rounded-xl border-2 text-sm font-medium ${
+                  className={`option-btn flex h-full min-h-[3rem] w-full items-start gap-2.5 text-left p-3 sm:p-4 rounded-xl border-2 text-sm font-medium ${
                     isSelected
                       ? "border-[#f05e23] bg-[#fffaf6] text-[#3d3d3d] shadow-sm anim-bounce-select"
                       : "border-[#e4ddd1] bg-[#faf8f5] text-[#5d5d5d] hover:border-[#f05e23]/50 hover:bg-[#fffaf6]"
                   }`}>
-                  <span className={`inline-block w-6 h-6 rounded-full text-xs font-bold text-center leading-6 mr-3 ${
+                  <span className={`shrink-0 w-6 h-6 rounded-full text-xs font-bold leading-6 text-center ${
                     isSelected ? "bg-[#f05e23] text-white" : "bg-[#ede8dd] text-[#888]"
                   }`}>
                     {["A","B","C","D"][idx]}
                   </span>
-                  {opt}
+                  <span className="min-w-0 flex-1 leading-snug">{opt}</span>
                 </button>
               );
             })}
