@@ -1,6 +1,7 @@
 import { getStudentsList, updateStudentRole } from '@/app/actions/student.actions';
 import { revalidatePath } from 'next/cache';
-import { Users, Shield, GraduationCap, UserX } from 'lucide-react';
+import { Users, UserX } from 'lucide-react';
+import { RoleSelect } from '@/components/admin/RoleSelect';
 
 function fmtDate(iso: string) {
   return new Date(iso).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
@@ -70,25 +71,7 @@ export default async function AdminStudentsPage() {
                   <p className="text-sm text-gray-600">{s.full_name || '—'}</p>
                 </td>
                 <td className="px-4 py-4">
-                  <form action={handleRoleChange}>
-                    <input type="hidden" name="id" value={s.id} />
-                    <select
-                      name="role"
-                      defaultValue={s.role}
-                      onChange={(e) => {
-                        const form = e.currentTarget.closest('form');
-                        if (form) form.requestSubmit();
-                      }}
-                      className={`text-xs font-semibold px-3 py-1.5 rounded-full border-0 cursor-pointer focus:ring-2 focus:ring-blue-300 ${
-                        s.role === 'admin'
-                          ? 'bg-blue-100 text-blue-700'
-                          : 'bg-emerald-100 text-emerald-700'
-                      }`}
-                    >
-                      <option value="admin">Admin</option>
-                      <option value="student">Học viên</option>
-                    </select>
-                  </form>
+                  <RoleSelect studentId={s.id} currentRole={s.role} action={handleRoleChange} />
                 </td>
                 <td className="px-4 py-4 text-center">
                   <span className={`text-sm font-semibold ${s.assignments_count > 0 ? 'text-gray-800' : 'text-gray-300'}`}>

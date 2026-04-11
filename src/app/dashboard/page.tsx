@@ -6,6 +6,7 @@ import {
   LogOut, ClipboardList, CheckCircle2, Play,
   Calendar, AlertCircle, Loader2, FileText, ArrowRight,
   TrendingUp, Clock, Award, ChevronRight, Sparkles,
+  Settings, MessageCircle, Timer, Hourglass,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
@@ -48,33 +49,33 @@ const EXAM_META: Record<ExamType, {
   detail: string; tagCls: string; accent: string;
 }> = {
   listening: {
-    label: "Compréhension de l'Oral", sublabel: "Compréhension orale",
+    label: "Compréhension Orale", sublabel: "Nghe hiểu",
     Icon: Headphones, color: "text-sky-600", bg: "bg-sky-50",
-    border: "border-sky-200", href: "/exam/listening", detail: "35 min · 39 questions",
+    border: "border-sky-200", href: "/exam/listening", detail: "35 phút · 39 câu hỏi",
     tagCls: "bg-sky-100 text-sky-700", accent: "from-sky-500 to-sky-600",
   },
   reading: {
-    label: "Compréhension de l'Écrit", sublabel: "Compréhension écrite",
+    label: "Compréhension Écrite", sublabel: "Đọc hiểu",
     Icon: BookOpen, color: "text-emerald-600", bg: "bg-emerald-50",
-    border: "border-emerald-200", href: "/exam/reading", detail: "60 min · 29 questions",
+    border: "border-emerald-200", href: "/exam/reading", detail: "60 phút · 29 câu hỏi",
     tagCls: "bg-emerald-100 text-emerald-700", accent: "from-emerald-500 to-emerald-600",
   },
   writing: {
-    label: "Expression Écrite", sublabel: "Expression écrite",
+    label: "Expression Écrite", sublabel: "Viết",
     Icon: PenLine, color: "text-violet-600", bg: "bg-violet-50",
-    border: "border-violet-200", href: "/exam/writing", detail: "60 min · 3 tâches",
+    border: "border-violet-200", href: "/exam/writing", detail: "60 phút · 3 bài",
     tagCls: "bg-violet-100 text-violet-700", accent: "from-violet-500 to-violet-600",
   },
   speaking: {
-    label: "Expression Orale", sublabel: "Expression orale",
+    label: "Expression Orale", sublabel: "Nói",
     Icon: Mic, color: "text-rose-600", bg: "bg-rose-50",
-    border: "border-rose-200", href: "/exam/speaking", detail: "7 min · 2 tâches",
+    border: "border-rose-200", href: "/exam/speaking", detail: "7 phút · 2 bài",
     tagCls: "bg-rose-100 text-rose-700", accent: "from-rose-500 to-rose-600",
   },
 };
 
 function fmtDate(iso: string) {
-  return new Date(iso).toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric" });
+  return new Date(iso).toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit", year: "numeric" });
 }
 function fmtTime(sec: number | null) {
   if (!sec) return null;
@@ -195,8 +196,8 @@ export default function DashboardPage() {
           </div>
           <div className="flex items-center gap-4">
             {userRole === "admin" && (
-              <Link href="/admin" className="text-xs font-semibold text-[#f05e23] bg-[#f05e23]/10 px-3 py-1.5 rounded-lg hover:bg-[#f05e23]/20 transition-colors">
-                🔧 Admin
+              <Link href="/admin" className="text-xs font-semibold text-[#f05e23] bg-[#f05e23]/10 px-3 py-1.5 rounded-lg hover:bg-[#f05e23]/20 transition-colors inline-flex items-center gap-1.5">
+                <Settings className="w-3.5 h-3.5" /> Quản trị
               </Link>
             )}
             <div className="text-right hidden sm:block">
@@ -206,7 +207,7 @@ export default function DashboardPage() {
             <button
               onClick={handleLogout}
               className="p-2 text-[#bbb] hover:text-red-500 transition-colors rounded-lg hover:bg-red-50"
-              title="Se déconnecter"
+              title="Đăng xuất"
             >
               <LogOut className="w-4 h-4" />
             </button>
@@ -226,15 +227,15 @@ export default function DashboardPage() {
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-2">
                 <Sparkles className="w-4 h-4 text-[#f05e23]" />
-                <span className="text-xs font-semibold text-[#f05e23] uppercase tracking-wider">Tableau de bord</span>
+                <span className="text-xs font-semibold text-[#f05e23] uppercase tracking-wider">Bảng điều khiển</span>
               </div>
               <h2 className="text-2xl sm:text-3xl font-display font-extrabold text-[#3d3d3d]">
-                Bonjour{userName ? `, ${userName.split(" ")[0]}` : ""} 👋
+                Xin chào{userName ? `, ${userName.split(" ")[0]}` : ""}!
               </h2>
               <p className="text-[#888] mt-2 text-sm leading-relaxed max-w-lg">
                 {pendingAssignments.length > 0
-                  ? `Vous avez ${pendingAssignments.length} examen${pendingAssignments.length > 1 ? "s" : ""} en attente. Bonne préparation !`
-                  : "Tous vos examens sont à jour. Continuez votre préparation !"
+                  ? `Bạn có ${pendingAssignments.length} bài thi cần hoàn thành. Chúc bạn ôn tập tốt!`
+                  : "Tất cả bài thi đã được cập nhật. Hãy tiếp tục chuẩn bị!"
                 }
               </p>
             </div>
@@ -243,18 +244,18 @@ export default function DashboardPage() {
             <div className="flex gap-3 shrink-0">
               <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-[#e4ddd1]/50 px-4 py-3 text-center min-w-[80px] shadow-sm">
                 <div className="text-2xl font-display font-extrabold text-[#f05e23]">{completedCount}</div>
-                <div className="text-[10px] text-[#888] font-medium uppercase tracking-wide mt-0.5">Soumis</div>
+                <div className="text-[10px] text-[#888] font-medium uppercase tracking-wide mt-0.5">Bài nộp</div>
               </div>
               {avgScore !== null && (
                 <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-[#e4ddd1]/50 px-4 py-3 text-center min-w-[80px] shadow-sm">
                   <div className="text-2xl font-display font-extrabold text-emerald-600">{avgScore}</div>
-                  <div className="text-[10px] text-[#888] font-medium uppercase tracking-wide mt-0.5">Score moy.</div>
+                  <div className="text-[10px] text-[#888] font-medium uppercase tracking-wide mt-0.5">Điểm TB</div>
                 </div>
               )}
               {totalTime > 0 && (
                 <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-[#e4ddd1]/50 px-4 py-3 text-center min-w-[80px] shadow-sm">
                   <div className="text-2xl font-display font-extrabold text-violet-600">{Math.round(totalTime / 60)}</div>
-                  <div className="text-[10px] text-[#888] font-medium uppercase tracking-wide mt-0.5">Min total</div>
+                  <div className="text-[10px] text-[#888] font-medium uppercase tracking-wide mt-0.5">Phút</div>
                 </div>
               )}
             </div>
@@ -265,7 +266,7 @@ export default function DashboardPage() {
         <section>
           <div className="flex items-center gap-2 mb-5">
             <GraduationCap className="w-5 h-5 text-[#f05e23]" />
-            <h3 className="font-display font-bold text-[#3d3d3d] text-lg">Épreuves TCF</h3>
+            <h3 className="font-display font-bold text-[#3d3d3d] text-lg">Xét nghiệm TCF</h3>
           </div>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {(Object.entries(EXAM_META) as [ExamType, typeof EXAM_META[ExamType]][]).map(([type, meta]) => {
@@ -284,20 +285,21 @@ export default function DashboardPage() {
                   <div className={`w-11 h-11 rounded-xl flex items-center justify-center mb-4 ${meta.bg} group-hover:scale-110 transition-transform duration-300`}>
                     <Icon className={`w-5 h-5 ${meta.color}`} />
                   </div>
-                  <h4 className="font-display font-bold text-[#3d3d3d] text-sm leading-tight">{meta.label}</h4>
+                  <h4 className="font-display font-bold text-[#3d3d3d] text-[13px] leading-tight">{meta.sublabel}</h4>
+                  <p className="text-[10px] text-[#999] mt-0.5 font-medium">{meta.label}</p>
                   <p className="text-[11px] text-[#aaa] mt-1.5">{meta.detail}</p>
 
                   {/* Submission count */}
                   {count > 0 && (
                     <div className="mt-3 flex items-center gap-1.5">
                       <CheckCircle2 className="w-3 h-3 text-emerald-500" />
-                      <span className="text-[11px] text-emerald-600 font-medium">{count} soumission{count > 1 ? "s" : ""}</span>
+                      <span className="text-[11px] text-emerald-600 font-medium">{count} bài nộp</span>
                     </div>
                   )}
 
                   <div className="mt-3 flex items-center gap-1 text-xs font-semibold text-[#f05e23] opacity-0 group-hover:opacity-100 transition-opacity">
                     <Play className="w-3 h-3 fill-current" />
-                    Commencer
+                    Bắt đầu
                     <ChevronRight className="w-3 h-3" />
                   </div>
                 </Link>
@@ -317,11 +319,11 @@ export default function DashboardPage() {
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
                     <ClipboardList className="w-5 h-5 text-[#f05e23]" />
-                    <h3 className="font-display font-bold text-[#3d3d3d] text-lg">Examens assignés</h3>
+                    <h3 className="font-display font-bold text-[#3d3d3d] text-lg">Bài thi được gán</h3>
                   </div>
                   {pendingAssignments.length > 0 && (
                     <span className="bg-[#f05e23] text-white text-[11px] font-bold px-2.5 py-1 rounded-full animate-pulse">
-                      {pendingAssignments.length} en attente
+                      {pendingAssignments.length} chờ làm
                     </span>
                   )}
                 </div>
@@ -353,20 +355,24 @@ export default function DashboardPage() {
                                   {meta.sublabel}
                                 </span>
                                 {done && (
-                                  <span className="text-[11px] text-emerald-600 font-semibold">✓ Soumis</span>
+                                  <span className="text-[11px] text-emerald-600 font-semibold flex items-center gap-0.5">
+                                    <CheckCircle2 className="w-3 h-3" /> Đã nộp
+                                  </span>
                                 )}
                                 {overdue && (
                                   <span className="text-[11px] bg-red-100 text-red-600 font-bold px-2 py-0.5 rounded-full flex items-center gap-0.5">
-                                    <AlertCircle className="w-3 h-3" />En retard
+                                    <AlertCircle className="w-3 h-3" /> Quá hạn
                                   </span>
                                 )}
                               </div>
                               <p className="font-display font-bold text-[#3d3d3d] mt-1 text-sm">{a.exam_label ?? meta.label}</p>
                               {a.note && (
-                                <p className="text-xs text-[#888] italic mt-0.5 line-clamp-1">📝 {a.note}</p>
+                                <p className="text-xs text-[#888] italic mt-0.5 line-clamp-1 flex items-center gap-1">
+                                  <FileText className="w-3 h-3 shrink-0" /> {a.note}
+                                </p>
                               )}
                               <div className="flex items-center gap-3 mt-2 text-[11px] text-[#aaa]">
-                                <span>Assigné le {fmtDate(a.assigned_at)}</span>
+                                <span>Gán ngày {fmtDate(a.assigned_at)}</span>
                                 {a.due_date && (
                                   <span className={`flex items-center gap-1 font-semibold ${overdue ? "text-red-500" : "text-[#f05e23]"}`}>
                                     <Calendar className="w-3 h-3" />
@@ -383,12 +389,12 @@ export default function DashboardPage() {
                               href={href}
                               className="flex items-center gap-1.5 bg-[#f05e23] hover:bg-[#d85118] font-semibold text-xs text-white px-4 py-2.5 rounded-xl transition-all shrink-0 shadow-sm hover:shadow-md"
                             >
-                              Commencer <ArrowRight className="w-3.5 h-3.5" />
+                              Bắt đầu <ArrowRight className="w-3.5 h-3.5" />
                             </Link>
                           )}
                           {!done && !hasTarget && (
                             <div className="text-[11px] text-red-600 bg-red-50 border border-red-200 rounded-lg px-2.5 py-1.5 shrink-0">
-                              ID manquant
+                              Thiếu ID
                             </div>
                           )}
                         </div>
@@ -401,12 +407,12 @@ export default function DashboardPage() {
               <section>
                 <div className="flex items-center gap-2 mb-4">
                   <ClipboardList className="w-5 h-5 text-[#f05e23]" />
-                  <h3 className="font-display font-bold text-[#3d3d3d] text-lg">Examens assignés</h3>
+                  <h3 className="font-display font-bold text-[#3d3d3d] text-lg">Bài thi được gán</h3>
                 </div>
                 <div className="bg-[#faf8f5] rounded-2xl border border-[#e4ddd1] p-10 text-center">
                   <ClipboardList className="w-10 h-10 mx-auto text-[#d7c9b8] mb-3" />
-                  <p className="text-sm font-display font-semibold text-[#3d3d3d]">Aucun examen assigné pour le moment.</p>
-                  <p className="text-xs text-[#aaa] mt-1">Contactez un administrateur pour recevoir une attribution.</p>
+                  <p className="text-sm font-display font-semibold text-[#3d3d3d]">Chưa có bài thi nào được gán.</p>
+                  <p className="text-xs text-[#aaa] mt-1">Liên hệ giảng viên để được gán bài.</p>
                 </div>
               </section>
             ) : null}
@@ -418,10 +424,10 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                   <FileText className="w-5 h-5 text-[#f05e23]" />
-                  <h3 className="font-display font-bold text-[#3d3d3d] text-lg">Historique</h3>
+                  <h3 className="font-display font-bold text-[#3d3d3d] text-lg">Lịch sử</h3>
                 </div>
                 {submissions.length > 0 && (
-                  <span className="text-[11px] text-[#aaa] font-medium">{submissions.length} résultat{submissions.length > 1 ? "s" : ""}</span>
+                  <span className="text-[11px] text-[#aaa] font-medium">{submissions.length} kết quả</span>
                 )}
               </div>
 
@@ -448,7 +454,11 @@ export default function DashboardPage() {
                             </div>
                             <div className="flex items-center gap-2 mt-0.5 text-[10px] text-[#bbb]">
                               <span>{fmtDate(s.submitted_at)}</span>
-                              {fmtTime(s.time_spent_seconds) && <span>⏱ {fmtTime(s.time_spent_seconds)}</span>}
+                              {fmtTime(s.time_spent_seconds) && (
+                                <span className="flex items-center gap-0.5">
+                                  <Timer className="w-2.5 h-2.5" /> {fmtTime(s.time_spent_seconds)}
+                                </span>
+                              )}
                             </div>
                           </div>
                           <div className="shrink-0">
@@ -461,8 +471,8 @@ export default function DashboardPage() {
                                 {s.score}/{maxScore}
                               </span>
                             ) : (
-                              <span className="text-[10px] text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full font-medium">
-                                ⏳ En attente
+                              <span className="text-[10px] text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full font-medium flex items-center gap-0.5">
+                                <Hourglass className="w-2.5 h-2.5" /> Chờ chấm
                               </span>
                             )}
                           </div>
@@ -470,7 +480,9 @@ export default function DashboardPage() {
                         {/* Admin feedback */}
                         {s.admin_feedback && (
                           <div className="mt-2 ml-9 bg-violet-50/80 rounded-lg px-3 py-2">
-                            <p className="text-[10px] text-violet-500 font-bold uppercase mb-0.5">💬 Professeur</p>
+                            <p className="text-[10px] text-violet-500 font-bold uppercase mb-0.5 flex items-center gap-1">
+                              <MessageCircle className="w-2.5 h-2.5" /> Giảng viên
+                            </p>
                             <p className="text-[11px] text-violet-800 leading-relaxed line-clamp-2">{s.admin_feedback}</p>
                           </div>
                         )}
@@ -479,14 +491,14 @@ export default function DashboardPage() {
                   })}
                   {submissions.length > 10 && (
                     <div className="px-4 py-3 text-center">
-                      <span className="text-xs text-[#aaa]">+ {submissions.length - 10} autres résultats</span>
+                      <span className="text-xs text-[#aaa]">+ {submissions.length - 10} kết quả khác</span>
                     </div>
                   )}
                 </div>
               ) : (
                 <div className="bg-[#faf8f5] rounded-2xl border border-[#e4ddd1] p-8 text-center">
                   <TrendingUp className="w-8 h-8 mx-auto text-[#d7c9b8] mb-2" />
-                  <p className="text-xs text-[#aaa]">Vos résultats apparaîtront ici</p>
+                  <p className="text-xs text-[#aaa]">Kết quả của bạn sẽ xuất hiện tại đây</p>
                 </div>
               )}
             </section>
@@ -497,22 +509,22 @@ export default function DashboardPage() {
                 <div className="bg-[#faf8f5] rounded-xl border border-[#e4ddd1] p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <Award className="w-4 h-4 text-amber-500" />
-                    <span className="text-[10px] text-[#aaa] font-semibold uppercase tracking-wide">Meilleur</span>
+                    <span className="text-[10px] text-[#aaa] font-semibold uppercase tracking-wide">Cao nhất</span>
                   </div>
                   <p className="font-display font-extrabold text-[#3d3d3d] text-xl">
                     {Math.max(...submissions.filter(s => s.score !== null).map(s => s.score ?? 0))}
                   </p>
-                  <p className="text-[10px] text-[#bbb] mt-0.5">score max</p>
+                  <p className="text-[10px] text-[#bbb] mt-0.5">điểm tối đa</p>
                 </div>
                 <div className="bg-[#faf8f5] rounded-xl border border-[#e4ddd1] p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <Clock className="w-4 h-4 text-sky-500" />
-                    <span className="text-[10px] text-[#aaa] font-semibold uppercase tracking-wide">Temps</span>
+                    <span className="text-[10px] text-[#aaa] font-semibold uppercase tracking-wide">Thời gian</span>
                   </div>
                   <p className="font-display font-extrabold text-[#3d3d3d] text-xl">
                     {totalTime > 3600 ? `${Math.floor(totalTime / 3600)}h${Math.round((totalTime % 3600) / 60)}` : `${Math.round(totalTime / 60)}m`}
                   </p>
-                  <p className="text-[10px] text-[#bbb] mt-0.5">temps total</p>
+                  <p className="text-[10px] text-[#bbb] mt-0.5">tổng thời gian</p>
                 </div>
               </div>
             )}
@@ -523,8 +535,8 @@ export default function DashboardPage() {
         {assignments.length === 0 && submissions.length === 0 && userRole !== "admin" && (
           <div className="text-center py-16 text-[#aaa]">
             <ClipboardList className="w-12 h-12 mx-auto mb-4 opacity-30" />
-            <p className="text-sm font-display font-semibold text-[#3d3d3d]">Bienvenue sur Miora Académie</p>
-            <p className="text-xs mt-1">Contactez votre enseignant pour recevoir vos premiers examens.</p>
+            <p className="text-sm font-display font-semibold text-[#3d3d3d]">Chào mừng đến Miora Académie</p>
+            <p className="text-xs mt-1">Liên hệ giảng viên để nhận bài thi đầu tiên.</p>
           </div>
         )}
       </main>

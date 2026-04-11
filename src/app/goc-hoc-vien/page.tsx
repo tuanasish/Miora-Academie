@@ -10,7 +10,6 @@ import { TipsSection } from '@/components/student-hub/TipsSection';
 import { ResourcesSection } from '@/components/student-hub/ResourcesSection';
 import { AchievementsSection } from '@/components/student-hub/AchievementsSection';
 import { TestimonialsSection } from '@/components/student-hub/TestimonialsSection';
-import { SectionNav } from '@/components/student-hub/SectionNav';
 
 export default async function StudentHubPage() {
   // Fetch all data in parallel
@@ -25,7 +24,6 @@ export default async function StudentHubPage() {
   return (
     <main className="min-h-screen bg-white text-[#121212]">
       <SiteHeader />
-      <SectionNav />
       <HeroSection />
       <BlogSection posts={blogPosts} />
       <TipsSection posts={tipsPosts} />
