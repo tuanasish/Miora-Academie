@@ -1,0 +1,51 @@
+export const VIETNAM_TIME_ZONE = 'Asia/Ho_Chi_Minh';
+export const VIETNAM_TIME_ZONE_LABEL = 'GMT+7';
+
+export function parseDueDateEnd(dueDate: string | null | undefined): Date | null {
+  if (!dueDate) return null;
+
+  const dateOnlyMatched = dueDate.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (dateOnlyMatched) {
+    const [, year, month, day] = dateOnlyMatched;
+    return new Date(`${year}-${month}-${day}T23:59:59.999+07:00`);
+  }
+
+  const localDateTimeMatched = dueDate.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/);
+  if (localDateTimeMatched) {
+    return new Date(`${dueDate}:00+07:00`);
+  }
+
+  const parsed = new Date(dueDate);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
+export function isDueDateOverdue(dueDate: string | null | undefined, now = new Date()): boolean {
+  const deadline = parseDueDateEnd(dueDate);
+  if (!deadline) return false;
+  return deadline.getTime() < now.getTime();
+}
+
+export function formatDueDate(dueDate: string | null | undefined, locale = 'vi-VN'): string | null {
+  const parsed = parseDueDateEnd(dueDate);
+  if (!parsed) return null;
+
+  const formatted = new Intl.DateTimeFormat(locale, {
+    timeZone: VIETNAM_TIME_ZONE,
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).format(parsed);
+
+  return `${formatted} ${VIETNAM_TIME_ZONE_LABEL}`;
+}
+
+export function toVietnamDeadlineIso(input: string | null | undefined): string | null {
+  if (!input) return null;
+
+  const parsed = parseDueDateEnd(input);
+  if (!parsed) return null;
+  return parsed.toISOString();
+}

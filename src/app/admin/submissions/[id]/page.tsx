@@ -1,10 +1,21 @@
 import Link from 'next/link';
 import { getSubmission, gradeSubmission } from '@/app/actions/submission.actions';
-import { notFound } from 'next/navigation';
+import GradeSubmitButton from '@/components/admin/GradeSubmitButton';
+import { notFound, redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
+import McqSubmissionReview from '@/components/exam/McqSubmissionReview';
+import WritingInlineReviewFields from '@/components/admin/WritingInlineReviewFields';
+import { getMcqQuestionsForSerie } from '@/lib/exam/loadMcqExamData';
+import { storedAnswersToIndices } from '@/lib/exam/mcqAnswers';
+import { ADMIN_GRADE_MAX, TCF_GRADE_BANDS } from '@/lib/exam/adminGrading';
+import {
+  parseWritingReviewMarkup,
+  plainTextToReviewHtml,
+  serializeWritingReviewMarkup,
+} from '@/lib/exam/writingReview';
 import {
   Headphones, BookOpen, PenLine, Mic, ArrowLeft, CheckCircle, MessageSquare,
-  Clock, Target, Save, Download, Library,
+  Clock, Target, Download, Library,
 } from 'lucide-react';
 
 const TYPE_META: Record<string, { label: string; Icon: React.ComponentType<{ className?: string }>; color: string }> = {
@@ -30,12 +41,25 @@ function fmtTime(sec: number | null) {
 
 interface PageProps {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ saved?: string; error?: string }>;
 }
 
-export default async function SubmissionDetailPage({ params }: PageProps) {
+export default async function SubmissionDetailPage({ params, searchParams }: PageProps) {
   const { id } = await params;
+  const query = await searchParams;
   const sub = await getSubmission(id);
   if (!sub) notFound();
+  const errorBannerMessage =
+    query.error === 'forbidden'
+      ? 'Bạn không có quyền chấm bài này.'
+      : query.error
+        ? 'Không thể lưu kết quả chấm. Vui lòng thử lại.'
+        : null;
+
+  const mcqQuestions =
+    (sub.exam_type === 'listening' || sub.exam_type === 'reading') && sub.serie_id != null
+      ? await getMcqQuestionsForSerie(sub.exam_type, sub.serie_id)
+      : null;
 
   const meta = TYPE_META[sub.exam_type];
   const examRef =
@@ -47,13 +71,54 @@ export default async function SubmissionDetailPage({ params }: PageProps) {
 
   const isGradable = sub.exam_type === 'writing' || sub.exam_type === 'speaking';
   const isGraded = sub.graded_at !== null && sub.graded_at !== undefined;
+  const writingTasks = sub.exam_type === 'writing'
+    ? [
+        { key: 't1' as const, label: 'Tâche 1', text: sub.writing_task1 ?? '', wc: sub.word_counts?.t1, time: sub.task_times?.t1, range: '60-120' },
+        { key: 't2' as const, label: 'Tâche 2', text: sub.writing_task2 ?? '', wc: sub.word_counts?.t2, time: sub.task_times?.t2, range: '120-150' },
+        { key: 't3' as const, label: 'Tâche 3', text: sub.writing_task3 ?? '', wc: sub.word_counts?.t3, time: sub.task_times?.t3, range: '120-180' },
+      ]
+    : [];
+  const writingReview = sub.exam_type === 'writing' ? parseWritingReviewMarkup(sub.notes) : null;
+  const visibleNotes = sub.exam_type === 'writing' && writingReview ? null : sub.notes;
 
   async function handleGrade(formData: FormData) {
     'use server';
-    const score = parseFloat(formData.get('admin_score') as string);
-    const feedback = (formData.get('admin_feedback') as string) || '';
-    await gradeSubmission(id, score, feedback);
+    let errorCode: 'forbidden' | 'save_failed' | null = null;
+
+    try {
+      const score = parseFloat(formData.get('admin_score') as string);
+      const feedback = (formData.get('admin_feedback') as string) || '';
+      const reviewNotes = (() => {
+        if (sub.exam_type !== 'writing') return undefined;
+
+        const originalTasks = {
+          t1: plainTextToReviewHtml(sub.writing_task1),
+          t2: plainTextToReviewHtml(sub.writing_task2),
+          t3: plainTextToReviewHtml(sub.writing_task3),
+        };
+
+        const submittedTasks = {
+          t1: (formData.get('writing_review_t1_html') as string) || writingReview?.tasks.t1 || originalTasks.t1,
+          t2: (formData.get('writing_review_t2_html') as string) || writingReview?.tasks.t2 || originalTasks.t2,
+          t3: (formData.get('writing_review_t3_html') as string) || writingReview?.tasks.t3 || originalTasks.t3,
+        };
+
+        const hasCustomReview = (['t1', 't2', 't3'] as const).some((taskKey) => submittedTasks[taskKey] !== originalTasks[taskKey]);
+        if (!hasCustomReview) return null;
+
+        return serializeWritingReviewMarkup(submittedTasks);
+      })();
+      await gradeSubmission(id, score, feedback, reviewNotes);
+    } catch (error) {
+      errorCode = error instanceof Error && error.message === 'FORBIDDEN' ? 'forbidden' : 'save_failed';
+    }
+
+    if (errorCode) {
+      redirect(`/admin/submissions/${id}?error=${errorCode}`);
+    }
+
     revalidatePath(`/admin/submissions/${id}`);
+    redirect(`/admin/submissions/${id}?saved=1`);
   }
 
   return (
@@ -76,6 +141,17 @@ export default async function SubmissionDetailPage({ params }: PageProps) {
           </span>
         )}
       </div>
+
+      {query.saved === '1' && (
+        <div className="mb-6 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3">
+          <p className="text-sm font-semibold text-emerald-800">Đã lưu điểm và nhận xét thành công.</p>
+        </div>
+      )}
+      {errorBannerMessage && (
+        <div className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3">
+          <p className="text-sm font-semibold text-red-800">{errorBannerMessage}</p>
+        </div>
+      )}
 
       {/* Meta Card */}
       <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
@@ -120,7 +196,7 @@ export default async function SubmissionDetailPage({ params }: PageProps) {
             <div>
               <p className="text-xs text-gray-400 uppercase font-semibold mb-1">Điểm Admin</p>
               <p className="text-2xl font-bold text-violet-600">
-                {sub.admin_score}<span className="text-sm font-normal text-gray-400 ml-1">/ 25</span>
+                {sub.admin_score}<span className="text-sm font-normal text-gray-400 ml-1">/ {ADMIN_GRADE_MAX}</span>
               </p>
             </div>
           )}
@@ -149,11 +225,7 @@ export default async function SubmissionDetailPage({ params }: PageProps) {
       {/* Writing Detail */}
       {sub.exam_type === 'writing' && (
         <div className="space-y-4 mb-6">
-          {[
-            { label: 'Tâche 1', text: sub.writing_task1, wc: sub.word_counts?.t1, time: sub.task_times?.t1, range: '60-120' },
-            { label: 'Tâche 2', text: sub.writing_task2, wc: sub.word_counts?.t2, time: sub.task_times?.t2, range: '120-150' },
-            { label: 'Tâche 3', text: sub.writing_task3, wc: sub.word_counts?.t3, time: sub.task_times?.t3, range: '120-180' },
-          ].map((t, i) => (
+          {writingTasks.map((t, i) => (
             <div key={i} className="bg-white rounded-xl border border-gray-200 p-6">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-bold text-gray-800">{t.label}</h3>
@@ -207,26 +279,45 @@ export default async function SubmissionDetailPage({ params }: PageProps) {
         </div>
       )}
 
-      {/* Listening/Reading Detail — Answers */}
+      {/* Listening/Reading — MCQ correction */}
       {(sub.exam_type === 'listening' || sub.exam_type === 'reading') && sub.answers && (
         <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
-          <h3 className="font-bold text-gray-800 mb-3">Réponses ({Object.keys(sub.answers).length} questions)</h3>
-          <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-2">
-            {Object.entries(sub.answers).map(([qId, ans], i) => (
-              <div key={qId} className="bg-gray-50 rounded-lg p-2 text-center">
-                <p className="text-[10px] text-gray-400">Q{i + 1}</p>
-                <p className="text-sm font-bold text-gray-800">{ans}</p>
+          {mcqQuestions && mcqQuestions.length > 0 ? (
+            <McqSubmissionReview
+              questions={mcqQuestions}
+              userAnswerByQuestionId={storedAnswersToIndices(sub.answers)}
+              variant="full"
+              title="Correction détaillée"
+              titleClassName="font-bold text-gray-800 mb-3"
+            />
+          ) : (
+            <>
+              <h3 className="font-bold text-gray-800 mb-3">
+                Réponses ({Object.keys(sub.answers).length} questions)
+              </h3>
+              <p className="text-xs text-amber-700 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2 mb-3">
+                Không tải được file đề để hiển thị đáp án đúng — chỉ hiển thị lựa chọn đã chọn.
+              </p>
+              <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-2">
+                {Object.entries(sub.answers)
+                  .sort(([a], [b]) => Number(a) - Number(b))
+                  .map(([qId, ans], i) => (
+                    <div key={qId} className="bg-gray-50 rounded-lg p-2 text-center">
+                      <p className="text-[10px] text-gray-400">Q{i + 1}</p>
+                      <p className="text-sm font-bold text-gray-800">{ans}</p>
+                    </div>
+                  ))}
               </div>
-            ))}
-          </div>
+            </>
+          )}
         </div>
       )}
 
       {/* Notes */}
-      {sub.notes && (
+      {visibleNotes && (
         <div className="bg-amber-50 rounded-xl border border-amber-200 p-4 mb-6">
           <p className="text-xs text-amber-600 font-semibold uppercase mb-1">Notes</p>
-          <p className="text-sm text-amber-800">{sub.notes}</p>
+          <p className="text-sm text-amber-800">{visibleNotes}</p>
         </div>
       )}
 
@@ -237,46 +328,60 @@ export default async function SubmissionDetailPage({ params }: PageProps) {
             <Target className="w-4 h-4 text-violet-500" />
             {isGraded ? 'Sửa điểm' : 'Chấm điểm'}
           </h3>
-          <p className="text-xs text-gray-400 mb-4">
-            {sub.exam_type === 'writing'
-              ? 'Chấm theo thang DELF B2: 25 điểm (Tâche 1: 5pts, Tâche 2: 10pts, Tâche 3: 10pts)'
-              : 'Chấm theo thang DELF B2: 25 điểm (Tâche 2: 10pts, Tâche 3: 15pts)'}
-          </p>
-
-          <form action={handleGrade} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="mt-4 rounded-2xl border border-violet-200 bg-violet-50/80 p-4">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
-                  Điểm <span className="text-gray-400 font-normal">/ 25</span>
-                </label>
-                <input
-                  type="number"
-                  name="admin_score"
-                  min={0}
-                  max={25}
-                  step={0.5}
-                  defaultValue={sub.admin_score ?? ''}
-                  required
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-lg font-bold text-gray-800 focus:ring-2 focus:ring-violet-300 focus:border-violet-400 outline-none"
-                  placeholder="0 - 25"
-                />
+                <p className="text-sm font-semibold text-violet-900">Chấm theo thang TCF / {ADMIN_GRADE_MAX}</p>
+                <p className="mt-1 text-xs leading-relaxed text-violet-700">
+                  Nhập tổng điểm cuối cùng, rồi đối chiếu nhanh với các mốc trình độ và NCLC dưới đây.
+                </p>
               </div>
-              <div className="flex items-end">
-                <div className="text-xs text-gray-400 space-y-0.5">
-                  {sub.exam_type === 'writing' ? (
-                    <>
-                      <p>• Tâche 1 (synthèse): max 5 pts</p>
-                      <p>• Tâche 2 (essai): max 10 pts</p>
-                      <p>• Tâche 3 (opinion): max 10 pts</p>
-                    </>
-                  ) : (
-                    <>
-                      <p>• Tâche 2 (roleplay): max 10 pts</p>
-                      <p>• Tâche 3 (débat): max 15 pts</p>
-                    </>
-                  )}
+              <span className="inline-flex w-fit rounded-full border border-violet-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-violet-700">
+                7 mốc tham chiếu
+              </span>
+            </div>
+            <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-4">
+              {TCF_GRADE_BANDS.map((band) => (
+                <div key={band.range} className="rounded-xl border border-violet-200 bg-white/90 px-3 py-2.5">
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-violet-500">{band.range} điểm</p>
+                  <p className="mt-1 text-sm font-bold text-gray-800">{band.level}</p>
+                  <p className="text-[11px] text-gray-500">{band.nclc}</p>
                 </div>
-              </div>
+              ))}
+            </div>
+          </div>
+
+          <form action={handleGrade} className="mt-4 space-y-4">
+            {sub.exam_type === 'writing' && (
+              <WritingInlineReviewFields
+                fields={writingTasks.map((task) => ({
+                  key: task.key,
+                  label: task.label,
+                  originalHtml: plainTextToReviewHtml(task.text),
+                  initialHtml: writingReview?.tasks[task.key] ?? plainTextToReviewHtml(task.text),
+                }))}
+              />
+            )}
+
+            <div className="max-w-md">
+              <label className="block text-sm font-semibold text-gray-700 mb-1">
+                Điểm tổng <span className="text-gray-400 font-normal">/ {ADMIN_GRADE_MAX}</span>
+              </label>
+              <input
+                type="number"
+                name="admin_score"
+                min={0}
+                max={ADMIN_GRADE_MAX}
+                step={0.5}
+                inputMode="decimal"
+                defaultValue={sub.admin_score ?? ''}
+                required
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-lg font-bold text-gray-800 focus:ring-2 focus:ring-violet-300 focus:border-violet-400 outline-none"
+                placeholder={`0 - ${ADMIN_GRADE_MAX}`}
+              />
+              <p className="mt-1.5 text-xs text-gray-400">
+                Hệ thống lưu một điểm tổng duy nhất cho bài viết hoặc bài nói.
+              </p>
             </div>
 
             <div>
@@ -292,12 +397,7 @@ export default async function SubmissionDetailPage({ params }: PageProps) {
               />
             </div>
 
-            <button
-              type="submit"
-              className="inline-flex items-center gap-2 px-6 py-2.5 bg-violet-600 hover:bg-violet-700 text-white font-semibold rounded-xl text-sm transition-colors"
-            >
-              {isGraded ? <><Save className="w-4 h-4" /> Cập nhật điểm</> : <><CheckCircle className="w-4 h-4" /> Xác nhận chấm điểm</>}
-            </button>
+            <GradeSubmitButton isGraded={isGraded} />
           </form>
         </div>
       )}

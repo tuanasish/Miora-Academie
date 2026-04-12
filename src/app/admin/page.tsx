@@ -70,6 +70,45 @@ const statCards = [
   { label: 'Bài viết', key: 'postsCount', Icon: Newspaper, color: 'text-amber-600', bg: 'bg-amber-50', link: '/admin/posts' },
 ] as const;
 
+const practiceCards = [
+  {
+    label: 'Compréhension Orale',
+    detail: 'Trang luyện thi listening',
+    href: '/exam/listening',
+    Icon: Headphones,
+    color: 'text-sky-600',
+    bg: 'bg-sky-50',
+    border: 'border-sky-200',
+  },
+  {
+    label: 'Compréhension Écrite',
+    detail: 'Trang luyện thi reading',
+    href: '/exam/reading',
+    Icon: BookOpen,
+    color: 'text-emerald-600',
+    bg: 'bg-emerald-50',
+    border: 'border-emerald-200',
+  },
+  {
+    label: 'Expression Écrite',
+    detail: 'Trang luyện thi writing',
+    href: '/exam/writing',
+    Icon: PenLine,
+    color: 'text-violet-600',
+    bg: 'bg-violet-50',
+    border: 'border-violet-200',
+  },
+  {
+    label: 'Expression Orale',
+    detail: 'Trang luyện thi speaking',
+    href: '/exam/speaking',
+    Icon: Mic,
+    color: 'text-rose-600',
+    bg: 'bg-rose-50',
+    border: 'border-rose-200',
+  },
+] as const;
+
 export default async function AdminDashboardPage() {
   const stats = await getDashboardStats();
 
@@ -96,6 +135,41 @@ export default async function AdminDashboardPage() {
             </Link>
           );
         })}
+      </div>
+
+      {/* Practice shortcuts */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className="font-bold text-gray-800 flex items-center gap-2">
+              <FileText className="w-4 h-4 text-orange-600" /> Mở Nhanh Trang Luyện Thi
+            </h2>
+            <p className="text-sm text-gray-500 mt-1">
+              Đi thẳng vào giao diện làm bài như học viên để kiểm tra luồng thực tế.
+            </p>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+          {practiceCards.map((card) => {
+            const Icon = card.Icon;
+            return (
+              <Link
+                key={card.href}
+                href={card.href}
+                className={`group rounded-2xl border ${card.border} bg-white p-5 hover:shadow-md transition-all`}
+              >
+                <div className={`inline-flex p-3 rounded-xl ${card.bg} mb-4`}>
+                  <Icon className={`w-5 h-5 ${card.color}`} />
+                </div>
+                <h3 className="font-semibold text-gray-800">{card.label}</h3>
+                <p className="text-xs text-gray-500 mt-1">{card.detail}</p>
+                <div className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-blue-600 group-hover:gap-2 transition-all">
+                  Mở trang luyện thi <ArrowRight className="w-4 h-4" />
+                </div>
+              </Link>
+            );
+          })}
+        </div>
       </div>
 
       {/* Two columns: Recent Submissions + Recent Assignments */}

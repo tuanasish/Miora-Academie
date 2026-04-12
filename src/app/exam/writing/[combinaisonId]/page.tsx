@@ -8,6 +8,8 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { submitExam } from "@/lib/submitExam";
+import DeadlineNotice from "@/components/exam/DeadlineNotice";
+import { useAssignmentDeadline } from "@/hooks/useAssignmentDeadline";
 
 const frenchKeys = [
   "à","â","ç","é","è","ê","ë","î","ï","ô","ù","û","ü","œ","æ",
@@ -61,6 +63,7 @@ export default function WritingExamPage() {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const deadline = useAssignmentDeadline("writing", combinaisonId);
 
   const globalTimer = useCountdown(60 * 60, true);
   const stopwatch = useStopwatch(true);
@@ -131,7 +134,7 @@ export default function WritingExamPage() {
 
   if (!item) return (
     <div className="h-screen flex flex-col items-center justify-center gap-4">
-      <p className="text-slate-500">La combinaison n'existe pas.</p>
+      <p className="text-slate-500">La combinaison n&apos;existe pas.</p>
       <Link href="/exam/writing" className="text-violet-600 hover:underline">← Retour</Link>
     </div>
   );
@@ -272,40 +275,44 @@ export default function WritingExamPage() {
         <main className="flex-1 flex flex-col min-h-0 overflow-y-auto px-3 md:px-6">
           {/* Prompt area */}
           <div className="shrink-0 pt-3">
-            <div className="max-w-[980px] w-full mx-auto bg-amber-50 border border-amber-200 rounded-xl p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <AlignLeft className="w-4 h-4 text-amber-600" />
-                <span className="text-xs font-bold text-amber-700 uppercase tracking-wider">
-                  Sujet — {task?.label}
-                </span>
-                <span className="ml-auto text-xs text-amber-600 font-semibold bg-amber-100 px-2 py-0.5 rounded-full">
-                  objectif {minWords}-{maxWords} mots
-                </span>
-              </div>
-              <p className="text-lg md:text-xl text-slate-900 leading-8 md:leading-9 font-semibold select-text cursor-text selection:bg-amber-200 selection:text-slate-900">
-                {activeTask === 2 ? (
-                  <span className="font-bold text-slate-900">{task?.prompt}</span>
-                ) : (
-                  task?.prompt
-                )}
-              </p>
-              {/* Task 3 documents */}
-              {activeTask === 2 && tasks[2] && (
-                <div className="grid grid-cols-2 gap-3 mt-3">
-                  {tasks[2].doc1 && (
-                    <div className="bg-white border border-amber-200 rounded-xl p-4 text-base md:text-lg font-medium text-slate-800 leading-8 select-text cursor-text selection:bg-emerald-100 selection:text-slate-900">
-                      <p className="text-base md:text-lg font-extrabold text-emerald-700 mb-2">Document POUR</p>
-                      {tasks[2].doc1}
-                    </div>
-                  )}
-                  {tasks[2].doc2 && (
-                    <div className="bg-white border border-amber-200 rounded-xl p-4 text-base md:text-lg font-medium text-slate-800 leading-8 select-text cursor-text selection:bg-rose-100 selection:text-slate-900">
-                      <p className="text-base md:text-lg font-extrabold text-red-600 mb-2">Document CONTRE</p>
-                      {tasks[2].doc2}
-                    </div>
-                  )}
+            <div className="max-w-[980px] w-full mx-auto space-y-3">
+              <DeadlineNotice dueDateLabel={deadline.formattedDueDate} isOverdue={deadline.isOverdue} />
+
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <AlignLeft className="w-4 h-4 text-amber-600" />
+                  <span className="text-xs font-bold text-amber-700 uppercase tracking-wider">
+                    Sujet — {task?.label}
+                  </span>
+                  <span className="ml-auto text-xs text-amber-600 font-semibold bg-amber-100 px-2 py-0.5 rounded-full">
+                    objectif {minWords}-{maxWords} mots
+                  </span>
                 </div>
-              )}
+                <p className="text-lg md:text-xl text-slate-900 leading-8 md:leading-9 font-semibold select-text cursor-text selection:bg-amber-200 selection:text-slate-900">
+                  {activeTask === 2 ? (
+                    <span className="font-bold text-slate-900">{task?.prompt}</span>
+                  ) : (
+                    task?.prompt
+                  )}
+                </p>
+                {/* Task 3 documents */}
+                {activeTask === 2 && tasks[2] && (
+                  <div className="grid grid-cols-2 gap-3 mt-3">
+                    {tasks[2].doc1 && (
+                      <div className="bg-white border border-amber-200 rounded-xl p-4 text-base md:text-lg font-medium text-slate-800 leading-8 select-text cursor-text selection:bg-emerald-100 selection:text-slate-900">
+                        <p className="text-base md:text-lg font-extrabold text-emerald-700 mb-2">Document POUR</p>
+                        {tasks[2].doc1}
+                      </div>
+                    )}
+                    {tasks[2].doc2 && (
+                      <div className="bg-white border border-amber-200 rounded-xl p-4 text-base md:text-lg font-medium text-slate-800 leading-8 select-text cursor-text selection:bg-rose-100 selection:text-slate-900">
+                        <p className="text-base md:text-lg font-extrabold text-red-600 mb-2">Document CONTRE</p>
+                        {tasks[2].doc2}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 

@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
 import {
-  Headphones, ChevronLeft, ChevronRight, Clock, Send, Volume2, ArrowLeft, Loader2, Flag,
+  Headphones, ChevronLeft, ChevronRight, Clock, Send, Volume2, Flag,
 } from "lucide-react";
 import { useCountdown } from "@/hooks/useTimer";
 import { useKeyboardNav } from "@/hooks/useKeyboardNav";
@@ -11,6 +11,9 @@ import { createClient } from "@/lib/supabase/client";
 import { submitExam } from "@/lib/submitExam";
 import SubmitConfirmModal from "@/components/exam/SubmitConfirmModal";
 import ScoreReveal from "@/components/exam/ScoreReveal";
+import McqSubmissionReview from "@/components/exam/McqSubmissionReview";
+import DeadlineNotice from "@/components/exam/DeadlineNotice";
+import { useAssignmentDeadline } from "@/hooks/useAssignmentDeadline";
 
 interface Question {
   id: number;
@@ -46,6 +49,7 @@ export default function ListeningSerieExamPage() {
   const [notFound, setNotFound] = useState(false);
   const [flagged, setFlagged] = useState<Set<number>>(new Set());
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const deadline = useAssignmentDeadline("listening", serieId);
 
   const timer = useCountdown(TOTAL_SECONDS, true);
 
@@ -142,49 +146,14 @@ export default function ListeningSerieExamPage() {
     const correctCount = questions.filter((q2) => answers[q2.id] === q2.correctAnswerIndex).length;
     return (
       <ScoreReveal serieId={serieId} correct={correctCount} total={total} examType="listening">
-        {/* Correction list */}
         <div className="max-w-3xl mx-auto px-4 mt-6">
-          <h3 className="font-display font-bold text-[#3d3d3d] mb-3">📋 Correction ({total} questions)</h3>
-          <div className="space-y-2">
-            {questions.map((q2, idx) => {
-              const userAns = answers[q2.id];
-              const isCorrect = userAns === q2.correctAnswerIndex;
-              const notAnswered = userAns === undefined;
-              return (
-                <div key={q2.id}
-                  className={`bg-[#faf8f5] rounded-xl border-2 p-3 sm:p-4 anim-fade-in ${
-                    notAnswered ? 'border-[#e4ddd1]' : isCorrect ? 'border-emerald-200' : 'border-red-200'
-                  }`}
-                  style={{ animationDelay: `${Math.min(idx * 0.03, 0.5)}s` }}>
-                  <div className="flex items-start gap-3">
-                    <span className={`shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
-                      notAnswered ? 'bg-gray-100 text-gray-400'
-                      : isCorrect ? 'bg-emerald-100 text-emerald-700'
-                      : 'bg-red-100 text-red-700'
-                    }`}>
-                      {notAnswered ? '—' : isCorrect ? '✓' : '✗'}
-                    </span>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs text-[#888] mb-1">Q{idx + 1} · {q2.level} · {q2.points}pts</p>
-                      <p className="text-sm text-[#3d3d3d] line-clamp-1">{q2.prompt}</p>
-                      <div className="flex flex-wrap gap-2 mt-2">
-                        {notAnswered ? (
-                          <span className="text-xs text-gray-400 italic">Pas de réponse</span>
-                        ) : !isCorrect && (
-                          <span className="text-xs bg-red-50 text-red-600 px-2 py-0.5 rounded">
-                            Votre: {["A","B","C","D"][userAns]} — {q2.options[userAns]}
-                          </span>
-                        )}
-                        <span className="text-xs bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded font-semibold">
-                          ✓ {["A","B","C","D"][q2.correctAnswerIndex]} — {q2.options[q2.correctAnswerIndex]}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+          <McqSubmissionReview
+            questions={questions}
+            userAnswerByQuestionId={answers}
+            variant="full"
+            title="📋 Correction"
+            animateRows
+          />
         </div>
       </ScoreReveal>
     );
@@ -261,6 +230,8 @@ export default function ListeningSerieExamPage() {
 
         {/* CENTER – Question */}
         <main className="flex-1 flex flex-col overflow-y-auto p-4 sm:p-6 gap-3 sm:gap-4">
+          <DeadlineNotice dueDateLabel={deadline.formattedDueDate} isOverdue={deadline.isOverdue} />
+
           {/* Tags row */}
           <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
             <span className="text-xs font-semibold bg-sky-100 text-sky-700 px-2.5 py-1 rounded-full">
@@ -292,11 +263,20 @@ export default function ListeningSerieExamPage() {
             <span className="text-xs text-[#888] md:hidden ml-auto">{answered}/{total}</span>
           </div>
 
-          {/* Audio */}
+          {/* Audio — nodownload: ẩn nút tải trên Chromium; chuột phải bị chặn để hạn chế "Lưu thành..." */}
           {q.audioUrl && (
-            <div className="bg-[#fffaf6] border border-[#e4ddd1] rounded-xl p-3 sm:p-4 flex items-center gap-3">
+            <div
+              className="bg-[#fffaf6] border border-[#e4ddd1] rounded-xl p-3 sm:p-4 flex items-center gap-3 select-none"
+              onContextMenu={(e) => e.preventDefault()}
+            >
               <Volume2 className="w-5 h-5 text-[#f05e23] shrink-0" />
-              <audio controls className="flex-1 h-9" src={q.audioUrl} />
+              <audio
+                controls
+                controlsList="nodownload"
+                className="flex-1 h-9"
+                src={q.audioUrl}
+                preload="metadata"
+              />
             </div>
           )}
 

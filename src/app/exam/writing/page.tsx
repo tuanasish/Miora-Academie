@@ -1,7 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
-import { PenLine, ChevronLeft, Play, Calendar, ChevronRight } from "lucide-react";
+import { PenLine, ChevronLeft, Play, Calendar, ChevronRight, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
+import { createClient } from "@/lib/supabase/client";
 
 interface WritingItem {
   id: number;
@@ -43,6 +44,26 @@ export default function WritingSelectionPage() {
   const [loading, setLoading] = useState(true);
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [selectedMonth, setSelectedMonth] = useState<MonthGroup | null>(null);
+  const [doneCombinaisonIds, setDoneCombinaisonIds] = useState<Set<number>>(new Set());
+
+  useEffect(() => {
+    const supabase = createClient();
+    void (async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user?.email) return;
+      const { data: rows } = await supabase
+        .from("exam_submissions")
+        .select("combinaison_id")
+        .eq("student_email", user.email)
+        .eq("exam_type", "writing")
+        .not("combinaison_id", "is", null);
+      const ids = new Set<number>();
+      for (const r of rows ?? []) {
+        if (r.combinaison_id != null) ids.add(r.combinaison_id);
+      }
+      setDoneCombinaisonIds(ids);
+    })();
+  }, []);
 
   useEffect(() => {
     fetch("/data/writing.json")
@@ -165,6 +186,12 @@ export default function WritingSelectionPage() {
                     <p className="text-xs text-slate-400 mt-0.5">
                       {month.items.length} combinaisons
                     </p>
+                    {month.items.some((i) => doneCombinaisonIds.has(i.id)) && (
+                      <p className="text-[11px] text-emerald-600 font-semibold mt-1 flex items-center gap-0.5">
+                        <CheckCircle2 className="w-3 h-3 shrink-0" />
+                        {month.items.filter((i) => doneCombinaisonIds.has(i.id)).length} đã nộp
+                      </p>
+                    )}
                   </button>
                 );
               })}
@@ -186,21 +213,36 @@ export default function WritingSelectionPage() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {selectedMonth.items.map((item) => (
+              {selectedMonth.items.map((item) => {
+                const done = doneCombinaisonIds.has(item.id);
+                return (
                 <Link
                   key={item.id}
                   href={`/exam/writing/${item.id}`}
-                  className="group bg-white border border-slate-200 hover:border-violet-300 hover:shadow-md rounded-2xl p-4 transition-all duration-200"
+                  className={`group rounded-2xl p-4 transition-all duration-200 border-2 ${
+                    done
+                      ? "bg-emerald-50/80 border-emerald-200 hover:border-emerald-300 hover:shadow-md"
+                      : "bg-white border-slate-200 hover:border-violet-300 hover:shadow-md"
+                  }`}
                 >
                   {/* Badge */}
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-xs font-bold text-violet-600 bg-violet-100 px-2.5 py-1 rounded-lg">
+                  <div className="flex items-center justify-between mb-3 gap-2 flex-wrap">
+                    <span className={`text-xs font-bold px-2.5 py-1 rounded-lg ${
+                      done ? "text-emerald-800 bg-emerald-100" : "text-violet-600 bg-violet-100"
+                    }`}>
                       {item.titre}
                     </span>
-                    <div className="flex gap-1">
-                      <span className="w-5 h-5 bg-slate-100 text-slate-500 text-[10px] font-bold rounded flex items-center justify-center">1</span>
-                      <span className="w-5 h-5 bg-slate-100 text-slate-500 text-[10px] font-bold rounded flex items-center justify-center">2</span>
-                      <span className="w-5 h-5 bg-slate-100 text-slate-500 text-[10px] font-bold rounded flex items-center justify-center">3</span>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      {done && (
+                        <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-emerald-700 bg-white/80 border border-emerald-200 px-2 py-0.5 rounded-full">
+                          <CheckCircle2 className="w-3 h-3" /> Đã nộp
+                        </span>
+                      )}
+                      <div className="flex gap-1">
+                        <span className="w-5 h-5 bg-slate-100 text-slate-500 text-[10px] font-bold rounded flex items-center justify-center">1</span>
+                        <span className="w-5 h-5 bg-slate-100 text-slate-500 text-[10px] font-bold rounded flex items-center justify-center">2</span>
+                        <span className="w-5 h-5 bg-slate-100 text-slate-500 text-[10px] font-bold rounded flex items-center justify-center">3</span>
+                      </div>
                     </div>
                   </div>
 
@@ -212,12 +254,15 @@ export default function WritingSelectionPage() {
                   )}
 
                   {/* CTA */}
-                  <div className="pt-3 border-t border-slate-100 flex items-center gap-1.5 text-xs font-semibold text-violet-600 group-hover:gap-3 transition-all">
-                    <Play className="w-3.5 h-3.5 fill-current" />
-                    Commencer · 60 min
+                  <div className={`pt-3 border-t flex items-center gap-1.5 text-xs font-semibold group-hover:gap-3 transition-all ${
+                    done ? "border-emerald-100 text-emerald-700" : "border-slate-100 text-violet-600"
+                  }`}>
+                    {done ? <CheckCircle2 className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 fill-current" />}
+                    {done ? "Xem lại / làm lại" : "Commencer · 60 min"}
                   </div>
                 </Link>
-              ))}
+                );
+              })}
             </div>
           </section>
         )}

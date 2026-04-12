@@ -1,9 +1,11 @@
 import Link from 'next/link';
 import { getAssignments, deleteAssignment, type Assignment } from '@/app/actions/assignment.actions';
+import DeleteAssignmentButton from '@/components/admin/DeleteAssignmentButton';
 import {
   ClipboardList, Headphones, BookOpen, PenLine, Mic,
-  Plus, Inbox, Trash2, AlertTriangle, MessageSquare,
+  Plus, Inbox, AlertTriangle, MessageSquare,
 } from 'lucide-react';
+import { formatDueDate, isDueDateOverdue } from '@/lib/exam/deadline';
 
 const EXAM_META: Record<string, { label: string; color: string; bg: string; Icon: React.ComponentType<{ className?: string }> }> = {
   listening: { label: 'Compréhension Orale', color: 'text-sky-700', bg: 'bg-sky-100', Icon: Headphones },
@@ -27,11 +29,6 @@ function getExamTarget(a: Assignment): string {
 
 function fmtDate(iso: string) {
   return new Date(iso).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-}
-
-function isOverdue(due: string | null): boolean {
-  if (!due) return false;
-  return new Date(due) < new Date();
 }
 
 export default async function AdminAssignmentsPage() {
@@ -88,7 +85,8 @@ export default async function AdminAssignmentsPage() {
               {assignments.map((a) => {
                 const meta = EXAM_META[a.exam_type] || EXAM_META.listening;
                 const MetaIcon = meta.Icon;
-                const overdue = isOverdue(a.due_date);
+                const overdue = isDueDateOverdue(a.due_date);
+                const dueDateLabel = formatDueDate(a.due_date, 'fr-FR');
 
                 return (
                   <tr key={a.id} className="hover:bg-gray-50 transition-colors">
@@ -115,9 +113,9 @@ export default async function AdminAssignmentsPage() {
                     </td>
                     {/* Due date */}
                     <td className="px-4 py-3">
-                      {a.due_date ? (
+                      {dueDateLabel ? (
                         <span className={`text-xs font-semibold flex items-center gap-1 ${overdue ? 'text-red-600' : 'text-orange-600'}`}>
-                          {overdue && <AlertTriangle className="w-3 h-3" />}{fmtDate(a.due_date)}
+                          {overdue && <AlertTriangle className="w-3 h-3" />}{dueDateLabel}
                         </span>
                       ) : (
                         <span className="text-gray-300">—</span>
@@ -135,15 +133,7 @@ export default async function AdminAssignmentsPage() {
                     <td className="px-4 py-3 text-right">
                       <form action={handleDelete}>
                         <input type="hidden" name="id" value={a.id} />
-                        <button
-                          type="submit"
-                          className="text-xs text-red-500 hover:text-red-700 font-semibold transition-colors inline-flex items-center gap-1"
-                          onClick={(e) => {
-                            if (!confirm('Xóa assignment này?')) e.preventDefault();
-                          }}
-                        >
-                          <Trash2 className="w-3 h-3" /> Xóa
-                        </button>
+                        <DeleteAssignmentButton />
                       </form>
                     </td>
                   </tr>

@@ -9,7 +9,9 @@ import {
   Settings, MessageCircle, Timer, Hourglass,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { ADMIN_GRADE_MAX } from "@/lib/exam/adminGrading";
 import { useRouter } from "next/navigation";
+import { formatDueDate, isDueDateOverdue } from "@/lib/exam/deadline";
 
 // ─── Types ────────────────────────────────────────────────────────
 type ExamType = "listening" | "reading" | "writing" | "speaking";
@@ -80,10 +82,6 @@ function fmtDate(iso: string) {
 function fmtTime(sec: number | null) {
   if (!sec) return null;
   return `${Math.floor(sec / 60)}m${sec % 60}s`;
-}
-function isOverdue(due: string | null) {
-  if (!due) return false;
-  return new Date(due) < new Date();
 }
 
 function buildExamHref(a: Assignment): string {
@@ -333,7 +331,8 @@ export default function DashboardPage() {
                     const meta = EXAM_META[a.exam_type];
                     const Icon = meta.Icon;
                     const done = isSubmitted(a);
-                    const overdue = !done && isOverdue(a.due_date);
+                    const overdue = !done && isDueDateOverdue(a.due_date);
+                    const dueDateLabel = formatDueDate(a.due_date);
                     const href = buildExamHref(a);
                     const hasTarget = hasAssignedTarget(a);
 
@@ -373,10 +372,10 @@ export default function DashboardPage() {
                               )}
                               <div className="flex items-center gap-3 mt-2 text-[11px] text-[#aaa]">
                                 <span>Gán ngày {fmtDate(a.assigned_at)}</span>
-                                {a.due_date && (
+                                {dueDateLabel && (
                                   <span className={`flex items-center gap-1 font-semibold ${overdue ? "text-red-500" : "text-[#f05e23]"}`}>
                                     <Calendar className="w-3 h-3" />
-                                    {a.due_date}
+                                    {dueDateLabel}
                                   </span>
                                 )}
                               </div>
@@ -436,10 +435,16 @@ export default function DashboardPage() {
                   {submissions.slice(0, 10).map((s) => {
                     const meta = EXAM_META[s.exam_type];
                     const Icon = meta.Icon;
-                    const ref = s.combinaison_id ? `Comb. ${s.combinaison_id}`
+                    const refShort = s.combinaison_id ? `Comb. ${s.combinaison_id}`
                       : s.partie_id ? `P. ${s.partie_id}`
                       : s.serie_id ? `S. ${s.serie_id}` : null;
-                    const maxScore = s.exam_type === 'listening' ? 39 : s.exam_type === 'reading' ? 29 : 25;
+                    const refLabel = s.exam_type === "writing" && s.combinaison_id != null
+                      ? `Combinaison ${s.combinaison_id}`
+                      : s.exam_type === "speaking" && s.partie_id != null
+                        ? `Partie ${s.partie_id}`
+                        : refShort;
+                    const maxScore = s.exam_type === 'listening' ? 39 : s.exam_type === 'reading' ? 29 : ADMIN_GRADE_MAX;
+                    const isWritingOrSpeaking = s.exam_type === "writing" || s.exam_type === "speaking";
 
                     return (
                       <div key={s.id} className="px-4 py-3.5 hover:bg-[#f3efe6]/50 transition-colors">
@@ -448,10 +453,20 @@ export default function DashboardPage() {
                             <Icon className={`w-3.5 h-3.5 ${meta.color}`} />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-1.5">
+                            <div className="flex items-center gap-1.5 flex-wrap">
                               <p className="font-semibold text-[#3d3d3d] text-xs">{meta.sublabel}</p>
-                              {ref && <span className="text-[10px] text-[#bbb]">· {ref}</span>}
+                              {refShort && !isWritingOrSpeaking && (
+                                <span className="text-[10px] text-[#bbb]">· {refShort}</span>
+                              )}
+                              {isWritingOrSpeaking && (
+                                <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-full">
+                                  <CheckCircle2 className="w-3 h-3" /> Đã nộp bài
+                                </span>
+                              )}
                             </div>
+                            {isWritingOrSpeaking && refLabel && (
+                              <p className="text-[11px] font-bold text-[#3d3d3d] mt-0.5">{refLabel}</p>
+                            )}
                             <div className="flex items-center gap-2 mt-0.5 text-[10px] text-[#bbb]">
                               <span>{fmtDate(s.submitted_at)}</span>
                               {fmtTime(s.time_spent_seconds) && (
@@ -461,20 +476,30 @@ export default function DashboardPage() {
                               )}
                             </div>
                           </div>
-                          <div className="shrink-0">
-                            {s.admin_score !== null && s.admin_score !== undefined ? (
-                              <span className="text-xs font-bold text-violet-700 bg-violet-50 px-2.5 py-1 rounded-full">
-                                {s.admin_score}/{maxScore}
-                              </span>
-                            ) : s.score !== null ? (
-                              <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full">
-                                {s.score}/{maxScore}
-                              </span>
-                            ) : (
-                              <span className="text-[10px] text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full font-medium flex items-center gap-0.5">
-                                <Hourglass className="w-2.5 h-2.5" /> Chờ chấm
-                              </span>
-                            )}
+                          <div className="shrink-0 flex flex-col items-end gap-1">
+                            <div className="flex items-center gap-2">
+                              {(s.exam_type === "listening" || s.exam_type === "reading") && (
+                                <Link
+                                  href={`/dashboard/submissions/${s.id}`}
+                                  className="text-[10px] font-semibold text-[#f05e23] hover:underline"
+                                >
+                                  Xem lại
+                                </Link>
+                              )}
+                              {s.admin_score !== null && s.admin_score !== undefined ? (
+                                <span className="text-xs font-bold text-violet-700 bg-violet-50 px-2.5 py-1 rounded-full">
+                                  {s.admin_score}/{maxScore}
+                                </span>
+                              ) : s.score !== null ? (
+                                <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full">
+                                  {s.score}/{maxScore}
+                                </span>
+                              ) : (
+                                <span className="text-[10px] text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full font-medium flex items-center gap-0.5">
+                                  <Hourglass className="w-2.5 h-2.5" /> Chờ chấm
+                                </span>
+                              )}
+                            </div>
                           </div>
                         </div>
                         {/* Admin feedback */}

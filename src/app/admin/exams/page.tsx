@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Headphones, BookOpen, PenLine, Mic, Library } from 'lucide-react';
+import { Headphones, BookOpen, PenLine, Mic, Library, ArrowRight } from 'lucide-react';
 
 const MODULES = [
   {
@@ -13,6 +13,7 @@ const MODULES = [
     stats: '40 séries · 39 questions/série',
     total: '1 560 questions',
     href: '/admin/exams/listening',
+    practiceHref: '/exam/listening',
   },
   {
     type: 'reading',
@@ -25,6 +26,7 @@ const MODULES = [
     stats: '40 séries · 39 questions/série',
     total: '1 560 questions',
     href: '/admin/exams/reading',
+    practiceHref: '/exam/reading',
   },
   {
     type: 'writing',
@@ -37,6 +39,7 @@ const MODULES = [
     stats: '320 combinaisons · 3 tâches chacune',
     total: '960 sujets + corrections',
     href: '/admin/exams/writing',
+    practiceHref: '/exam/writing',
   },
   {
     type: 'speaking',
@@ -49,6 +52,7 @@ const MODULES = [
     stats: '38 mois · 314 parties',
     total: '600+ sujets + corrections',
     href: '/admin/exams/speaking',
+    practiceHref: '/exam/speaking',
   },
 ];
 
@@ -61,6 +65,9 @@ export default function AdminExamsPage() {
         </h1>
         <p className="text-sm text-gray-500 mt-1">
           Xem tất cả bài thi, đáp án, bài mẫu và gợi ý trả lời
+        </p>
+        <p className="text-xs text-gray-400 mt-1">
+          Admin có thể mở trực tiếp giao diện luyện thi từ từng module bên dưới.
         </p>
       </div>
 
@@ -89,9 +96,8 @@ export default function AdminExamsPage() {
         {MODULES.map((m) => {
           const Icon = m.Icon;
           return (
-            <Link
+            <div
               key={m.type}
-              href={m.href}
               className={`group bg-white rounded-2xl border-2 ${m.border} p-6 hover:shadow-lg transition-all`}
             >
               <div className="flex items-start gap-4">
@@ -106,13 +112,27 @@ export default function AdminExamsPage() {
                     <span className={`text-xs font-bold ${m.color} ${m.bg} px-2.5 py-1 rounded-full`}>
                       {m.total}
                     </span>
-                    <span className="text-xs font-semibold text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity">
-                      Xem chi tiết →
+                    <span className="text-xs font-semibold text-gray-400">
+                      {m.sublabel}
                     </span>
+                  </div>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <Link
+                      href={m.href}
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-gray-900 text-white text-xs font-semibold px-3 py-2 hover:bg-gray-800 transition-colors"
+                    >
+                      Xem ngân hàng đề <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
+                    <Link
+                      href={m.practiceHref}
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 text-blue-600 text-xs font-semibold px-3 py-2 hover:bg-blue-50 transition-colors"
+                    >
+                      Mở trang luyện thi <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
                   </div>
                 </div>
               </div>
-            </Link>
+            </div>
           );
         })}
       </div>

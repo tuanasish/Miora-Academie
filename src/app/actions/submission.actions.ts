@@ -1,7 +1,9 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server';
+import { ADMIN_GRADE_MAX } from '@/lib/exam/adminGrading';
 import { revalidatePath } from 'next/cache';
+import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 
 // --- Types ---
 
@@ -76,29 +78,97 @@ export async function getSubmission(id: string): Promise<SubmissionRow | null> {
   return data as SubmissionRow | null;
 }
 
+/** Học viên: chỉ trả về bài nộp nếu thuộc email đang đăng nhập. */
+export async function getSubmissionIfOwner(id: string): Promise<SubmissionRow | null> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const email = user?.email;
+  if (!email) return null;
+
+  const sub = await getSubmission(id);
+  if (!sub) return null;
+  if (sub.student_email !== email) return null;
+  return sub;
+}
+
 // --- Admin: Grade a submission ---
 
 export async function gradeSubmission(
   id: string,
   adminScore: number,
   adminFeedback: string,
+  notes?: string | null,
 ): Promise<void> {
+  if (!Number.isFinite(adminScore) || adminScore < 0 || adminScore > ADMIN_GRADE_MAX) {
+    throw new Error(`Điểm admin phải nằm trong khoảng 0-${ADMIN_GRADE_MAX}.`);
+  }
+
   const supabase = await createClient();
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const privilegedSupabase =
+    process.env.NEXT_PUBLIC_SUPABASE_URL && serviceRoleKey
+      ? createSupabaseClient(process.env.NEXT_PUBLIC_SUPABASE_URL, serviceRoleKey, {
+          auth: { autoRefreshToken: false, persistSession: false },
+        })
+      : null;
 
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user?.id) {
+    throw new Error('SAVE_FAILED');
+  }
 
-  const { error } = await supabase
+  const { data: profile, error: profileError } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .maybeSingle();
+
+  if (profileError) {
+    throw new Error('SAVE_FAILED');
+  }
+  if (profile?.role !== 'admin') {
+    throw new Error('FORBIDDEN');
+  }
+
+  const gradingUpdates: {
+    admin_score: number;
+    admin_feedback: string;
+    graded_at: string;
+    graded_by: string;
+  } = {
+    admin_score: adminScore,
+    admin_feedback: adminFeedback,
+    graded_at: new Date().toISOString(),
+    graded_by: user?.email ?? 'admin',
+  };
+
+  const db = privilegedSupabase ?? supabase;
+  const { data: updatedRow, error } = await db
     .from('exam_submissions')
-    .update({
-      admin_score: adminScore,
-      admin_feedback: adminFeedback,
-      graded_at: new Date().toISOString(),
-      graded_by: user?.email ?? 'admin',
-    })
-    .eq('id', id);
+    .update(gradingUpdates)
+    .eq('id', id)
+    .select('id')
+    .maybeSingle();
 
-  if (error) throw new Error(`Lỗi chấm điểm: ${error.message}`);
+  if (error) throw new Error('SAVE_FAILED');
+  if (!updatedRow) {
+    throw new Error('SAVE_FAILED');
+  }
+
+  if (notes !== undefined) {
+    await db
+      .from('exam_submissions')
+      .update({ notes })
+      .eq('id', id)
+      .select('id')
+      .maybeSingle();
+  }
 
   revalidatePath(`/admin/submissions/${id}`);
   revalidatePath('/admin/submissions');
+  revalidatePath('/dashboard');
 }

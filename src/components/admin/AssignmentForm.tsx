@@ -3,9 +3,10 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createAssignment, bulkCreateAssignments, type CreateAssignmentDTO, type StudentProfile } from '@/app/actions/assignment.actions';
+import { toVietnamDeadlineIso, VIETNAM_TIME_ZONE_LABEL } from '@/lib/exam/deadline';
 import {
   Headphones, BookOpen, PenLine, Mic, User, Users, AlertTriangle,
-  CheckCircle, X, Loader2, CheckSquare, Square,
+  CheckCircle, X, Loader2, CheckSquare,
 } from 'lucide-react';
 
 type ExamType = 'listening' | 'reading' | 'writing' | 'speaking';
@@ -170,7 +171,7 @@ export function AssignmentForm({ students }: AssignmentFormProps) {
         combinaison_id: examType === 'writing' ? Number(targetId) : null,
         partie_id: examType === 'speaking' ? Number(targetId) : null,
         exam_label: examLabel || null,
-        due_date: dueDate || null,
+        due_date: toVietnamDeadlineIso(dueDate),
         note: note || null,
       };
 
@@ -375,14 +376,18 @@ export function AssignmentForm({ students }: AssignmentFormProps) {
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-            4. Hạn nộp <span className="text-gray-400 font-normal">(tùy chọn)</span>
+            4. Hạn nộp <span className="text-gray-400 font-normal">(tùy chọn, giờ Việt Nam {VIETNAM_TIME_ZONE_LABEL})</span>
           </label>
           <input
-            type="date"
+            type="datetime-local"
             value={dueDate}
             onChange={(e) => setDueDate(e.target.value)}
             className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+            step={60}
           />
+          <p className="mt-1 text-xs text-gray-400">
+            Deadline sẽ được lưu và hiển thị theo giờ Việt Nam ({VIETNAM_TIME_ZONE_LABEL}).
+          </p>
         </div>
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-1.5">

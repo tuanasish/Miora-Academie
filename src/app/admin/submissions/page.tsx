@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { getSubmissions } from '@/app/actions/submission.actions';
-import { Headphones, BookOpen, PenLine, Mic, FileCheck, Clock, Filter } from 'lucide-react';
+import { ADMIN_GRADE_MAX } from '@/lib/exam/adminGrading';
+import { Headphones, BookOpen, PenLine, Mic, FileCheck, Clock, ArrowRight } from 'lucide-react';
 
 const TYPE_BADGE: Record<string, { label: string; Icon: React.ComponentType<{ className?: string }>; cls: string }> = {
   listening: { label: 'Listening', Icon: Headphones, cls: 'bg-sky-100 text-sky-700' },
@@ -32,7 +33,7 @@ function scoreDisplay(sub: { exam_type: string; score: number | null; word_count
     return sub.score !== null ? `${sub.score} pts` : '—';
   }
   if (sub.admin_score !== null && sub.admin_score !== undefined) {
-    return `${sub.admin_score}/25`;
+    return `${sub.admin_score}/${ADMIN_GRADE_MAX}`;
   }
   if (sub.exam_type === 'writing' && sub.word_counts) {
     const total = sub.word_counts.t1 + sub.word_counts.t2 + sub.word_counts.t3;
@@ -114,32 +115,56 @@ export default async function AdminSubmissionsPage({ searchParams }: PageProps) 
                 const badge = TYPE_BADGE[sub.exam_type] || TYPE_BADGE.listening;
                 const BadgeIcon = badge.Icon;
                 const graded = sub.graded_at !== null && sub.graded_at !== undefined;
+                const detailHref = `/admin/submissions/${sub.id}`;
+                const needsManualReview = sub.exam_type === 'writing' || sub.exam_type === 'speaking';
                 return (
-                  <tr key={sub.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-4 py-3">
-                      <Link href={`/admin/submissions/${sub.id}`} className="text-blue-600 hover:underline font-medium">
+                  <tr key={sub.id} className="group hover:bg-gray-50 transition-colors">
+                    <td className="p-0">
+                      <Link href={detailHref} className="block px-4 py-3 text-blue-600 font-medium hover:underline">
                         {sub.student_email}
                       </Link>
                     </td>
-                    <td className="px-4 py-3">
-                      <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold ${badge.cls}`}>
-                        <BadgeIcon className="w-3 h-3" /> {badge.label}
-                      </span>
+                    <td className="p-0">
+                      <Link href={detailHref} className="block px-4 py-3">
+                        <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold ${badge.cls}`}>
+                          <BadgeIcon className="w-3 h-3" /> {badge.label}
+                        </span>
+                      </Link>
                     </td>
-                    <td className="px-4 py-3 font-medium text-gray-700">{examRef(sub)}</td>
-                    <td className="px-4 py-3 font-semibold text-gray-800">{scoreDisplay(sub)}</td>
-                    <td className="px-4 py-3 text-gray-500 flex items-center gap-1">
-                      <Clock className="w-3 h-3" /> {fmtTime(sub.time_spent_seconds)}
+                    <td className="p-0">
+                      <Link href={detailHref} className="block px-4 py-3 font-medium text-gray-700">
+                        {examRef(sub)}
+                      </Link>
                     </td>
-                    <td className="px-4 py-3 text-gray-500 text-xs">{fmtDate(sub.submitted_at)}</td>
-                    <td className="px-4 py-3">
-                      {graded ? (
-                        <span className="text-xs font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">Đã chấm</span>
-                      ) : (sub.exam_type === 'writing' || sub.exam_type === 'speaking') ? (
-                        <span className="text-xs font-bold text-amber-600 bg-amber-100 px-2 py-0.5 rounded-full">Chờ chấm</span>
-                      ) : (
-                        <span className="text-xs text-gray-400">Tự chấm</span>
-                      )}
+                    <td className="p-0">
+                      <Link href={detailHref} className="block px-4 py-3 font-semibold text-gray-800">
+                        {scoreDisplay(sub)}
+                      </Link>
+                    </td>
+                    <td className="p-0">
+                      <Link href={detailHref} className="flex items-center gap-1 px-4 py-3 text-gray-500">
+                        <Clock className="w-3 h-3" /> {fmtTime(sub.time_spent_seconds)}
+                      </Link>
+                    </td>
+                    <td className="p-0">
+                      <Link href={detailHref} className="block px-4 py-3 text-xs text-gray-500">
+                        {fmtDate(sub.submitted_at)}
+                      </Link>
+                    </td>
+                    <td className="p-0">
+                      <Link href={detailHref} className="flex items-center justify-between gap-3 px-4 py-3">
+                        {graded ? (
+                          <span className="text-xs font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">Đã chấm</span>
+                        ) : needsManualReview ? (
+                          <span className="text-xs font-bold text-amber-600 bg-amber-100 px-2 py-0.5 rounded-full">Chờ chấm</span>
+                        ) : (
+                          <span className="text-xs text-gray-400">Tự chấm</span>
+                        )}
+                        <span className="inline-flex items-center gap-1 text-xs font-semibold text-violet-700 opacity-0 transition-opacity group-hover:opacity-100">
+                          {needsManualReview ? (graded ? 'Mở bài chấm' : 'Chấm bài') : 'Mở bài'}
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </span>
+                      </Link>
                     </td>
                   </tr>
                 );

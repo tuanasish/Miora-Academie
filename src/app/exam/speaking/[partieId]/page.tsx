@@ -10,6 +10,8 @@ import { useParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { submitExam } from "@/lib/submitExam";
 import { playExamChime } from "@/lib/playExamChime";
+import DeadlineNotice from "@/components/exam/DeadlineNotice";
+import { useAssignmentDeadline } from "@/hooks/useAssignmentDeadline";
 
 interface Sujet {
   id: number;
@@ -246,6 +248,7 @@ export default function SpeakingExamPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [micError, setMicError] = useState<string | null>(null);
+  const deadline = useAssignmentDeadline("speaking", partieId);
 
   const recorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -637,6 +640,8 @@ export default function SpeakingExamPage() {
 
       <div className="flex flex-1 overflow-hidden">
         <main className="flex-1 p-8 flex flex-col gap-5 overflow-y-auto">
+          <DeadlineNotice dueDateLabel={deadline.formattedDueDate} isOverdue={deadline.isOverdue} />
+
           <div className="flex items-center gap-2">
             <span className={`text-xs font-bold px-3 py-1 rounded-full ${activeTask === 0 ? "bg-blue-100 text-blue-700" : "bg-orange-100 text-orange-700"}`}>
               {activeTask === 0 ? "Tâche 2 — Simulation de roleplay" : "Tâche 3 — Point de vue & Débat"}

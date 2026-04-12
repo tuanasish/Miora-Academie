@@ -1,7 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Mic, ChevronLeft, Play, Calendar, ChevronRight } from "lucide-react";
+import { Mic, ChevronLeft, Play, Calendar, ChevronRight, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
+import { createClient } from "@/lib/supabase/client";
 
 interface Sujet {
   id: number;
@@ -48,6 +49,26 @@ export default function SpeakingSelectionPage() {
   const [loading, setLoading] = useState(true);
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [selectedMonth, setSelectedMonth] = useState<Month | null>(null);
+  const [donePartieIds, setDonePartieIds] = useState<Set<number>>(new Set());
+
+  useEffect(() => {
+    const supabase = createClient();
+    void (async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user?.email) return;
+      const { data: rows } = await supabase
+        .from("exam_submissions")
+        .select("partie_id")
+        .eq("student_email", user.email)
+        .eq("exam_type", "speaking")
+        .not("partie_id", "is", null);
+      const ids = new Set<number>();
+      for (const r of rows ?? []) {
+        if (r.partie_id != null) ids.add(r.partie_id);
+      }
+      setDonePartieIds(ids);
+    })();
+  }, []);
 
   useEffect(() => {
     fetch("/data/speaking.json")
@@ -167,6 +188,12 @@ export default function SpeakingSelectionPage() {
                     <p className="text-xs text-slate-400 mt-0.5">
                       {validParties.length} parties
                     </p>
+                    {validParties.some((p) => donePartieIds.has(p.id)) && (
+                      <p className="text-[11px] text-emerald-600 font-semibold mt-1 flex items-center gap-0.5">
+                        <CheckCircle2 className="w-3 h-3 shrink-0" />
+                        {validParties.filter((p) => donePartieIds.has(p.id)).length} đã nộp
+                      </p>
+                    )}
                   </button>
                 );
               })}
@@ -193,21 +220,33 @@ export default function SpeakingSelectionPage() {
                 {validParties.map((partie) => {
                   const t2 = partie.sujets.find((s) => s.tache === 2);
                   const t3 = partie.sujets.find((s) => s.tache === 3);
+                  const done = donePartieIds.has(partie.id);
                   return (
                     <Link
                       key={partie.id}
                       href={`/exam/speaking/${partie.id}`}
-                      className="group bg-white border border-slate-200 hover:border-rose-300 hover:shadow-md rounded-2xl p-4 transition-all duration-200"
+                      className={`group rounded-2xl p-4 transition-all duration-200 border-2 ${
+                        done
+                          ? "bg-emerald-50/80 border-emerald-200 hover:border-emerald-300 hover:shadow-md"
+                          : "bg-white border-slate-200 hover:border-rose-300 hover:shadow-md"
+                      }`}
                     >
                       {/* Header */}
-                      <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center justify-between mb-3 gap-2 flex-wrap">
                         <div className="flex items-center gap-2">
-                          <span className="w-8 h-8 bg-rose-100 text-rose-700 rounded-xl text-sm font-black flex items-center justify-center">
+                          <span className={`w-8 h-8 rounded-xl text-sm font-black flex items-center justify-center ${
+                            done ? "bg-emerald-200 text-emerald-800" : "bg-rose-100 text-rose-700"
+                          }`}>
                             {partie.jour}
                           </span>
                           <span className="text-sm font-bold text-slate-700">Jour {partie.jour}</span>
                         </div>
-                        <div className="flex items-center gap-1.5">
+                        <div className="flex items-center gap-1.5 flex-wrap justify-end">
+                          {done && (
+                            <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-emerald-700 bg-white/80 border border-emerald-200 px-2 py-0.5 rounded-full">
+                              <CheckCircle2 className="w-3 h-3" /> Đã nộp
+                            </span>
+                          )}
                           <span className="text-xs bg-blue-50 text-blue-600 font-semibold px-2 py-0.5 rounded-lg">2:00 + 3:30</span>
                           <span className="text-xs text-slate-300">+</span>
                           <span className="text-xs bg-orange-50 text-orange-600 font-semibold px-2 py-0.5 rounded-lg">4:30</span>
@@ -237,9 +276,11 @@ export default function SpeakingSelectionPage() {
                       )}
 
                       {/* CTA */}
-                      <div className="mt-3 pt-3 border-t border-slate-100 flex items-center gap-1.5 text-xs font-semibold text-rose-600 group-hover:gap-3 transition-all">
-                        <Play className="w-3.5 h-3.5 fill-current" />
-                        Commencer
+                      <div className={`mt-3 pt-3 border-t flex items-center gap-1.5 text-xs font-semibold group-hover:gap-3 transition-all ${
+                        done ? "border-emerald-100 text-emerald-700" : "border-slate-100 text-rose-600"
+                      }`}>
+                        {done ? <CheckCircle2 className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 fill-current" />}
+                        {done ? "Xem lại / làm lại" : "Commencer"}
                       </div>
                     </Link>
                   );
