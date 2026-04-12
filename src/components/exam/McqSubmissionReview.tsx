@@ -205,11 +205,6 @@ export default function McqSubmissionReview({
                       </span>
                       <div className="min-w-0 flex-1 leading-snug">
                         {opt}
-                        {isUserPick && (
-                          <div className={`mt-1.5 text-[11px] font-bold uppercase tracking-wider ${isCorrectOpt ? 'text-emerald-700' : 'text-red-700'}`}>
-                            {isCorrectOpt ? "✓ Lựa chọn của học viên" : "✗ Lựa chọn của học viên"}
-                          </div>
-                        )}
                       </div>
                     </div>
                   );
