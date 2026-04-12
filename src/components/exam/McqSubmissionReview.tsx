@@ -51,7 +51,7 @@ export default function McqSubmissionReview({
       <h3 className={titleClassName}>
         {title} ({sorted.length} questions)
       </h3>
-      <div className="space-y-2">
+      <div className="space-y-4">
         {sorted.map((q2, idx) => {
           const userAns = userAnswerByQuestionId[q2.id];
           const isCorrect = userAns === q2.correctAnswerIndex;
@@ -107,108 +107,105 @@ export default function McqSubmissionReview({
             );
           }
 
-          // full: four options with highlights + audio + image
+          // full: một cột cố định — đề, audio, ảnh, 2×2 đáp án cùng bề ngang, dễ theo dõi
           return (
             <div
               key={q2.id}
-              className={`bg-[#faf8f5] rounded-xl border-2 p-3 sm:p-4 anim-fade-in ${
+              className={`bg-[#faf8f5] rounded-xl border-2 p-4 sm:p-5 anim-fade-in ${
                 notAnswered ? "border-[#e4ddd1]" : isCorrect ? "border-emerald-200" : "border-red-200"
               }`}
               style={delayStyle}
             >
-              <div className="flex items-start gap-3 mb-2">
-                <span
-                  className={`shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
-                    notAnswered
-                      ? "bg-gray-100 text-gray-400"
-                      : isCorrect
-                        ? "bg-emerald-100 text-emerald-700"
-                        : "bg-red-100 text-red-700"
-                  }`}
-                >
-                  {notAnswered ? "—" : isCorrect ? "✓" : "✗"}
-                </span>
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs text-[#888] mb-1">
+              <div className="flex items-center justify-between gap-3 pb-3 mb-1 border-b border-[#e4ddd1]/50">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <span
+                    className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${
+                      notAnswered
+                        ? "bg-gray-100 text-gray-400"
+                        : isCorrect
+                          ? "bg-emerald-100 text-emerald-700"
+                          : "bg-red-100 text-red-700"
+                    }`}
+                  >
+                    {notAnswered ? "—" : isCorrect ? "✓" : "✗"}
+                  </span>
+                  <p className="text-[11px] sm:text-xs font-semibold text-[#888] tracking-wide truncate">
                     Q{idx + 1} · {q2.level} · {q2.points}pts
                   </p>
-                  <p className="text-sm text-[#3d3d3d] leading-relaxed">{q2.prompt}</p>
-                  {notAnswered && (
-                    <p className="mt-1.5 text-xs font-medium text-gray-500 italic flex items-center gap-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-gray-400"></span>
-                      Học viên đã bỏ trống câu này. Đáp án đúng là {LABELS[q2.correctAnswerIndex]}.
-                    </p>
-                  )}
                 </div>
               </div>
 
-              {/* Audio player — inline like during the exam */}
-              {q2.audioUrl && (
-                <div
-                  className="flex items-center gap-2.5 bg-[#fffaf6] border border-[#e4ddd1] rounded-lg p-2.5 mb-2 ml-0 sm:ml-10 max-w-xl select-none"
-                  onContextMenu={(e) => e.preventDefault()}
-                >
-                  <Volume2 className="w-4 h-4 text-[#f05e23] shrink-0" />
-                  <audio
-                    controls
-                    controlsList="nodownload"
-                    className="flex-1 h-8"
-                    src={q2.audioUrl}
-                    preload="none"
-                  />
-                </div>
-              )}
+              <div className="mx-auto w-full max-w-2xl space-y-3 pt-2">
+                <p className="text-sm text-[#3d3d3d] leading-snug text-center">{q2.prompt}</p>
+                {notAnswered && (
+                  <p className="text-xs font-medium text-gray-500 italic text-center flex items-center justify-center gap-1.5 flex-wrap">
+                    <span className="w-1.5 h-1.5 rounded-full bg-gray-400 shrink-0" />
+                    Học viên đã bỏ trống câu này. Đáp án đúng là {LABELS[q2.correctAnswerIndex]}.
+                  </p>
+                )}
 
-              {/* Question image — like during the exam */}
-              {q2.imageUrl && (
-                <div className="mb-2 ml-0 sm:ml-10 max-w-xl">
-                  <div className="w-max max-w-full rounded-lg border border-[#e4ddd1] overflow-hidden shadow-sm">
+                {q2.audioUrl && (
+                  <div
+                    className="flex items-center gap-2.5 bg-[#fffaf6] border border-[#e4ddd1] rounded-lg p-2.5 w-full select-none"
+                    onContextMenu={(e) => e.preventDefault()}
+                  >
+                    <Volume2 className="w-4 h-4 text-[#f05e23] shrink-0" />
+                    <audio
+                      controls
+                      controlsList="nodownload"
+                      className="flex-1 h-8 min-w-0"
+                      src={q2.audioUrl}
+                      preload="none"
+                    />
+                  </div>
+                )}
+
+                {q2.imageUrl && (
+                  <div className="flex justify-center">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={q2.imageUrl}
                       alt={`Question ${idx + 1}`}
-                      className="block h-auto w-auto max-w-full max-h-48 sm:max-h-56 object-contain"
+                      className="block h-auto w-full max-h-[min(72vh,36rem)] sm:max-h-[min(78vh,40rem)] object-contain object-center"
                       loading="lazy"
                     />
                   </div>
-                </div>
-              )}
+                )}
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-w-2xl pl-0 sm:pl-10">
-                {q2.options.map((opt, optIdx) => {
-                  const isCorrectOpt = optIdx === q2.correctAnswerIndex;
-                  const isUserPick = userAns === optIdx;
-                  const showWrongPick = !notAnswered && !isCorrect && isUserPick && !isCorrectOpt;
+                <div className="grid grid-cols-2 gap-2 sm:gap-2.5 pt-0.5">
+                  {q2.options.map((opt, optIdx) => {
+                    const isCorrectOpt = optIdx === q2.correctAnswerIndex;
+                    const isUserPick = userAns === optIdx;
+                    const showWrongPick = !notAnswered && !isCorrect && isUserPick && !isCorrectOpt;
 
-                  let box =
-                    "border-2 rounded-xl p-2.5 sm:p-3 text-left text-sm flex gap-2 items-start transition-colors ";
-                  if (isCorrectOpt) {
-                    box += "border-emerald-400 bg-emerald-50 text-emerald-900 font-medium ring-1 ring-emerald-200";
-                  } else if (showWrongPick) {
-                    box += "border-red-400 bg-red-50 text-red-900 ring-1 ring-red-200";
-                  } else {
-                    box += "border-[#e4ddd1] bg-white/60 text-[#5d5d5d]";
-                  }
+                    let box =
+                      "border-2 rounded-lg p-2 sm:p-2.5 text-left text-[13px] sm:text-sm flex gap-2 items-start transition-colors min-h-[3rem] ";
+                    if (isCorrectOpt) {
+                      box += "border-emerald-400 bg-emerald-50 text-emerald-900 font-medium ring-1 ring-emerald-200/80";
+                    } else if (showWrongPick) {
+                      box += "border-red-400 bg-red-50 text-red-900 ring-1 ring-red-200/80";
+                    } else {
+                      box += "border-[#e4ddd1] bg-white/80 text-[#5d5d5d]";
+                    }
 
-                  return (
-                    <div key={optIdx} className={box}>
-                      <span
-                        className={`shrink-0 w-6 h-6 rounded-full text-xs font-bold leading-6 text-center ${
-                          isCorrectOpt
-                            ? "bg-emerald-600 text-white"
-                            : showWrongPick
-                              ? "bg-red-600 text-white"
-                              : "bg-[#ede8dd] text-[#888]"
-                        }`}
-                      >
-                        {LABELS[optIdx]}
-                      </span>
-                      <div className="min-w-0 flex-1 leading-snug">
-                        {opt}
+                    return (
+                      <div key={optIdx} className={box}>
+                        <span
+                          className={`shrink-0 w-6 h-6 rounded-full text-xs font-bold leading-6 text-center ${
+                            isCorrectOpt
+                              ? "bg-emerald-600 text-white"
+                              : showWrongPick
+                                ? "bg-red-600 text-white"
+                                : "bg-[#ede8dd] text-[#888]"
+                          }`}
+                        >
+                          {LABELS[optIdx]}
+                        </span>
+                        <div className="min-w-0 flex-1 leading-snug">{opt}</div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
               </div>
             </div>
           );

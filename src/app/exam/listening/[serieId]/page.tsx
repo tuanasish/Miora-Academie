@@ -284,7 +284,7 @@ export default function ListeningSerieExamPage() {
 
           {/* Image — khung ôm sát ảnh (w-max), không nền trắng full width */}
           {q.imageUrl && (
-            <div className="shrink-0 w-max max-w-full rounded-xl border border-[#e4ddd1] overflow-hidden shadow-sm">
+            <div className="shrink-0 w-max max-w-full rounded-xl overflow-hidden">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={q.imageUrl}

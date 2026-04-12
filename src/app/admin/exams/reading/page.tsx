@@ -147,15 +147,17 @@ export default function AdminReadingBankPage() {
 
                       {q.imageUrl && (
                         <div className="mb-3">
-                          <p className="text-xs font-bold text-gray-400 uppercase mb-1">Image</p>
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={q.imageUrl} alt="Question" className="max-w-md rounded-lg border border-gray-200" />
+                          <p className="text-xs font-bold text-gray-400 uppercase mb-1 text-center">Image</p>
+                          <div className="flex justify-center">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={q.imageUrl} alt="Question" className="max-w-md rounded-lg" />
+                          </div>
                         </div>
                       )}
 
                       <div className="mb-3">
-                        <p className="text-xs font-bold text-gray-400 uppercase mb-1">Choix de réponse</p>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <p className="text-xs font-bold text-gray-400 uppercase mb-1 text-center">Choix de réponse</p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-w-xl mx-auto w-full">
                           {q.options.map((opt, i) => (
                             <div
                               key={i}

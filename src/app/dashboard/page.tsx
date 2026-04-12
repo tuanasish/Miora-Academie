@@ -5,13 +5,14 @@ import {
   GraduationCap, Headphones, BookOpen, PenLine, Mic,
   LogOut, ClipboardList, CheckCircle2, Play,
   Calendar, AlertCircle, Loader2, FileText, ArrowRight,
-  TrendingUp, Clock, Award, ChevronRight, Sparkles,
+  TrendingUp, ChevronRight, Sparkles,
   Settings, MessageCircle, Timer, Hourglass,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { ADMIN_GRADE_MAX } from "@/lib/exam/adminGrading";
 import { useRouter } from "next/navigation";
 import { formatDueDate, isDueDateOverdue } from "@/lib/exam/deadline";
+import { ASSETS } from "@/components/landing/landing-data";
 
 // ─── Types ────────────────────────────────────────────────────────
 type ExamType = "listening" | "reading" | "writing" | "speaking";
@@ -183,15 +184,14 @@ export default function DashboardPage() {
       {/* ══════════ HEADER ══════════ */}
       <header className="bg-[#faf8f5] border-b border-[#e4ddd1] sticky top-0 z-10 shadow-[0_1px_8px_rgba(0,0,0,0.05)]">
         <div className="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="bg-gradient-to-br from-[#f05e23] to-[#d85118] p-2.5 rounded-xl shadow-md">
-              <GraduationCap className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <h1 className="font-display font-bold text-[#3d3d3d] leading-tight">Miora Académie</h1>
-              <p className="text-[10px] text-[#aaa] tracking-wide uppercase">Préparation TCF</p>
-            </div>
-          </div>
+          <Link href="/" className="flex shrink-0 items-center">
+            {/* eslint-disable-next-line @next/next/no-img-element — cùng asset landing (Figma MCP URL) */}
+            <img
+              src={ASSETS.logo}
+              alt="Miora"
+              className="h-9 w-auto object-contain sm:h-10 xl:h-[46px]"
+            />
+          </Link>
           <div className="flex items-center gap-4">
             {userRole === "admin" && (
               <Link href="/admin" className="text-xs font-semibold text-[#f05e23] bg-[#f05e23]/10 px-3 py-1.5 rounded-lg hover:bg-[#f05e23]/20 transition-colors inline-flex items-center gap-1.5">
@@ -264,7 +264,7 @@ export default function DashboardPage() {
         <section>
           <div className="flex items-center gap-2 mb-5">
             <GraduationCap className="w-5 h-5 text-[#f05e23]" />
-            <h3 className="font-display font-bold text-[#3d3d3d] text-lg">Xét nghiệm TCF</h3>
+            <h3 className="font-display font-bold text-[#3d3d3d] text-lg">Đề ôn TCF</h3>
           </div>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {(Object.entries(EXAM_META) as [ExamType, typeof EXAM_META[ExamType]][]).map(([type, meta]) => {
@@ -317,7 +317,7 @@ export default function DashboardPage() {
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
                     <ClipboardList className="w-5 h-5 text-[#f05e23]" />
-                    <h3 className="font-display font-bold text-[#3d3d3d] text-lg">Bài thi được gán</h3>
+                    <h3 className="font-display font-bold text-[#3d3d3d] text-lg">Bài tập cần làm</h3>
                   </div>
                   {pendingAssignments.length > 0 && (
                     <span className="bg-[#f05e23] text-white text-[11px] font-bold px-2.5 py-1 rounded-full animate-pulse">
@@ -406,12 +406,12 @@ export default function DashboardPage() {
               <section>
                 <div className="flex items-center gap-2 mb-4">
                   <ClipboardList className="w-5 h-5 text-[#f05e23]" />
-                  <h3 className="font-display font-bold text-[#3d3d3d] text-lg">Bài thi được gán</h3>
+                  <h3 className="font-display font-bold text-[#3d3d3d] text-lg">Bài tập cần làm</h3>
                 </div>
                 <div className="bg-[#faf8f5] rounded-2xl border border-[#e4ddd1] p-10 text-center">
                   <ClipboardList className="w-10 h-10 mx-auto text-[#d7c9b8] mb-3" />
-                  <p className="text-sm font-display font-semibold text-[#3d3d3d]">Chưa có bài thi nào được gán.</p>
-                  <p className="text-xs text-[#aaa] mt-1">Liên hệ giảng viên để được gán bài.</p>
+                  <p className="text-sm font-display font-semibold text-[#3d3d3d]">Chưa có bài tập nào cần làm.</p>
+                  <p className="text-xs text-[#aaa] mt-1">Liên hệ giảng viên nếu bạn cần bài tập mới.</p>
                 </div>
               </section>
             ) : null}
@@ -527,32 +527,6 @@ export default function DashboardPage() {
                 </div>
               )}
             </section>
-
-            {/* Quick stats cards */}
-            {submissions.length > 0 && (
-              <div className="mt-5 grid grid-cols-2 gap-3">
-                <div className="bg-[#faf8f5] rounded-xl border border-[#e4ddd1] p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Award className="w-4 h-4 text-amber-500" />
-                    <span className="text-[10px] text-[#aaa] font-semibold uppercase tracking-wide">Cao nhất</span>
-                  </div>
-                  <p className="font-display font-extrabold text-[#3d3d3d] text-xl">
-                    {Math.max(...submissions.filter(s => s.score !== null).map(s => s.score ?? 0))}
-                  </p>
-                  <p className="text-[10px] text-[#bbb] mt-0.5">điểm tối đa</p>
-                </div>
-                <div className="bg-[#faf8f5] rounded-xl border border-[#e4ddd1] p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Clock className="w-4 h-4 text-sky-500" />
-                    <span className="text-[10px] text-[#aaa] font-semibold uppercase tracking-wide">Thời gian</span>
-                  </div>
-                  <p className="font-display font-extrabold text-[#3d3d3d] text-xl">
-                    {totalTime > 3600 ? `${Math.floor(totalTime / 3600)}h${Math.round((totalTime % 3600) / 60)}` : `${Math.round(totalTime / 60)}m`}
-                  </p>
-                  <p className="text-[10px] text-[#bbb] mt-0.5">tổng thời gian</p>
-                </div>
-              </div>
-            )}
           </div>
         </div>
 

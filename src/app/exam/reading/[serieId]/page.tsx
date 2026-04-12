@@ -245,7 +245,7 @@ export default function ReadingSerieExamPage() {
           </div>
 
           {q.imageUrl && (
-            <div className="relative shrink-0 w-max max-w-full min-h-[120px] min-w-[8rem] rounded-xl overflow-hidden border border-[#e4ddd1] shadow-sm">
+            <div className="relative shrink-0 w-max max-w-full min-h-[120px] min-w-[8rem] rounded-xl overflow-hidden">
               {!readingImageReady && (
                 <div
                   className="absolute inset-0 z-[1] animate-pulse bg-[#ede8dd]"
