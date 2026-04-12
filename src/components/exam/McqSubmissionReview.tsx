@@ -30,6 +30,17 @@ export interface McqSubmissionReviewProps {
 
 const LABELS = ["A", "B", "C", "D"];
 
+/** 39 câu / série: ~10 câu mỗi quý (1–10 → Q1, …, 31–39 → Q4). */
+function quarterFromOrder(order: number): number {
+  return Math.min(4, Math.max(1, Math.ceil(order / 10)));
+}
+
+function formatQuestionMeta(q: McqReviewQuestion, zeroBasedIndex: number): string {
+  const order = q.orderIndex ?? zeroBasedIndex + 1;
+  const quy = quarterFromOrder(order);
+  return `Quý ${quy} · ${q.level} · ${q.points} điểm`;
+}
+
 export default function McqSubmissionReview({
   questions,
   userAnswerByQuestionId,
@@ -83,7 +94,7 @@ export default function McqSubmissionReview({
                   </span>
                   <div className="flex-1 min-w-0">
                     <p className="text-xs text-[#888] mb-1">
-                      Q{idx + 1} · {q2.level} · {q2.points}pts
+                      {formatQuestionMeta(q2, idx)}
                     </p>
                     <p className="text-sm text-[#3d3d3d] line-clamp-2">{q2.prompt}</p>
                     <div className="flex flex-wrap gap-2 mt-2">
@@ -116,7 +127,7 @@ export default function McqSubmissionReview({
               }`}
               style={delayStyle}
             >
-              <div className="flex items-center justify-between gap-3 pb-3 mb-1 border-b border-[#e4ddd1]/50">
+              <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 pb-3 mb-1 border-b border-[#e4ddd1]/50">
                 <div className="flex items-center gap-2.5 min-w-0">
                   <span
                     className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${
@@ -129,20 +140,20 @@ export default function McqSubmissionReview({
                   >
                     {notAnswered ? "—" : isCorrect ? "✓" : "✗"}
                   </span>
-                  <p className="text-[11px] sm:text-xs font-semibold text-[#888] tracking-wide truncate">
-                    Q{idx + 1} · {q2.level} · {q2.points}pts
+                  <p className="text-[11px] sm:text-xs font-semibold text-[#888] tracking-wide">
+                    {formatQuestionMeta(q2, idx)}
                   </p>
                 </div>
+                {notAnswered && (
+                  <p className="text-[11px] sm:text-xs font-semibold text-red-700 flex items-center gap-2 shrink-0 w-full sm:w-auto sm:justify-end">
+                    <span className="w-2 h-2 rounded-full bg-red-500 shrink-0" aria-hidden />
+                    Học viên đã bỏ trống câu này.
+                  </p>
+                )}
               </div>
 
               <div className="mx-auto w-full max-w-2xl space-y-3 pt-2">
                 <p className="text-sm text-[#3d3d3d] leading-snug text-center">{q2.prompt}</p>
-                {notAnswered && (
-                  <p className="text-xs font-medium text-gray-500 italic text-center flex items-center justify-center gap-1.5 flex-wrap">
-                    <span className="w-1.5 h-1.5 rounded-full bg-gray-400 shrink-0" />
-                    Học viên đã bỏ trống câu này. Đáp án đúng là {LABELS[q2.correctAnswerIndex]}.
-                  </p>
-                )}
 
                 {q2.audioUrl && (
                   <div
@@ -172,7 +183,7 @@ export default function McqSubmissionReview({
                   </div>
                 )}
 
-                <div className="grid grid-cols-2 gap-2 sm:gap-2.5 pt-0.5">
+                <div className="grid grid-cols-2 gap-2 sm:gap-2.5">
                   {q2.options.map((opt, optIdx) => {
                     const isCorrectOpt = optIdx === q2.correctAnswerIndex;
                     const isUserPick = userAns === optIdx;
