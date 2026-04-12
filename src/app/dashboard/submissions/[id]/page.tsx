@@ -32,7 +32,7 @@ export default async function DashboardSubmissionReviewPage({ params }: PageProp
 
   const maxScore = 
     sub.exam_type === "listening" ? 39 : 
-    sub.exam_type === "reading" ? 29 : 
+    sub.exam_type === "reading" ? 39 : 
     ADMIN_GRADE_MAX;
 
   const MetaIcon = 
@@ -155,7 +155,7 @@ export default async function DashboardSubmissionReviewPage({ params }: PageProp
               const doc1 = i === 2 ? writingPrompt?.tache3Document1 : null;
               const doc2 = i === 2 ? writingPrompt?.tache3Document2 : null;
               
-              const reviewForTask = writingReview?.[t.key];
+              const reviewForTask = writingReview?.tasks[t.key];
 
               return (
                 <div key={i} className="bg-white rounded-2xl border border-[#e4ddd1] p-6 shadow-sm">

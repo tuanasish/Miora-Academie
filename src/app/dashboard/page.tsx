@@ -59,7 +59,7 @@ const EXAM_META: Record<ExamType, {
   reading: {
     label: "Compréhension Écrite", sublabel: "Đọc hiểu",
     Icon: BookOpen, color: "text-emerald-600", bg: "bg-emerald-50",
-    border: "border-emerald-200", href: "/exam/reading", detail: "60 phút · 29 câu hỏi",
+    border: "border-emerald-200", href: "/exam/reading", detail: "60 phút · 39 câu hỏi",
     tagCls: "bg-emerald-100 text-emerald-700", accent: "from-emerald-500 to-emerald-600",
   },
   writing: {
@@ -443,7 +443,7 @@ export default function DashboardPage() {
                       : s.exam_type === "speaking" && s.partie_id != null
                         ? `Partie ${s.partie_id}`
                         : refShort;
-                    const maxScore = s.exam_type === 'listening' ? 39 : s.exam_type === 'reading' ? 29 : ADMIN_GRADE_MAX;
+                    const maxScore = s.exam_type === 'listening' ? 39 : s.exam_type === 'reading' ? 39 : ADMIN_GRADE_MAX;
                     const isWritingOrSpeaking = s.exam_type === "writing" || s.exam_type === "speaking";
 
                     return (

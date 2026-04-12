@@ -202,7 +202,7 @@ export default async function SubmissionDetailPage({ params, searchParams }: Pag
               <p className="text-2xl font-bold text-gray-800">
                 {sub.score !== null ? sub.score : '—'}
                 <span className="text-sm font-normal text-gray-400 ml-1">
-                  / {sub.exam_type === 'listening' ? 39 : 29}
+                  / {sub.exam_type === 'listening' ? 39 : 39}
                 </span>
               </p>
             </div>
