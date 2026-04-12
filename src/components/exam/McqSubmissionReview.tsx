@@ -1,6 +1,7 @@
 "use client";
 
 import { indexToLetter } from "@/lib/exam/mcqAnswers";
+import { Volume2 } from "lucide-react";
 
 export interface McqReviewQuestion {
   id: number;
@@ -10,6 +11,8 @@ export interface McqReviewQuestion {
   prompt: string;
   options: string[];
   correctAnswerIndex: number;
+  audioUrl?: string | null;
+  imageUrl?: string | null;
 }
 
 export interface McqSubmissionReviewProps {
@@ -104,7 +107,7 @@ export default function McqSubmissionReview({
             );
           }
 
-          // full: four options with highlights
+          // full: four options with highlights + audio + image
           return (
             <div
               key={q2.id}
@@ -132,6 +135,39 @@ export default function McqSubmissionReview({
                   <p className="text-sm text-[#3d3d3d] leading-relaxed">{q2.prompt}</p>
                 </div>
               </div>
+
+              {/* Audio player — inline like during the exam */}
+              {q2.audioUrl && (
+                <div
+                  className="flex items-center gap-2.5 bg-[#fffaf6] border border-[#e4ddd1] rounded-lg p-2.5 mb-2 ml-0 sm:ml-10 max-w-xl select-none"
+                  onContextMenu={(e) => e.preventDefault()}
+                >
+                  <Volume2 className="w-4 h-4 text-[#f05e23] shrink-0" />
+                  <audio
+                    controls
+                    controlsList="nodownload"
+                    className="flex-1 h-8"
+                    src={q2.audioUrl}
+                    preload="none"
+                  />
+                </div>
+              )}
+
+              {/* Question image — like during the exam */}
+              {q2.imageUrl && (
+                <div className="mb-2 ml-0 sm:ml-10 max-w-xl">
+                  <div className="w-max max-w-full rounded-lg border border-[#e4ddd1] overflow-hidden shadow-sm">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={q2.imageUrl}
+                      alt={`Question ${idx + 1}`}
+                      className="block h-auto w-auto max-w-full max-h-48 sm:max-h-56 object-contain"
+                      loading="lazy"
+                    />
+                  </div>
+                </div>
+              )}
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-w-2xl pl-0 sm:pl-10">
                 {q2.options.map((opt, optIdx) => {
                   const isCorrectOpt = optIdx === q2.correctAnswerIndex;

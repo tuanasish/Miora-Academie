@@ -215,23 +215,23 @@ function WritingTaskReviewEditor({
         </div>
 
         <div className="flex flex-wrap gap-2">
+          <ToolbarButton active={editor.isActive('reviewError')} onClick={markSelectionAsError}>
+            <AlertCircle className="h-3.5 w-3.5" /> Tô đỏ lỗi
+          </ToolbarButton>
+          <ToolbarButton onClick={clearReviewMarks}>
+            <CircleOff className="h-3.5 w-3.5" /> Bỏ đánh dấu
+          </ToolbarButton>
           <ToolbarButton active={editor.isActive('bold')} onClick={() => editor.chain().focus().toggleBold().run()}>
             <Bold className="h-3.5 w-3.5" /> Đậm
           </ToolbarButton>
           <ToolbarButton active={editor.isActive('italic')} onClick={() => editor.chain().focus().toggleItalic().run()}>
             <Italic className="h-3.5 w-3.5" /> Nghiêng
           </ToolbarButton>
-          <ToolbarButton active={editor.isActive('reviewError')} onClick={markSelectionAsError}>
-            <AlertCircle className="h-3.5 w-3.5" /> Tô đỏ lỗi
-          </ToolbarButton>
           <ToolbarButton active={editor.isActive('underline')} onClick={() => editor.chain().focus().toggleUnderline().run()}>
             <UnderlineIcon className="h-3.5 w-3.5" /> Gạch chân
           </ToolbarButton>
           <ToolbarButton active={editor.isActive('bulletList')} onClick={() => editor.chain().focus().toggleBulletList().run()}>
             <List className="h-3.5 w-3.5" /> Gạch đầu dòng
-          </ToolbarButton>
-          <ToolbarButton onClick={clearReviewMarks}>
-            <CircleOff className="h-3.5 w-3.5" /> Bỏ đánh dấu
           </ToolbarButton>
           <ToolbarButton onClick={() => editor.chain().focus().undo().run()}>
             <Undo2 className="h-3.5 w-3.5" /> Undo

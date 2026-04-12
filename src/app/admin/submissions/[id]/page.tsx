@@ -8,6 +8,7 @@ import WritingInlineReviewFields from '@/components/admin/WritingInlineReviewFie
 import { getMcqQuestionsForSerie } from '@/lib/exam/loadMcqExamData';
 import { storedAnswersToIndices } from '@/lib/exam/mcqAnswers';
 import { ADMIN_GRADE_MAX, TCF_GRADE_BANDS } from '@/lib/exam/adminGrading';
+import { getWritingCombinaison, getSpeakingPartie } from '@/lib/exam/loadExamPrompts';
 import {
   parseWritingReviewMarkup,
   plainTextToReviewHtml,
@@ -15,7 +16,7 @@ import {
 } from '@/lib/exam/writingReview';
 import {
   Headphones, BookOpen, PenLine, Mic, ArrowLeft, CheckCircle, MessageSquare,
-  Clock, Target, Download, Library,
+  Clock, Target, Download, Library, AlignLeft, FileText,
 } from 'lucide-react';
 
 const TYPE_META: Record<string, { label: string; Icon: React.ComponentType<{ className?: string }>; color: string }> = {
@@ -61,6 +62,19 @@ export default async function SubmissionDetailPage({ params, searchParams }: Pag
     (sub.exam_type === 'listening' || sub.exam_type === 'reading') && sub.serie_id != null
       ? await getMcqQuestionsForSerie(sub.exam_type, sub.serie_id)
       : null;
+
+  // Load original exam prompts for writing/speaking
+  const writingPrompt =
+    sub.exam_type === 'writing' && sub.combinaison_id != null
+      ? await getWritingCombinaison(sub.combinaison_id)
+      : null;
+
+  const speakingPrompt =
+    sub.exam_type === 'speaking' && sub.partie_id != null
+      ? await getSpeakingPartie(sub.partie_id)
+      : null;
+  const speakingT2 = speakingPrompt?.sujets.find((s) => s.tache === 2) ?? null;
+  const speakingT3 = speakingPrompt?.sujets.find((s) => s.tache === 3) ?? null;
 
   const meta = TYPE_META[sub.exam_type];
   const examRef =
@@ -226,28 +240,69 @@ export default async function SubmissionDetailPage({ params, searchParams }: Pag
       {/* Writing Detail */}
       {sub.exam_type === 'writing' && (
         <div className="space-y-4 mb-6">
-          {writingTasks.map((t, i) => (
-            <div key={i} className="bg-white rounded-xl border border-gray-200 p-6">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="font-bold text-gray-800">{t.label}</h3>
-                <div className="flex items-center gap-3">
-                  <span className={`text-xs font-semibold px-2 py-1 rounded-full ${
-                    (t.wc || 0) >= parseInt(t.range.split('-')[0]) ? 'bg-emerald-100 text-emerald-700' : 'bg-orange-100 text-orange-600'
-                  }`}>
-                    {t.wc || 0} mots (obj. {t.range})
-                  </span>
-                  {t.time !== undefined && (
-                    <span className="text-xs text-gray-400 font-mono flex items-center gap-1"><Clock className="w-3 h-3" /> {fmtTime(t.time)}</span>
-                  )}
+          {writingTasks.map((t, i) => {
+            const sujetText = writingPrompt
+              ? i === 0 ? writingPrompt.tache1Sujet
+                : i === 1 ? writingPrompt.tache2Sujet
+                : writingPrompt.tache3Titre
+              : null;
+            const doc1 = i === 2 ? writingPrompt?.tache3Document1 : null;
+            const doc2 = i === 2 ? writingPrompt?.tache3Document2 : null;
+
+            return (
+              <div key={i} className="bg-white rounded-xl border border-gray-200 p-6">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="font-bold text-gray-800">{t.label}</h3>
+                  <div className="flex items-center gap-3">
+                    <span className={`text-xs font-semibold px-2 py-1 rounded-full ${
+                      (t.wc || 0) >= parseInt(t.range.split('-')[0]) ? 'bg-emerald-100 text-emerald-700' : 'bg-orange-100 text-orange-600'
+                    }`}>
+                      {t.wc || 0} mots (obj. {t.range})
+                    </span>
+                    {t.time !== undefined && (
+                      <span className="text-xs text-gray-400 font-mono flex items-center gap-1"><Clock className="w-3 h-3" /> {fmtTime(t.time)}</span>
+                    )}
+                  </div>
+                </div>
+
+                {/* ── Original exam prompt ── */}
+                {sujetText && (
+                  <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-3">
+                    <div className="flex items-center gap-2 mb-2">
+                      <AlignLeft className="w-3.5 h-3.5 text-amber-600" />
+                      <span className="text-[11px] font-bold text-amber-700 uppercase tracking-wider">Sujet — {t.label}</span>
+                      <span className="ml-auto text-[11px] text-amber-600 font-semibold bg-amber-100 px-2 py-0.5 rounded-full">obj. {t.range} mots</span>
+                    </div>
+                    <p className="text-sm text-gray-800 leading-relaxed font-medium">{sujetText}</p>
+                    {/* Task 3 documents */}
+                    {(doc1 || doc2) && (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
+                        {doc1 && (
+                          <div className="bg-white border border-amber-200 rounded-lg p-3">
+                            <p className="text-xs font-extrabold text-emerald-700 mb-1.5">Document POUR</p>
+                            <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{doc1}</p>
+                          </div>
+                        )}
+                        {doc2 && (
+                          <div className="bg-white border border-amber-200 rounded-lg p-3">
+                            <p className="text-xs font-extrabold text-red-600 mb-1.5">Document CONTRE</p>
+                            <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{doc2}</p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Student answer */}
+                <div className="bg-gray-50 rounded-lg p-4 max-h-64 overflow-y-auto">
+                  <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">
+                    {t.text || <span className="italic text-gray-400">Pas de réponse</span>}
+                  </p>
                 </div>
               </div>
-              <div className="bg-gray-50 rounded-lg p-4 max-h-64 overflow-y-auto">
-                <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">
-                  {t.text || <span className="italic text-gray-400">Pas de réponse</span>}
-                </p>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
@@ -255,11 +310,33 @@ export default async function SubmissionDetailPage({ params, searchParams }: Pag
       {sub.exam_type === 'speaking' && (
         <div className="space-y-4 mb-6">
           {[
-            { label: 'Tâche 2 — Roleplay', url: sub.speaking_task1_video_url },
-            { label: 'Tâche 3 — Débat', url: sub.speaking_task2_video_url },
+            { label: 'Tâche 2 — Roleplay', url: sub.speaking_task1_video_url, sujet: speakingT2 },
+            { label: 'Tâche 3 — Débat', url: sub.speaking_task2_video_url, sujet: speakingT3 },
           ].map((t, i) => (
             <div key={i} className="bg-white rounded-xl border border-gray-200 p-6">
               <h3 className="font-bold text-gray-800 mb-3 flex items-center gap-2"><Mic className="w-4 h-4 text-rose-500" /> {t.label}</h3>
+
+              {/* ── Original exam sujet ── */}
+              {t.sujet && (
+                <div className="bg-rose-50 border border-rose-200 rounded-lg p-4 mb-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <FileText className="w-3.5 h-3.5 text-rose-500" />
+                    <span className="text-[11px] font-bold text-rose-600 uppercase tracking-wider">Sujet d&apos;examen</span>
+                  </div>
+                  <p className="text-sm text-gray-800 leading-relaxed font-medium">{t.sujet.title}</p>
+                  {t.sujet.question && (
+                    <div className="mt-3 border-t border-rose-100 pt-3">
+                      <p className="text-xs text-rose-500 font-semibold mb-1">Questions guide :</p>
+                      <p className="text-sm text-gray-700 whitespace-pre-line leading-relaxed">{t.sujet.question}</p>
+                    </div>
+                  )}
+                  {t.sujet.description && (
+                    <p className="text-xs text-gray-500 italic mt-2">{t.sujet.description}</p>
+                  )}
+                </div>
+              )}
+
+              {/* Student recording */}
               {t.url ? (
                 <div className="space-y-2">
                   <audio controls src={t.url} className="w-full h-12" />

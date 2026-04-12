@@ -478,7 +478,7 @@ export default function DashboardPage() {
                           </div>
                           <div className="shrink-0 flex flex-col items-end gap-1">
                             <div className="flex items-center gap-2">
-                              {(s.exam_type === "listening" || s.exam_type === "reading") && (
+                              {((s.exam_type === "listening" || s.exam_type === "reading") || s.graded_at) && (
                                 <Link
                                   href={`/dashboard/submissions/${s.id}`}
                                   className="text-[10px] font-semibold text-[#f05e23] hover:underline"
