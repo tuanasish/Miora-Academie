@@ -443,7 +443,7 @@ export default function DashboardPage() {
                       : s.exam_type === "speaking" && s.partie_id != null
                         ? `Partie ${s.partie_id}`
                         : refShort;
-                    const maxScore = s.exam_type === 'listening' ? 39 : s.exam_type === 'reading' ? 39 : ADMIN_GRADE_MAX;
+                    const maxScore = s.exam_type === 'listening' ? 699 : s.exam_type === 'reading' ? 699 : ADMIN_GRADE_MAX;
                     const isWritingOrSpeaking = s.exam_type === "writing" || s.exam_type === "speaking";
 
                     return (

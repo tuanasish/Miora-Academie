@@ -31,8 +31,8 @@ export default async function DashboardSubmissionReviewPage({ params }: PageProp
   if (!sub) notFound();
 
   const maxScore = 
-    sub.exam_type === "listening" ? 39 : 
-    sub.exam_type === "reading" ? 39 : 
+    sub.exam_type === "listening" ? 699 : 
+    sub.exam_type === "reading" ? 699 : 
     ADMIN_GRADE_MAX;
 
   const MetaIcon = 

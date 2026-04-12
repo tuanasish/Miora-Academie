@@ -108,7 +108,9 @@ export default function ListeningSerieExamPage() {
     setSubmitError(null);
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
-    const correctCount = questions.filter((q2) => answers[q2.id] === q2.correctAnswerIndex).length;
+    const totalScore = questions.reduce((sum, q2) => {
+      return sum + (answers[q2.id] === q2.correctAnswerIndex ? (q2.points || 0) : 0);
+    }, 0);
     const elapsed = TOTAL_SECONDS - timer.seconds;
     const answersMap: Record<string, string> = {};
     for (const [qId, aIdx] of Object.entries(answers)) {
@@ -117,7 +119,7 @@ export default function ListeningSerieExamPage() {
     const result = await submitExam({
       exam_type: "listening", serie_id: serieId,
       student_email: user?.email ?? "anonymous", student_id: user?.id ?? "",
-      answers: answersMap, score: correctCount, time_spent_seconds: elapsed,
+      answers: answersMap, score: totalScore, time_spent_seconds: elapsed,
     });
     setSubmitting(false);
     if (result.success) { setSubmitted(true); setShowConfirmModal(false); }
