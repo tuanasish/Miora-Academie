@@ -133,6 +133,12 @@ export default function McqSubmissionReview({
                     Q{idx + 1} · {q2.level} · {q2.points}pts
                   </p>
                   <p className="text-sm text-[#3d3d3d] leading-relaxed">{q2.prompt}</p>
+                  {notAnswered && (
+                    <p className="mt-1.5 text-xs font-medium text-gray-500 italic flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-gray-400"></span>
+                      Học viên đã bỏ trống câu này. Đáp án đúng là {LABELS[q2.correctAnswerIndex]}.
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -197,7 +203,14 @@ export default function McqSubmissionReview({
                       >
                         {LABELS[optIdx]}
                       </span>
-                      <span className="min-w-0 flex-1 leading-snug">{opt}</span>
+                      <div className="min-w-0 flex-1 leading-snug">
+                        {opt}
+                        {isUserPick && (
+                          <div className={`mt-1.5 text-[11px] font-bold uppercase tracking-wider ${isCorrectOpt ? 'text-emerald-700' : 'text-red-700'}`}>
+                            {isCorrectOpt ? "✓ Lựa chọn của học viên" : "✗ Lựa chọn của học viên"}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   );
                 })}
