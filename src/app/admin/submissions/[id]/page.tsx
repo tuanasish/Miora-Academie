@@ -49,6 +49,7 @@ export default async function SubmissionDetailPage({ params, searchParams }: Pag
   const query = await searchParams;
   const sub = await getSubmission(id);
   if (!sub) notFound();
+  const submission = sub;
   const errorBannerMessage =
     query.error === 'forbidden'
       ? 'Bạn không có quyền chấm bài này.'
@@ -89,12 +90,12 @@ export default async function SubmissionDetailPage({ params, searchParams }: Pag
       const score = parseFloat(formData.get('admin_score') as string);
       const feedback = (formData.get('admin_feedback') as string) || '';
       const reviewNotes = (() => {
-        if (sub.exam_type !== 'writing') return undefined;
+        if (submission.exam_type !== 'writing') return undefined;
 
         const originalTasks = {
-          t1: plainTextToReviewHtml(sub.writing_task1),
-          t2: plainTextToReviewHtml(sub.writing_task2),
-          t3: plainTextToReviewHtml(sub.writing_task3),
+          t1: plainTextToReviewHtml(submission.writing_task1),
+          t2: plainTextToReviewHtml(submission.writing_task2),
+          t3: plainTextToReviewHtml(submission.writing_task3),
         };
 
         const submittedTasks = {
