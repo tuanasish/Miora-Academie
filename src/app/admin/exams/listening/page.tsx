@@ -57,8 +57,8 @@ export default function AdminListeningBankPage() {
           <p className="text-sm text-gray-500 mt-1">40 séries · 39 questions par série · 1 560 questions total</p>
         </div>
         
-        {/* Serie selector */}
-        <div className="flex items-center gap-3">
+        {/* Serie selector + gán đúng série đang xem */}
+        <div className="flex items-center gap-3 flex-wrap justify-end">
           <label className="text-sm font-medium text-gray-600">Série:</label>
           <select
             value={selectedSerie}
@@ -69,6 +69,12 @@ export default function AdminListeningBankPage() {
               <option key={n} value={n}>Série {n}</option>
             ))}
           </select>
+          <Link
+            href={`/admin/assignments/new?type=listening&id=${selectedSerie}&label=${encodeURIComponent(`Série ${selectedSerie}`)}`}
+            className="text-xs font-semibold text-blue-600 hover:text-blue-800 bg-blue-50 px-2.5 py-1.5 rounded-full hover:bg-blue-100 transition-colors whitespace-nowrap"
+          >
+            Gán bài
+          </Link>
         </div>
       </div>
 

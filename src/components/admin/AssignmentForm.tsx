@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createAssignment, bulkCreateAssignments, type CreateAssignmentDTO, type StudentProfile } from '@/app/actions/assignment.actions';
 import { toVietnamDeadlineIso, VIETNAM_TIME_ZONE_LABEL } from '@/lib/exam/deadline';
@@ -51,28 +51,46 @@ export function AssignmentForm({ students }: AssignmentFormProps) {
   const [examOptions, setExamOptions] = useState<ExamOption[]>([]);
   const [loadingOptions, setLoadingOptions] = useState(false);
 
-  // Pre-fill from URL params (from exam bank "Gán bài" button)
+  const prevExamTypeRef = useRef<ExamType | ''>('');
+
+  // Pre-fill loại đề + nhãn từ URL (nút "Gán bài" từ ngân hàng đề)
   useEffect(() => {
     const paramType = searchParams.get('type') as ExamType | null;
-    const paramId = searchParams.get('id');
     const paramLabel = searchParams.get('label');
     if (paramType) setExamType(paramType);
-    if (paramId) setTargetId(Number(paramId));
     if (paramLabel) setExamLabel(paramLabel);
   }, [searchParams]);
+
+  // Đồng bộ bài cụ thể (serie / combinaison / partie) với URL; tránh race với effect tải options
+  useEffect(() => {
+    const urlType = searchParams.get('type') as ExamType | null;
+    const rawId = searchParams.get('id');
+    const parsed =
+      rawId && rawId !== '' && !Number.isNaN(Number(rawId)) ? Number(rawId) : null;
+
+    if (!examType) {
+      prevExamTypeRef.current = '';
+      return;
+    }
+
+    const typeChanged = prevExamTypeRef.current !== examType;
+    prevExamTypeRef.current = examType;
+
+    if (urlType === examType && parsed !== null) {
+      setTargetId(parsed);
+    } else if (typeChanged) {
+      setTargetId('');
+    }
+  }, [examType, searchParams]);
 
   // Load exam options when exam type changes
   useEffect(() => {
     if (!examType) {
       setExamOptions([]);
-      setTargetId('');
       return;
     }
 
     setLoadingOptions(true);
-    // Don't reset targetId if pre-filled from URL
-    const urlId = searchParams.get('id');
-    if (!urlId) setTargetId('');
 
     if (examType === 'listening') {
       fetch('/data/listening.json')
@@ -130,7 +148,7 @@ export function AssignmentForm({ students }: AssignmentFormProps) {
         .catch(() => setExamOptions([]))
         .finally(() => setLoadingOptions(false));
     }
-  }, [examType, searchParams]);
+  }, [examType]);
 
   const toggleStudent = (email: string) => {
     setSelectedEmails((prev) =>

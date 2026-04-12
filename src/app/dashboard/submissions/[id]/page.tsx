@@ -9,6 +9,7 @@ import { storedAnswersToIndices } from "@/lib/exam/mcqAnswers";
 import { getWritingCombinaison, getSpeakingPartie } from '@/lib/exam/loadExamPrompts';
 import { parseWritingReviewMarkup, plainTextToReviewHtml } from '@/lib/exam/writingReview';
 import { ADMIN_GRADE_MAX } from '@/lib/exam/adminGrading';
+import { submissionWithSpeakingPlaybackUrls } from '@/lib/supabase/signSpeakingSubmissionUrl';
 import { PenLine, Mic, Clock, Download, FileText, AlignLeft, MessageSquare } from "lucide-react";
 
 interface PageProps {
@@ -27,8 +28,9 @@ function fmtDate(iso: string) {
 
 export default async function DashboardSubmissionReviewPage({ params }: PageProps) {
   const { id } = await params;
-  const sub = await getSubmissionIfOwner(id);
-  if (!sub) notFound();
+  const subRaw = await getSubmissionIfOwner(id);
+  if (!subRaw) notFound();
+  const sub = await submissionWithSpeakingPlaybackUrls(subRaw);
 
   const maxScore = 
     sub.exam_type === "listening" ? 699 : 
@@ -204,16 +206,16 @@ export default async function DashboardSubmissionReviewPage({ params }: PageProp
                   )}
 
                   {/* Admin corrected answer or raw student answer */}
-                  <div className="bg-[#fffaf6] border border-[#f05e23]/20 rounded-xl p-4">
-                    <p className="text-xs font-bold text-[#f05e23] uppercase tracking-wider mb-2">Chi tiết bài làm</p>
+                  <div className="bg-sky-50 border border-sky-200 rounded-xl p-4">
+                    <p className="text-xs font-bold text-blue-700 uppercase tracking-wider mb-2">Chi tiết bài làm</p>
                     {reviewForTask && reviewForTask.length > 0 ? (
                       <div 
-                        className="prose prose-sm max-w-none text-gray-800 leading-relaxed"
+                        className="prose prose-sm max-w-none text-blue-900 leading-relaxed prose-headings:text-blue-900 prose-p:text-blue-900"
                         dangerouslySetInnerHTML={{ __html: plainTextToReviewHtml(reviewForTask) }}
                       />
                     ) : (
-                      <p className="text-sm text-gray-800 whitespace-pre-wrap leading-relaxed">
-                        {t.text || <span className="italic text-gray-400">Pas de réponse</span>}
+                      <p className="text-sm text-blue-900 whitespace-pre-wrap leading-relaxed">
+                        {t.text || <span className="italic text-blue-600/80">Pas de réponse</span>}
                       </p>
                     )}
                   </div>
@@ -237,30 +239,32 @@ export default async function DashboardSubmissionReviewPage({ params }: PageProp
 
                 {/* Original Exam Sujet */}
                 {t.sujet && (
-                  <div className="bg-rose-50 border border-rose-200 rounded-xl p-4 mb-5">
+                  <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 mb-5">
                     <div className="flex items-center gap-2 mb-2">
-                      <FileText className="w-4 h-4 text-rose-500" />
-                      <span className="text-[11px] font-bold text-rose-600 uppercase tracking-wider">Sujet d&apos;examen</span>
+                      <FileText className="w-4 h-4 text-emerald-600" />
+                      <span className="text-[11px] font-bold text-emerald-700 uppercase tracking-wider">Sujet d&apos;examen</span>
                     </div>
-                    <p className="text-sm text-gray-800 leading-relaxed font-semibold">{t.sujet.title}</p>
+                    <p className="text-sm text-emerald-950 leading-relaxed font-semibold">{t.sujet.title}</p>
                     {t.sujet.question && (
-                      <div className="mt-3 border-t border-rose-100 pt-3">
-                        <p className="text-xs text-rose-500 font-semibold mb-1">Questions guide :</p>
-                        <p className="text-sm text-gray-700 whitespace-pre-line leading-relaxed">{t.sujet.question}</p>
+                      <div className="mt-3 border-t border-emerald-100 pt-3">
+                        <p className="text-xs text-emerald-600 font-semibold mb-1">Questions guide :</p>
+                        <p className="text-sm text-emerald-900 whitespace-pre-line leading-relaxed">{t.sujet.question}</p>
                       </div>
                     )}
                     {t.sujet.description && (
-                      <p className="text-xs text-gray-500 italic mt-2">{t.sujet.description}</p>
+                      <p className="text-xs text-emerald-700/80 italic mt-2">{t.sujet.description}</p>
                     )}
                   </div>
                 )}
 
                 {/* Student Recording */}
-                <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
-                  <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Bản Ghi Âm</p>
+                <div className="bg-sky-50 border border-sky-200 rounded-xl p-4">
+                  <p className="text-xs font-bold text-blue-700 uppercase tracking-wider mb-2">Bản ghi âm</p>
                   {t.url ? (
                     <div className="space-y-3">
-                      <audio controls src={t.url} className="w-full h-12" />
+                      <audio controls preload="metadata" className="w-full h-12">
+                        <source src={t.url} />
+                      </audio>
                       <a
                         href={t.url}
                         target="_blank"
@@ -271,7 +275,7 @@ export default async function DashboardSubmissionReviewPage({ params }: PageProp
                       </a>
                     </div>
                   ) : (
-                    <p className="text-sm text-gray-400 italic">Pas d&apos;enregistrement</p>
+                    <p className="text-sm text-blue-600/80 italic">Pas d&apos;enregistrement</p>
                   )}
                 </div>
               </div>

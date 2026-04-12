@@ -57,7 +57,7 @@ export default function AdminReadingBankPage() {
           <p className="text-sm text-gray-500 mt-1">40 séries · 39 questions par série · 1 560 questions total</p>
         </div>
         
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap justify-end">
           <label className="text-sm font-medium text-gray-600">Série:</label>
           <select
             value={selectedSerie}
@@ -68,6 +68,12 @@ export default function AdminReadingBankPage() {
               <option key={n} value={n}>Série {n}</option>
             ))}
           </select>
+          <Link
+            href={`/admin/assignments/new?type=reading&id=${selectedSerie}&label=${encodeURIComponent(`Série ${selectedSerie}`)}`}
+            className="text-xs font-semibold text-blue-600 hover:text-blue-800 bg-blue-50 px-2.5 py-1.5 rounded-full hover:bg-blue-100 transition-colors whitespace-nowrap"
+          >
+            Gán bài
+          </Link>
         </div>
       </div>
 

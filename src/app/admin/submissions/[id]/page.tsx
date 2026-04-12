@@ -18,6 +18,7 @@ import {
   Headphones, BookOpen, PenLine, Mic, ArrowLeft, CheckCircle, MessageSquare,
   Clock, Target, Download, Library, AlignLeft, FileText,
 } from 'lucide-react';
+import { submissionWithSpeakingPlaybackUrls } from '@/lib/supabase/signSpeakingSubmissionUrl';
 
 const TYPE_META: Record<string, { label: string; Icon: React.ComponentType<{ className?: string }>; color: string }> = {
   listening: { label: 'Compréhension Orale', Icon: Headphones, color: 'text-sky-600' },
@@ -48,8 +49,9 @@ interface PageProps {
 export default async function SubmissionDetailPage({ params, searchParams }: PageProps) {
   const { id } = await params;
   const query = await searchParams;
-  const sub = await getSubmission(id);
-  if (!sub) notFound();
+  const subRaw = await getSubmission(id);
+  if (!subRaw) notFound();
+  const sub = await submissionWithSpeakingPlaybackUrls(subRaw);
   const submission = sub;
   const errorBannerMessage =
     query.error === 'forbidden'
@@ -295,9 +297,10 @@ export default async function SubmissionDetailPage({ params, searchParams }: Pag
                 )}
 
                 {/* Student answer */}
-                <div className="bg-gray-50 rounded-lg p-4 max-h-64 overflow-y-auto">
-                  <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">
-                    {t.text || <span className="italic text-gray-400">Pas de réponse</span>}
+                <div className="bg-sky-50 border border-sky-200 rounded-lg p-4 max-h-64 overflow-y-auto">
+                  <p className="text-[11px] font-bold text-blue-700 uppercase tracking-wider mb-2">Bài làm</p>
+                  <p className="text-sm text-blue-900 whitespace-pre-wrap leading-relaxed">
+                    {t.text || <span className="italic text-blue-600/80">Pas de réponse</span>}
                   </p>
                 </div>
               </div>
@@ -318,40 +321,45 @@ export default async function SubmissionDetailPage({ params, searchParams }: Pag
 
               {/* ── Original exam sujet ── */}
               {t.sujet && (
-                <div className="bg-rose-50 border border-rose-200 rounded-lg p-4 mb-4">
+                <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4 mb-4">
                   <div className="flex items-center gap-2 mb-2">
-                    <FileText className="w-3.5 h-3.5 text-rose-500" />
-                    <span className="text-[11px] font-bold text-rose-600 uppercase tracking-wider">Sujet d&apos;examen</span>
+                    <FileText className="w-3.5 h-3.5 text-emerald-600" />
+                    <span className="text-[11px] font-bold text-emerald-700 uppercase tracking-wider">Sujet d&apos;examen</span>
                   </div>
-                  <p className="text-sm text-gray-800 leading-relaxed font-medium">{t.sujet.title}</p>
+                  <p className="text-sm text-emerald-950 leading-relaxed font-medium">{t.sujet.title}</p>
                   {t.sujet.question && (
-                    <div className="mt-3 border-t border-rose-100 pt-3">
-                      <p className="text-xs text-rose-500 font-semibold mb-1">Questions guide :</p>
-                      <p className="text-sm text-gray-700 whitespace-pre-line leading-relaxed">{t.sujet.question}</p>
+                    <div className="mt-3 border-t border-emerald-100 pt-3">
+                      <p className="text-xs text-emerald-600 font-semibold mb-1">Questions guide :</p>
+                      <p className="text-sm text-emerald-900 whitespace-pre-line leading-relaxed">{t.sujet.question}</p>
                     </div>
                   )}
                   {t.sujet.description && (
-                    <p className="text-xs text-gray-500 italic mt-2">{t.sujet.description}</p>
+                    <p className="text-xs text-emerald-700/80 italic mt-2">{t.sujet.description}</p>
                   )}
                 </div>
               )}
 
               {/* Student recording */}
-              {t.url ? (
-                <div className="space-y-2">
-                  <audio controls src={t.url} className="w-full h-12" />
-                  <a
-                    href={t.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-xs text-blue-600 hover:text-blue-800 font-semibold"
-                  >
-                    <span className="flex items-center gap-1"><Download className="w-3 h-3" /> Tải file gốc</span>
-                  </a>
-                </div>
-              ) : (
-                <p className="text-sm text-gray-400 italic">Pas d&apos;enregistrement</p>
-              )}
+              <div className="bg-sky-50 border border-sky-200 rounded-lg p-4 space-y-2">
+                <p className="text-[11px] font-bold text-blue-700 uppercase tracking-wider">Bài làm</p>
+                {t.url ? (
+                  <>
+                    <audio controls preload="metadata" className="w-full h-12">
+                      <source src={t.url} />
+                    </audio>
+                    <a
+                      href={t.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-blue-600 hover:text-blue-800 font-semibold"
+                    >
+                      <span className="flex items-center gap-1"><Download className="w-3 h-3" /> Tải file gốc</span>
+                    </a>
+                  </>
+                ) : (
+                  <p className="text-sm text-blue-600/80 italic">Pas d&apos;enregistrement</p>
+                )}
+              </div>
             </div>
           ))}
         </div>
