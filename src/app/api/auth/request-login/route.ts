@@ -1,18 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 
-import { buildRateLimitBucket, consumeRateLimit, getClientIp } from "@/lib/security/rateLimit";
 import { createPrivilegedSupabase } from "@/lib/supabase/adminAuth";
-
-const EMAIL_RATE_LIMIT = {
-  maxAttempts: 3,
-  windowSeconds: 10 * 60,
-};
-
-const IP_RATE_LIMIT = {
-  maxAttempts: 8,
-  windowSeconds: 10 * 60,
-};
 
 function parseRedirectTo(request: NextRequest, redirectTo: string) {
   let parsed: URL;
@@ -28,23 +17,6 @@ function parseRedirectTo(request: NextRequest, redirectTo: string) {
   }
 
   return parsed.toString();
-}
-
-function rateLimitedResponse(retryAfterSeconds: number, remaining: number, limit: number) {
-  return NextResponse.json(
-    {
-      error: "RATE_LIMITED",
-      retryAfterSeconds,
-    },
-    {
-      status: 429,
-      headers: {
-        "Retry-After": String(retryAfterSeconds),
-        "X-RateLimit-Limit": String(limit),
-        "X-RateLimit-Remaining": String(Math.max(0, remaining)),
-      },
-    },
-  );
 }
 
 export async function POST(request: NextRequest) {
@@ -69,27 +41,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "SERVER_MISCONFIGURED" }, { status: 500 });
     }
 
-    const [emailLimit, ipLimit] = await Promise.all([
-      consumeRateLimit(privileged, {
-        bucket: buildRateLimitBucket("login:email", normalizedEmail),
-        maxAttempts: EMAIL_RATE_LIMIT.maxAttempts,
-        windowSeconds: EMAIL_RATE_LIMIT.windowSeconds,
-      }),
-      consumeRateLimit(privileged, {
-        bucket: buildRateLimitBucket("login:ip", getClientIp(request)),
-        maxAttempts: IP_RATE_LIMIT.maxAttempts,
-        windowSeconds: IP_RATE_LIMIT.windowSeconds,
-      }),
-    ]);
-
-    if (!emailLimit.allowed || !ipLimit.allowed) {
-      const activeLimit = !emailLimit.allowed ? emailLimit : ipLimit;
-      return rateLimitedResponse(
-        activeLimit.retryAfterSeconds,
-        activeLimit.remaining,
-        activeLimit.limit,
-      );
-    }
+    // Rate limiting completely disabled per request.
 
     const { data: profile, error: profileError } = await privileged
       .from("profiles")
