@@ -101,7 +101,7 @@ export default function LoginPage() {
 
         setStatus("error");
         setErrorMsg(
-          "Không thể gửi yêu cầu đăng nhập lúc này. Vui lòng thử lại sau ít phút.",
+           payload?.details ? `Lỗi hệ thống: ${payload.details}` : "Không thể gửi yêu cầu đăng nhập lúc này. Vui lòng thử lại sau ít phút."
         );
         return;
       }

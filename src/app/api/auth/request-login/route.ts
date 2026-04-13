@@ -3,7 +3,6 @@ import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 
 import { buildRateLimitBucket, consumeRateLimit, getClientIp } from "@/lib/security/rateLimit";
 import { createPrivilegedSupabase } from "@/lib/supabase/adminAuth";
-import { createClient as createServerClient } from "@/lib/supabase/server";
 
 const EMAIL_RATE_LIMIT = {
   maxAttempts: 3,

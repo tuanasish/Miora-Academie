@@ -1,14 +1,16 @@
 const { createClient } = require("@supabase/supabase-js");
 
 async function testOtp() {
-  const response = await fetch("http://localhost:3000/api/auth/request-login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email: "vuanhtuanofc@gmail.com", redirectTo: "http://localhost:3000/login" }),
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const supabase = createClient(url, key);
+  
+  const { data, error } = await supabase.auth.admin.generateLink({
+    type: "magiclink",
+    email: "mioraacademie@gmail.com",
   });
-  console.log("Status:", response.status);
-  console.log("Set-Cookie headers:", response.headers.get("set-cookie"));
-  const payload = await response.json();
-  console.log("Payload:", payload);
+  
+  console.log("Error:", error);
+  console.log("Data:", data);
 }
 testOtp();
