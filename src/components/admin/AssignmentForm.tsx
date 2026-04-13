@@ -2,7 +2,14 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { createAssignment, bulkCreateAssignments, type CreateAssignmentDTO, type StudentProfile } from '@/app/actions/assignment.actions';
+import {
+  createAssignment,
+  bulkCreateAssignments,
+  createTeacherAssignment,
+  bulkCreateTeacherAssignments,
+  type CreateAssignmentDTO,
+  type StudentProfile,
+} from '@/app/actions/assignment.actions';
 import { toVietnamDeadlineIso, VIETNAM_TIME_ZONE_LABEL } from '@/lib/exam/deadline';
 import {
   Headphones, BookOpen, PenLine, Mic, User, Users, AlertTriangle,
@@ -19,6 +26,8 @@ interface ExamOption {
 
 interface AssignmentFormProps {
   students: StudentProfile[];
+  scope?: 'admin' | 'teacher';
+  cancelHref?: string;
 }
 
 const EXAM_TYPES: { value: ExamType; label: string; Icon: React.ComponentType<{ className?: string }>; color: string }[] = [
@@ -28,12 +37,18 @@ const EXAM_TYPES: { value: ExamType; label: string; Icon: React.ComponentType<{ 
   { value: 'speaking', label: 'Expression Orale', Icon: Mic, color: 'border-rose-400 bg-rose-50' },
 ];
 
-export function AssignmentForm({ students }: AssignmentFormProps) {
+export function AssignmentForm({
+  students,
+  scope = 'admin',
+  cancelHref,
+}: AssignmentFormProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+  const listHref = scope === 'teacher' ? '/teacher/assignments' : '/admin/assignments';
 
   // Mode: single or bulk
   const [mode, setMode] = useState<'single' | 'bulk'>('single');
@@ -194,10 +209,17 @@ export function AssignmentForm({ students }: AssignmentFormProps) {
       };
 
       if (mode === 'single') {
-        await createAssignment({ ...examConfig, student_email: studentEmail });
-        router.push('/admin/assignments');
+        if (scope === 'teacher') {
+          await createTeacherAssignment({ ...examConfig, student_email: studentEmail });
+        } else {
+          await createAssignment({ ...examConfig, student_email: studentEmail });
+        }
+        router.push(listHref);
       } else {
-        const result = await bulkCreateAssignments(selectedEmails, examConfig);
+        const result =
+          scope === 'teacher'
+            ? await bulkCreateTeacherAssignments(selectedEmails, examConfig)
+            : await bulkCreateAssignments(selectedEmails, examConfig);
         setSuccess(`Đã gán thành công cho ${result.success} học viên!`);
         setSelectedEmails([]);
       }
@@ -450,7 +472,7 @@ export function AssignmentForm({ students }: AssignmentFormProps) {
         </button>
         <button
           type="button"
-          onClick={() => router.push('/admin/assignments')}
+          onClick={() => router.push(cancelHref ?? listHref)}
           className="rounded-lg px-4 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors"
         >
           Hủy

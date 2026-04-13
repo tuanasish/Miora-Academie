@@ -13,6 +13,7 @@ import { ADMIN_GRADE_MAX } from "@/lib/exam/adminGrading";
 import { useRouter } from "next/navigation";
 import { formatDueDate, isDueDateOverdue } from "@/lib/exam/deadline";
 import { ASSETS } from "@/components/landing/landing-data";
+import { StreakWidget } from "@/components/dashboard/StreakWidget";
 
 // ─── Types ────────────────────────────────────────────────────────
 type ExamType = "listening" | "reading" | "writing" | "speaking";
@@ -104,10 +105,12 @@ export default function DashboardPage() {
   const router = useRouter();
   const [userEmail, setUserEmail] = useState("");
   const [userName, setUserName] = useState("");
-  const [userRole, setUserRole] = useState<"admin" | "student">("student");
+  const [userRole, setUserRole] = useState<"admin" | "teacher" | "student">("student");
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(true);
+  const [streakData, setStreakData] = useState({ current_streak: 0, longest_streak: 0, last_activity_date: null as string | null });
+  const [teacherInfo, setTeacherInfo] = useState<{ full_name: string | null; email: string } | null>(null);
   const supabase = createClient();
 
   const load = useCallback(async () => {
@@ -123,24 +126,39 @@ export default function DashboardPage() {
         .order("submitted_at", { ascending: false }),
     ]);
 
-    const role = (profile?.role as "admin" | "student") ?? "student";
+    const role = (profile?.role as "admin" | "teacher" | "student") ?? "student";
     setUserRole(role);
     setUserName(profile?.full_name ?? "");
     setSubmissions(subs ?? []);
 
-    if (role === "admin") {
-      const { data: allAssigns } = await supabase
-        .from("exam_assignments")
-        .select("*")
-        .order("assigned_at", { ascending: false });
-      setAssignments(allAssigns ?? []);
-    } else {
-      const { data: myAssigns } = await supabase
-        .from("exam_assignments")
-        .select("*")
-        .eq("student_email", user.email ?? "")
-        .order("assigned_at", { ascending: false });
-      setAssignments(myAssigns ?? []);
+    // Teacher → redirect to /teacher dashboard
+    if (role === "teacher") {
+      router.push("/teacher");
+      return;
+    }
+
+    const { data: myAssigns } = await supabase
+      .from("exam_assignments")
+      .select("*")
+      .eq("student_email", user.email ?? "")
+      .order("assigned_at", { ascending: false });
+    setAssignments(myAssigns ?? []);
+
+    // Fetch streak + teacher info for students
+    if (role === "student") {
+      const [{ data: streak }, { data: teacherMapping }] = await Promise.all([
+        supabase.from("streaks").select("current_streak, highest_streak, last_activity_date").eq("student_id", user.id).maybeSingle(),
+        supabase.from("teacher_students").select("teacher_id").eq("student_id", user.id).limit(1).maybeSingle(),
+      ]);
+      if (streak) setStreakData({
+        current_streak: streak.current_streak ?? 0,
+        longest_streak: streak.highest_streak ?? 0,
+        last_activity_date: streak.last_activity_date ?? null,
+      });
+      if (teacherMapping) {
+        const { data: tProfile } = await supabase.from("profiles").select("full_name, email").eq("id", teacherMapping.teacher_id).maybeSingle();
+        if (tProfile) setTeacherInfo(tProfile);
+      }
     }
 
     setLoading(false);
@@ -173,6 +191,20 @@ export default function DashboardPage() {
   );
 
   const pendingAssignments = assignments.filter((a) => !isSubmitted(a));
+  const today = new Date();
+  const dueTodayAssignments = pendingAssignments.filter((assignment) => {
+    if (!assignment.due_date) return false;
+    const due = new Date(assignment.due_date);
+    return due.toDateString() === today.toDateString();
+  });
+  const dueSoonAssignments = pendingAssignments.filter((assignment) => {
+    if (!assignment.due_date) return false;
+    const due = new Date(assignment.due_date);
+    const diff = due.getTime() - today.getTime();
+    return diff > 0 && diff <= 24 * 60 * 60 * 1000;
+  });
+  const overdueAssignments = pendingAssignments.filter((assignment) => isDueDateOverdue(assignment.due_date));
+  const gradedSubmissions = submissions.filter((submission) => submission.graded_at || submission.admin_feedback);
   const completedCount = submissions.length;
   const avgScore = submissions.filter(s => s.score !== null).length > 0
     ? Math.round(submissions.filter(s => s.score !== null).reduce((acc, s) => acc + (s.score ?? 0), 0) / submissions.filter(s => s.score !== null).length)
@@ -185,7 +217,7 @@ export default function DashboardPage() {
       <header className="bg-[#faf8f5] border-b border-[#e4ddd1] sticky top-0 z-10 shadow-[0_1px_8px_rgba(0,0,0,0.05)]">
         <div className="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
           <Link href="/" className="flex shrink-0 items-center">
-            {/* eslint-disable-next-line @next/next/no-img-element — cùng asset landing (Figma MCP URL) */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={ASSETS.logo}
               alt="Miora"
@@ -232,7 +264,7 @@ export default function DashboardPage() {
               </h2>
               <p className="text-[#888] mt-2 text-sm leading-relaxed max-w-lg">
                 {pendingAssignments.length > 0
-                  ? `Bạn có ${pendingAssignments.length} bài thi cần hoàn thành. Chúc bạn ôn tập tốt!`
+                  ? `Bạn có ${pendingAssignments.length} bài thi cần hoàn thành${overdueAssignments.length > 0 ? `, trong đó ${overdueAssignments.length} bài đã quá hạn` : ""}.`
                   : "Tất cả bài thi đã được cập nhật. Hãy tiếp tục chuẩn bị!"
                 }
               </p>
@@ -258,6 +290,19 @@ export default function DashboardPage() {
               )}
             </div>
           </div>
+
+          {/* Streak Widget (students only) */}
+          {userRole === "student" && (
+            <div className="mt-6">
+              <StreakWidget
+                currentStreak={streakData.current_streak}
+                longestStreak={streakData.longest_streak}
+                lastActivity={streakData.last_activity_date}
+                teacherName={teacherInfo?.full_name}
+                teacherEmail={teacherInfo?.email}
+              />
+            </div>
+          )}
         </div>
 
         {/* ══════════ EXAM MODULES GRID ══════════ */}
@@ -311,13 +356,34 @@ export default function DashboardPage() {
 
           {/* LEFT: Assignments (3 cols) */}
           <div className="lg:col-span-3 space-y-5">
+            <section>
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+                <div className="rounded-2xl border border-[#e4ddd1] bg-[#faf8f5] p-4">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-[#888]">Cần làm hôm nay</p>
+                  <p className="mt-2 text-3xl font-display font-extrabold text-[#f05e23]">{dueTodayAssignments.length}</p>
+                </div>
+                <div className="rounded-2xl border border-[#e4ddd1] bg-[#faf8f5] p-4">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-[#888]">Sắp đến hạn</p>
+                  <p className="mt-2 text-3xl font-display font-extrabold text-amber-600">{dueSoonAssignments.length}</p>
+                </div>
+                <div className="rounded-2xl border border-[#e4ddd1] bg-[#faf8f5] p-4">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-[#888]">Chưa hoàn thành</p>
+                  <p className="mt-2 text-3xl font-display font-extrabold text-[#3d3d3d]">{pendingAssignments.length}</p>
+                </div>
+                <div className="rounded-2xl border border-[#e4ddd1] bg-[#faf8f5] p-4">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-[#888]">Đã chấm / feedback</p>
+                  <p className="mt-2 text-3xl font-display font-extrabold text-violet-600">{gradedSubmissions.length}</p>
+                </div>
+              </div>
+            </section>
+
             {/* ── ASSIGNED EXAMS ── */}
             {assignments.length > 0 ? (
               <section>
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
                     <ClipboardList className="w-5 h-5 text-[#f05e23]" />
-                    <h3 className="font-display font-bold text-[#3d3d3d] text-lg">Bài tập cần làm</h3>
+                    <h3 className="font-display font-bold text-[#3d3d3d] text-lg">Bài được giao cho bạn</h3>
                   </div>
                   {pendingAssignments.length > 0 && (
                     <span className="bg-[#f05e23] text-white text-[11px] font-bold px-2.5 py-1 rounded-full animate-pulse">

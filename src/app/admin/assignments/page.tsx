@@ -1,6 +1,7 @@
 import Link from 'next/link';
-import { getAssignments, deleteAssignment, type Assignment } from '@/app/actions/assignment.actions';
+import { getAssignments, deleteAssignment, getStudents, type Assignment } from '@/app/actions/assignment.actions';
 import DeleteAssignmentButton from '@/components/admin/DeleteAssignmentButton';
+import { BulkDeleteAssignmentsButton } from '@/components/admin/BulkDeleteAssignmentsButton';
 import {
   ClipboardList, Headphones, BookOpen, PenLine, Mic,
   Plus, Inbox, AlertTriangle, MessageSquare,
@@ -31,8 +32,28 @@ function fmtDate(iso: string) {
   return new Date(iso).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
-export default async function AdminAssignmentsPage() {
-  const assignments = await getAssignments();
+interface PageProps {
+  searchParams: Promise<{ student?: string; from?: string; to?: string }>;
+}
+
+export default async function AdminAssignmentsPage({ searchParams }: PageProps) {
+  const params = await searchParams;
+  const studentFilter = params.student?.trim() ?? '';
+  const fromFilter = params.from?.trim() ?? '';
+  const toFilter = params.to?.trim() ?? '';
+
+  const [assignments, students] = await Promise.all([
+    getAssignments({
+      student_email: studentFilter || undefined,
+      assigned_from: fromFilter || undefined,
+      assigned_to: toFilter || undefined,
+    }),
+    getStudents(),
+  ]);
+
+  const studentOptions = students.filter((s) => s.role === 'student');
+  const canBulkDelete =
+    Boolean(studentFilter) || Boolean(fromFilter) || Boolean(toFilter);
 
   async function handleDelete(formData: FormData) {
     'use server';
@@ -42,34 +63,94 @@ export default async function AdminAssignmentsPage() {
 
   return (
     <div>
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
             <ClipboardList className="w-6 h-6 text-blue-600" /> Gán Bài Luyện Thi
           </h1>
           <p className="text-gray-500 text-sm mt-1">
-            Quản lý bài tập được gán cho học viên · {assignments.length} assignments
+            Quản lý bài tập được gán cho học viên · {assignments.length} bản ghi
+            {(studentFilter || fromFilter || toFilter) ? ' (đã lọc, tối đa 500)' : ''}
           </p>
         </div>
-        <Link
-          href="/admin/assignments/new"
-          className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 transition-colors"
-        >
-          <Plus className="w-4 h-4" /> Gán bài mới
-        </Link>
+        <div className="flex flex-wrap items-center gap-3">
+          <BulkDeleteAssignmentsButton
+            studentEmail={studentFilter}
+            from={fromFilter}
+            to={toFilter}
+            listCount={assignments.length}
+            canBulk={canBulkDelete}
+          />
+          <Link
+            href="/admin/assignments/new"
+            className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 transition-colors"
+          >
+            <Plus className="w-4 h-4" /> Gán bài mới
+          </Link>
+        </div>
       </div>
 
-      {/* Table */}
+      <form
+        method="get"
+        className="flex flex-wrap items-end gap-3 mb-4 bg-white rounded-xl border border-gray-200 p-4 shadow-sm"
+      >
+        <div className="flex flex-col gap-1 min-w-[200px]">
+          <label className="text-xs font-semibold text-gray-500">Học viên</label>
+          <select
+            name="student"
+            defaultValue={studentFilter}
+            className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+          >
+            <option value="">Tất cả</option>
+            {studentOptions.map((s) => (
+              <option key={s.id} value={s.email}>
+                {s.full_name ? `${s.full_name} (${s.email})` : s.email}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="flex flex-col gap-1">
+          <label className="text-xs font-semibold text-gray-500">Ngày gán từ (GMT+7)</label>
+          <input
+            type="date"
+            name="from"
+            defaultValue={fromFilter}
+            className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+          />
+        </div>
+        <div className="flex flex-col gap-1">
+          <label className="text-xs font-semibold text-gray-500">Đến</label>
+          <input
+            type="date"
+            name="to"
+            defaultValue={toFilter}
+            className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+          />
+        </div>
+        <button
+          type="submit"
+          className="rounded-lg bg-gray-800 text-white px-4 py-2 text-sm font-semibold hover:bg-gray-900"
+        >
+          Áp dụng lọc
+        </button>
+        <Link href="/admin/assignments" className="text-sm font-semibold text-gray-500 hover:text-gray-800 py-2">
+          Xóa lọc
+        </Link>
+      </form>
+
       {assignments.length === 0 ? (
         <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
           <Inbox className="w-10 h-10 mx-auto mb-3 text-gray-300" />
-          <p className="font-semibold text-gray-700">Chưa có bài nào được gán</p>
-          <p className="text-sm text-gray-400 mt-1">Nhấn &quot;Gán bài mới&quot; để bắt đầu</p>
+          <p className="font-semibold text-gray-700">
+            {canBulkDelete ? 'Không có bài gán khớp bộ lọc' : 'Chưa có bài nào được gán'}
+          </p>
+          {!canBulkDelete && (
+            <p className="text-sm text-gray-400 mt-1">Nhấn &quot;Gán bài mới&quot; để bắt đầu</p>
+          )}
         </div>
       ) : (
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
-          <table className="w-full text-sm">
+        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm overflow-x-auto">
+          <table className="w-full text-sm min-w-[800px]">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200">
                 <th className="text-left px-4 py-3 font-semibold text-gray-600">Học viên</th>
@@ -90,7 +171,6 @@ export default async function AdminAssignmentsPage() {
 
                 return (
                   <tr key={a.id} className="hover:bg-gray-50 transition-colors">
-                    {/* Student */}
                     <td className="px-4 py-3">
                       <p className="font-medium text-gray-800">{a.student_email}</p>
                       {a.note && (
@@ -99,19 +179,16 @@ export default async function AdminAssignmentsPage() {
                         </p>
                       )}
                     </td>
-                    {/* Exam type badge */}
                     <td className="px-4 py-3">
                       <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold ${meta.bg} ${meta.color}`}>
                         <MetaIcon className="w-3 h-3" /> {meta.label}
                       </span>
                     </td>
-                    {/* Target */}
                     <td className="px-4 py-3">
                       <span className="font-medium text-gray-700">
                         {a.exam_label || getExamTarget(a)}
                       </span>
                     </td>
-                    {/* Due date */}
                     <td className="px-4 py-3">
                       {dueDateLabel ? (
                         <span className={`text-xs font-semibold flex items-center gap-1 ${overdue ? 'text-red-600' : 'text-orange-600'}`}>
@@ -121,15 +198,12 @@ export default async function AdminAssignmentsPage() {
                         <span className="text-gray-300">—</span>
                       )}
                     </td>
-                    {/* Assigned at */}
                     <td className="px-4 py-3 text-gray-500 text-xs">
                       {fmtDate(a.assigned_at)}
                     </td>
-                    {/* Assigned by */}
                     <td className="px-4 py-3 text-gray-500 text-xs">
                       {a.assigner_name || a.assigner_email || '—'}
                     </td>
-                    {/* Actions */}
                     <td className="px-4 py-3 text-right">
                       <form action={handleDelete}>
                         <input type="hidden" name="id" value={a.id} />

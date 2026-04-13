@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, BookOpen, Headphones } from "lucide-react";
 
 import McqSubmissionReview from "@/components/exam/McqSubmissionReview";
-import { getSubmissionIfOwner } from "@/app/actions/submission.actions";
+import { getSubmissionIfOwner, markSubmissionFeedbackViewed } from "@/app/actions/submission.actions";
 import { getMcqQuestionsForSerie } from "@/lib/exam/loadMcqExamData";
 import { storedAnswersToIndices } from "@/lib/exam/mcqAnswers";
 import { getWritingCombinaison, getSpeakingPartie } from '@/lib/exam/loadExamPrompts';
@@ -30,6 +30,9 @@ export default async function DashboardSubmissionReviewPage({ params }: PageProp
   const { id } = await params;
   const subRaw = await getSubmissionIfOwner(id);
   if (!subRaw) notFound();
+  if (subRaw.graded_at || subRaw.admin_feedback) {
+    await markSubmissionFeedbackViewed(id);
+  }
   const sub = await submissionWithSpeakingPlaybackUrls(subRaw);
 
   const maxScore = 

@@ -1,8 +1,12 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import type { SupabaseClient } from "@supabase/supabase-js";
+
+import { createPrivilegedSupabase } from "@/lib/supabase/privileged";
 
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
+  const privileged = createPrivilegedSupabase();
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -26,41 +30,79 @@ export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const redirectToDashboard = () => NextResponse.redirect(new URL("/dashboard", request.url));
 
-  let cachedRole: string | null | undefined;
-  const getRole = async () => {
-    if (cachedRole !== undefined) return cachedRole;
-    const { data: profile } = await supabase
+  let cachedProfile: { role: string; status: string } | null = null;
+  let didFetchProfile = false;
+
+  const getProfile = async () => {
+    if (didFetchProfile) return cachedProfile;
+    didFetchProfile = true;
+    const profileReader = (privileged ??
+      (supabase as unknown as SupabaseClient)) as SupabaseClient;
+    const { data: profile, error } = await profileReader
       .from("profiles")
-      .select("role")
+      .select("role, status")
       .eq("id", user?.id ?? "")
       .maybeSingle();
-    cachedRole = profile?.role ?? null;
-    return cachedRole;
+    if (error) {
+      console.error("[middleware] profile lookup failed:", error.message);
+    }
+    cachedProfile = profile;
+    return profile;
   };
 
   // Protected routes - require login
-  const protectedPaths = ["/dashboard", "/exam", "/admin"];
+  const protectedPaths = ["/dashboard", "/exam", "/admin", "/teacher", "/student-hub", "/pending-approval"];
   const isProtected = protectedPaths.some((p) => pathname.startsWith(p));
 
   if (isProtected && !user) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-
-
   if (!user) return supabaseResponse;
+
+  const profile = await getProfile();
+  const role = profile?.role ?? "student";
+  const status = profile?.status ?? "active";
+
+  if (status === "disabled") {
+    return NextResponse.redirect(new URL("/login?error=access_denied", request.url));
+  }
+
+  // Teacher pending approval check
+  if (role === "teacher" && status === "pending" && !pathname.startsWith("/pending-approval")) {
+    return NextResponse.redirect(new URL("/pending-approval", request.url));
+  }
+
+  if (pathname.startsWith("/pending-approval")) {
+    if (role !== "teacher") return redirectToDashboard();
+    return supabaseResponse;
+  }
 
   // /admin is admin-only
   if (pathname.startsWith("/admin")) {
-    const role = await getRole();
     if (role !== "admin") return redirectToDashboard();
+    return supabaseResponse;
+  }
+
+  // /teacher is admin or teacher
+  if (pathname.startsWith("/teacher")) {
+    if (role !== "teacher" && role !== "admin") return redirectToDashboard();
+    return supabaseResponse;
+  }
+
+  // /student-hub is student or admin
+  if (pathname.startsWith("/student-hub")) {
+    if (role !== "student" && role !== "admin") return redirectToDashboard();
     return supabaseResponse;
   }
 
   // Students can only access assigned exam detail routes
   if (pathname.startsWith("/exam")) {
-    const role = await getRole();
-    if (role === "admin") return supabaseResponse;
+    if (role === "admin" || role === "teacher") return supabaseResponse;
+
+    if (pathname.match(/^\/exam\/(listening|reading|writing|speaking)\/?$/)) {
+      return supabaseResponse;
+    }
 
     const match = pathname.match(/^\/exam\/(listening|reading|writing|speaking)\/(\d+)\/?$/);
     if (!match) return redirectToDashboard();

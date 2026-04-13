@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { getSubmission, gradeSubmission } from '@/app/actions/submission.actions';
+import { DeleteSubmissionButton } from '@/components/admin/DeleteSubmissionButton';
 import GradeSubmitButton from '@/components/admin/GradeSubmitButton';
 import { notFound, redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
@@ -152,11 +153,18 @@ export default async function SubmissionDetailPage({ params, searchParams }: Pag
         <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
           <meta.Icon className={`w-6 h-6 ${meta.color}`} /> Chi Tiết Bài Nộp
         </h1>
-        {isGraded && (
-          <span className="text-xs font-bold bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full ml-auto flex items-center gap-1">
-            <CheckCircle className="w-3 h-3" /> Đã chấm
-          </span>
-        )}
+        <div className="ml-auto flex flex-wrap items-center gap-2">
+          <DeleteSubmissionButton
+            id={id}
+            redirectTo="/admin/submissions"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-sm font-semibold text-red-700 hover:bg-red-100 disabled:opacity-50"
+          />
+          {isGraded && (
+            <span className="text-xs font-bold bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full flex items-center gap-1">
+              <CheckCircle className="w-3 h-3" /> Đã chấm
+            </span>
+          )}
+        </div>
       </div>
 
       {query.saved === '1' && (

@@ -1,20 +1,32 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import {
   LayoutDashboard, FileText, BookOpen, MessageSquare, Award,
-  Library, ClipboardList, FileCheck, Users, ArrowLeft,
+  Library, ClipboardList, FileCheck, Users, ArrowLeft, ShieldCheck,
 } from 'lucide-react';
+
+import { getCurrentUserProfile } from '@/lib/supabase/adminAuth';
 
 export const metadata: Metadata = {
   title: 'Admin Dashboard',
   description: 'Miora Académie CMS',
 };
 
-export default function AdminLayout({
+export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  try {
+    const { profile } = await getCurrentUserProfile();
+    if (profile.role !== 'admin') {
+      redirect('/dashboard');
+    }
+  } catch {
+    redirect('/login');
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 flex">
       {/* Sidebar */}
@@ -59,8 +71,11 @@ export default function AdminLayout({
           <Link href="/admin/submissions" className="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-md font-medium hover:bg-blue-50 hover:text-blue-600 transition-colors">
             <FileCheck className="w-4 h-4" /> Bài nộp
           </Link>
-          <Link href="/admin/students" className="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-md font-medium hover:bg-blue-50 hover:text-blue-600 transition-colors">
-            <Users className="w-4 h-4" /> Học viên
+          <Link href="/admin/users" className="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-md font-medium hover:bg-blue-50 hover:text-blue-600 transition-colors">
+            <Users className="w-4 h-4" /> Người dùng
+          </Link>
+          <Link href="/admin/audit-logs" className="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-md font-medium hover:bg-blue-50 hover:text-blue-600 transition-colors">
+            <ShieldCheck className="w-4 h-4" /> Audit log
           </Link>
 
           <Link href="/" className="flex items-center gap-3 px-4 py-3 text-gray-500 rounded-md font-medium hover:bg-gray-100 transition-colors mt-8">

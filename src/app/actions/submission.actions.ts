@@ -1,15 +1,23 @@
-'use server'
+'use server';
 
-import { createClient } from '@/lib/supabase/server';
-import { ADMIN_GRADE_MAX } from '@/lib/exam/adminGrading';
 import { revalidatePath } from 'next/cache';
-import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 
-// --- Types ---
+import { logAuditEventSafely } from '@/lib/audit';
+import {
+  requireAdminAndDb,
+  requireActiveStudentAndDb,
+  requireActiveTeacherOrAdminAndDb,
+  requireOwnedStudentResource,
+} from '@/lib/supabase/adminAuth';
+import { sendFeedbackEmail, buildExamRef } from '@/lib/notifications/email';
+import { vietnamDayEndIso, vietnamDayStartIso } from '@/lib/exam/deadline';
+import { ADMIN_GRADE_MAX } from '@/lib/exam/adminGrading';
+import { touchLearningActivity } from '@/app/actions/streak.actions';
 
 export interface SubmissionRow {
   id: string;
   student_email: string;
+  student_id?: string | null;
   exam_type: 'listening' | 'reading' | 'writing' | 'speaking';
   submitted_at: string;
   score: number | null;
@@ -18,7 +26,6 @@ export interface SubmissionRow {
   partie_id: number | null;
   time_spent_seconds: number | null;
   word_counts: { t1: number; t2: number; t3: number } | null;
-  // Detail fields (only in getSubmission)
   answers?: Record<string, string> | null;
   writing_task1?: string | null;
   writing_task2?: string | null;
@@ -27,73 +34,218 @@ export interface SubmissionRow {
   speaking_task2_video_url?: string | null;
   task_times?: { t1: number; t2: number; t3: number } | null;
   notes?: string | null;
-  // Grading fields
   admin_score?: number | null;
   admin_feedback?: string | null;
   graded_at?: string | null;
   graded_by?: string | null;
+  graded_email_sent_at?: string | null;
+  student_feedback_viewed_at?: string | null;
 }
 
-// --- List submissions with optional filters ---
-
-export async function getSubmissions(filters?: {
-  exam_type?: string;
-  student_email?: string;
-}): Promise<SubmissionRow[]> {
-  const supabase = await createClient();
-
-  let query = supabase
-    .from('exam_submissions')
-    .select('id, student_email, exam_type, submitted_at, score, serie_id, combinaison_id, partie_id, time_spent_seconds, word_counts, admin_score, graded_at')
-    .order('submitted_at', { ascending: false })
-    .limit(200);
-
-  if (filters?.exam_type && filters.exam_type !== 'all') {
-    query = query.eq('exam_type', filters.exam_type);
-  }
-
-  if (filters?.student_email) {
-    query = query.eq('student_email', filters.student_email);
-  }
-
-  const { data, error } = await query;
-  if (error) throw new Error(`Lỗi lấy bài nộp: ${error.message}`);
-
-  return (data || []) as SubmissionRow[];
-}
-
-// --- Get single submission detail ---
-
-export async function getSubmission(id: string): Promise<SubmissionRow | null> {
-  const supabase = await createClient();
-
-  const { data, error } = await supabase
+async function fetchSubmissionById(
+  db: Awaited<ReturnType<typeof requireAdminAndDb>>['db'],
+  id: string,
+): Promise<SubmissionRow | null> {
+  const { data, error } = await db
     .from('exam_submissions')
     .select('*')
     .eq('id', id)
     .maybeSingle();
 
-  if (error) throw new Error(`Lỗi lấy chi tiết bài nộp: ${error.message}`);
+  if (error) {
+    throw new Error(`Lỗi lấy chi tiết bài nộp: ${error.message}`);
+  }
 
   return data as SubmissionRow | null;
 }
 
-/** Học viên: chỉ trả về bài nộp nếu thuộc email đang đăng nhập. */
-export async function getSubmissionIfOwner(id: string): Promise<SubmissionRow | null> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  const email = user?.email;
-  if (!email) return null;
+function submissionBulkFilterAllowed(params: {
+  student_email?: string | null;
+  submitted_from?: string | null;
+  submitted_to?: string | null;
+}): boolean {
+  if (params.student_email?.trim()) return true;
+  if (params.submitted_from?.trim() || params.submitted_to?.trim()) return true;
+  return false;
+}
 
-  const sub = await getSubmission(id);
+function revalidateSubmissionViews(id?: string) {
+  revalidatePath('/admin');
+  revalidatePath('/admin/audit-logs');
+  revalidatePath('/dashboard');
+  revalidatePath('/admin/submissions');
+  revalidatePath('/teacher/submissions');
+  if (id) {
+    revalidatePath(`/admin/submissions/${id}`);
+    revalidatePath(`/teacher/submissions/${id}`);
+    revalidatePath(`/dashboard/submissions/${id}`);
+  }
+}
+
+export async function getSubmissions(filters?: {
+  exam_type?: string;
+  student_email?: string;
+  submitted_from?: string | null;
+  submitted_to?: string | null;
+}): Promise<SubmissionRow[]> {
+  const { db } = await requireAdminAndDb();
+
+  const hasFilters =
+    Boolean(filters?.exam_type && filters.exam_type !== 'all') ||
+    Boolean(filters?.student_email?.trim()) ||
+    Boolean(filters?.submitted_from?.trim()) ||
+    Boolean(filters?.submitted_to?.trim());
+
+  let query = db
+    .from('exam_submissions')
+    .select('id, student_email, student_id, exam_type, submitted_at, score, serie_id, combinaison_id, partie_id, time_spent_seconds, word_counts, admin_score, admin_feedback, graded_at, graded_by, graded_email_sent_at, student_feedback_viewed_at')
+    .order('submitted_at', { ascending: false })
+    .limit(hasFilters ? 500 : 200);
+
+  if (filters?.exam_type && filters.exam_type !== 'all') {
+    query = query.eq('exam_type', filters.exam_type);
+  }
+  if (filters?.student_email?.trim()) {
+    query = query.eq('student_email', filters.student_email.trim().toLowerCase());
+  }
+  const fromIso = vietnamDayStartIso(filters?.submitted_from ?? undefined);
+  if (fromIso) query = query.gte('submitted_at', fromIso);
+  const toIso = vietnamDayEndIso(filters?.submitted_to ?? undefined);
+  if (toIso) query = query.lte('submitted_at', toIso);
+
+  const { data, error } = await query;
+  if (error) throw new Error(`Lỗi lấy bài nộp: ${error.message}`);
+  return (data ?? []) as SubmissionRow[];
+}
+
+export async function getSubmission(id: string): Promise<SubmissionRow | null> {
+  const { db } = await requireAdminAndDb();
+  return fetchSubmissionById(db, id);
+}
+
+export async function getTeacherAccessibleSubmission(id: string): Promise<SubmissionRow | null> {
+  const ctx = await requireActiveTeacherOrAdminAndDb();
+  const sub = await fetchSubmissionById(ctx.db, id);
   if (!sub) return null;
-  if (sub.student_email !== email) return null;
+  if (ctx.profile.role === 'teacher') {
+    try {
+      await requireOwnedStudentResource({ studentEmail: sub.student_email });
+    } catch {
+      return null;
+    }
+  }
   return sub;
 }
 
-// --- Admin: Grade a submission ---
+export async function getSubmissionIfOwner(id: string): Promise<SubmissionRow | null> {
+  const { db, user } = await requireActiveStudentAndDb();
+  const sub = await fetchSubmissionById(db, id);
+  if (!sub) return null;
+
+  const matchesStudentId = sub.student_id && sub.student_id === user.id;
+  const matchesEmail = sub.student_email === user.email;
+  if (!matchesStudentId && !matchesEmail) {
+    return null;
+  }
+
+  return sub;
+}
+
+export async function deleteSubmission(id: string): Promise<void> {
+  const ctx = await requireAdminAndDb();
+  const { db } = ctx;
+  const existing = await fetchSubmissionById(db, id);
+  const { error } = await db.from('exam_submissions').delete().eq('id', id);
+  if (error) throw new Error(`Lỗi xóa bài nộp: ${error.message}`);
+
+  await logAuditEventSafely(db, {
+    actorId: ctx.user.id,
+    actorEmail: ctx.profile.email,
+    actorName: ctx.profile.full_name,
+    actorRole: ctx.profile.role,
+    action: 'submission.delete',
+    targetType: 'exam_submission',
+    targetId: id,
+    targetLabel: existing?.student_email ?? id,
+    metadata: existing
+      ? {
+          student_email: existing.student_email,
+          exam_type: existing.exam_type,
+          serie_id: existing.serie_id,
+          combinaison_id: existing.combinaison_id,
+          partie_id: existing.partie_id,
+          submitted_at: existing.submitted_at,
+        }
+      : {},
+  });
+
+  revalidateSubmissionViews(id);
+}
+
+export async function deleteSubmissionsMatching(params: {
+  student_email?: string | null;
+  submitted_from?: string | null;
+  submitted_to?: string | null;
+  exam_type?: string | null;
+}): Promise<{ deleted: number }> {
+  const ctx = await requireAdminAndDb();
+  const { db } = ctx;
+  if (!submissionBulkFilterAllowed(params)) {
+    throw new Error('FILTER_REQUIRED');
+  }
+
+  let countQ = db.from('exam_submissions').select('id', { count: 'exact', head: true });
+  if (params.student_email?.trim()) {
+    countQ = countQ.eq('student_email', params.student_email.trim().toLowerCase());
+  }
+  if (params.exam_type && params.exam_type !== 'all') {
+    countQ = countQ.eq('exam_type', params.exam_type);
+  }
+  const fromIso = vietnamDayStartIso(params.submitted_from ?? undefined);
+  if (fromIso) countQ = countQ.gte('submitted_at', fromIso);
+  const toIso = vietnamDayEndIso(params.submitted_to ?? undefined);
+  if (toIso) countQ = countQ.lte('submitted_at', toIso);
+
+  const { count, error: countErr } = await countQ;
+  if (countErr) throw new Error(`Lỗi đếm bài nộp: ${countErr.message}`);
+  const total = count ?? 0;
+  if (total === 0) return { deleted: 0 };
+
+  let deleteQ = db.from('exam_submissions').delete();
+  if (params.student_email?.trim()) {
+    deleteQ = deleteQ.eq('student_email', params.student_email.trim().toLowerCase());
+  }
+  if (params.exam_type && params.exam_type !== 'all') {
+    deleteQ = deleteQ.eq('exam_type', params.exam_type);
+  }
+  if (fromIso) deleteQ = deleteQ.gte('submitted_at', fromIso);
+  if (toIso) deleteQ = deleteQ.lte('submitted_at', toIso);
+
+  const { error: deleteError } = await deleteQ;
+  if (deleteError) throw new Error(`Lỗi xóa bài nộp: ${deleteError.message}`);
+
+  await logAuditEventSafely(db, {
+    actorId: ctx.user.id,
+    actorEmail: ctx.profile.email,
+    actorName: ctx.profile.full_name,
+    actorRole: ctx.profile.role,
+    action: 'submission.bulk_delete',
+    targetType: 'exam_submission',
+    targetLabel: `${total} submissions`,
+    metadata: {
+      deleted: total,
+      filters: {
+        student_email: params.student_email?.trim().toLowerCase() || null,
+        submitted_from: params.submitted_from ?? null,
+        submitted_to: params.submitted_to ?? null,
+        exam_type: params.exam_type ?? null,
+      },
+    },
+  });
+
+  revalidateSubmissionViews();
+  return { deleted: total };
+}
 
 export async function gradeSubmission(
   id: string,
@@ -105,33 +257,12 @@ export async function gradeSubmission(
     throw new Error(`Điểm admin phải nằm trong khoảng 0-${ADMIN_GRADE_MAX}.`);
   }
 
-  const supabase = await createClient();
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  const privilegedSupabase =
-    process.env.NEXT_PUBLIC_SUPABASE_URL && serviceRoleKey
-      ? createSupabaseClient(process.env.NEXT_PUBLIC_SUPABASE_URL, serviceRoleKey, {
-          auth: { autoRefreshToken: false, persistSession: false },
-        })
-      : null;
+  const ctx = await requireActiveTeacherOrAdminAndDb();
+  const sub = await fetchSubmissionById(ctx.db, id);
+  if (!sub) throw new Error('SAVE_FAILED');
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user?.id) {
-    throw new Error('SAVE_FAILED');
-  }
-
-  const { data: profile, error: profileError } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .maybeSingle();
-
-  if (profileError) {
-    throw new Error('SAVE_FAILED');
-  }
-  if (profile?.role !== 'admin') {
-    throw new Error('FORBIDDEN');
+  if (ctx.profile.role === 'teacher') {
+    await requireOwnedStudentResource({ studentEmail: sub.student_email });
   }
 
   const gradingUpdates: {
@@ -139,36 +270,97 @@ export async function gradeSubmission(
     admin_feedback: string;
     graded_at: string;
     graded_by: string;
+    notes?: string | null;
   } = {
     admin_score: adminScore,
     admin_feedback: adminFeedback,
     graded_at: new Date().toISOString(),
-    graded_by: user?.email ?? 'admin',
+    graded_by: ctx.profile.full_name || ctx.user.email || ctx.profile.role,
   };
 
-  const db = privilegedSupabase ?? supabase;
-  const { data: updatedRow, error } = await db
+  if (notes !== undefined) {
+    gradingUpdates.notes = notes;
+  }
+
+  const { data: updatedRow, error } = await ctx.db
     .from('exam_submissions')
     .update(gradingUpdates)
     .eq('id', id)
     .select('id')
     .maybeSingle();
 
-  if (error) throw new Error('SAVE_FAILED');
-  if (!updatedRow) {
+  if (error || !updatedRow) {
     throw new Error('SAVE_FAILED');
   }
 
-  if (notes !== undefined) {
-    await db
-      .from('exam_submissions')
-      .update({ notes })
-      .eq('id', id)
-      .select('id')
-      .maybeSingle();
+  await logAuditEventSafely(ctx.db, {
+    actorId: ctx.user.id,
+    actorEmail: ctx.profile.email,
+    actorName: ctx.profile.full_name,
+    actorRole: ctx.profile.role,
+    action: 'submission.grade',
+    targetType: 'exam_submission',
+    targetId: id,
+    targetLabel: sub.student_email,
+    metadata: {
+      student_email: sub.student_email,
+      exam_type: sub.exam_type,
+      previous_admin_score: sub.admin_score ?? null,
+      new_admin_score: adminScore,
+      previous_feedback_present: Boolean(sub.admin_feedback),
+      new_feedback_present: Boolean(adminFeedback.trim()),
+      notes_updated: notes !== undefined,
+    },
+  });
+
+  if (!sub.graded_email_sent_at) {
+    try {
+      await sendFeedbackEmail({
+        studentEmail: sub.student_email,
+        examType: sub.exam_type,
+        examRef: buildExamRef({
+          examType: sub.exam_type,
+          serieId: sub.serie_id,
+          combinaisonId: sub.combinaison_id,
+          partieId: sub.partie_id,
+        }),
+        feedback: adminFeedback,
+      });
+
+      await ctx.db
+        .from('exam_submissions')
+        .update({ graded_email_sent_at: new Date().toISOString() })
+        .eq('id', id);
+    } catch (notifyError) {
+      console.error('[submission.actions] feedback email failed:', notifyError);
+    }
   }
 
-  revalidatePath(`/admin/submissions/${id}`);
-  revalidatePath('/admin/submissions');
-  revalidatePath('/dashboard');
+  revalidateSubmissionViews(id);
+}
+
+export async function markSubmissionFeedbackViewed(id: string): Promise<boolean> {
+  const { db, user } = await requireActiveStudentAndDb();
+  const sub = await fetchSubmissionById(db, id);
+  if (!sub) return false;
+
+  const matchesStudentId = sub.student_id && sub.student_id === user.id;
+  const matchesEmail = sub.student_email === user.email;
+  if (!matchesStudentId && !matchesEmail) return false;
+  if (!sub.graded_at && !sub.admin_feedback) return false;
+  if (sub.student_feedback_viewed_at) return false;
+
+  const now = new Date().toISOString();
+  const { error } = await db
+    .from('exam_submissions')
+    .update({ student_feedback_viewed_at: now })
+    .eq('id', id);
+
+  if (error) {
+    throw new Error(`Không thể đánh dấu feedback đã xem: ${error.message}`);
+  }
+
+  await touchLearningActivity(user.id, 'feedback_view');
+  revalidateSubmissionViews(id);
+  return true;
 }

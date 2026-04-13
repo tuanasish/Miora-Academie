@@ -49,3 +49,19 @@ export function toVietnamDeadlineIso(input: string | null | undefined): string |
   if (!parsed) return null;
   return parsed.toISOString();
 }
+
+const YMD = /^(\d{4})-(\d{2})-(\d{2})$/;
+
+/** Chuỗi YYYY-MM-DD → ISO UTC đầu ngày theo Asia/Ho_Chi_Minh. */
+export function vietnamDayStartIso(ymd: string | null | undefined): string | null {
+  if (!ymd || !YMD.test(ymd.trim())) return null;
+  const d = new Date(`${ymd.trim()}T00:00:00.000+07:00`);
+  return Number.isNaN(d.getTime()) ? null : d.toISOString();
+}
+
+/** Chuỗi YYYY-MM-DD → ISO UTC cuối ngày theo Asia/Ho_Chi_Minh. */
+export function vietnamDayEndIso(ymd: string | null | undefined): string | null {
+  if (!ymd || !YMD.test(ymd.trim())) return null;
+  const d = new Date(`${ymd.trim()}T23:59:59.999+07:00`);
+  return Number.isNaN(d.getTime()) ? null : d.toISOString();
+}

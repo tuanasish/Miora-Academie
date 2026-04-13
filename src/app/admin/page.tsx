@@ -63,8 +63,8 @@ function examRef(row: { exam_type: string; serie_id?: number | null; combinaison
 }
 
 const statCards = [
-  { label: 'Tổng Users', key: 'usersCount', Icon: Users, color: 'text-gray-800', bg: 'bg-gray-50', link: '/admin/students' },
-  { label: 'Học viên', key: 'studentsCount', Icon: GraduationCap, color: 'text-emerald-600', bg: 'bg-emerald-50', link: '/admin/students' },
+  { label: 'Tổng Users', key: 'usersCount', Icon: Users, color: 'text-gray-800', bg: 'bg-gray-50', link: '/admin/users' },
+  { label: 'Học viên', key: 'studentsCount', Icon: GraduationCap, color: 'text-emerald-600', bg: 'bg-emerald-50', link: '/admin/users' },
   { label: 'Bài đã gán', key: 'assignmentsCount', Icon: ClipboardList, color: 'text-blue-600', bg: 'bg-blue-50', link: '/admin/assignments' },
   { label: 'Bài đã nộp', key: 'submissionsCount', Icon: FileCheck, color: 'text-violet-600', bg: 'bg-violet-50', link: '/admin/submissions' },
   { label: 'Bài viết', key: 'postsCount', Icon: Newspaper, color: 'text-amber-600', bg: 'bg-amber-50', link: '/admin/posts' },
@@ -74,7 +74,7 @@ const practiceCards = [
   {
     label: 'Compréhension Orale',
     detail: 'Trang luyện thi listening',
-    href: '/exam/listening',
+    href: '/admin/exams/listening',
     Icon: Headphones,
     color: 'text-sky-600',
     bg: 'bg-sky-50',
@@ -83,7 +83,7 @@ const practiceCards = [
   {
     label: 'Compréhension Écrite',
     detail: 'Trang luyện thi reading',
-    href: '/exam/reading',
+    href: '/admin/exams/reading',
     Icon: BookOpen,
     color: 'text-emerald-600',
     bg: 'bg-emerald-50',
@@ -92,7 +92,7 @@ const practiceCards = [
   {
     label: 'Expression Écrite',
     detail: 'Trang luyện thi writing',
-    href: '/exam/writing',
+    href: '/admin/exams/writing',
     Icon: PenLine,
     color: 'text-violet-600',
     bg: 'bg-violet-50',
@@ -101,7 +101,7 @@ const practiceCards = [
   {
     label: 'Expression Orale',
     detail: 'Trang luyện thi speaking',
-    href: '/exam/speaking',
+    href: '/admin/exams/speaking',
     Icon: Mic,
     color: 'text-rose-600',
     bg: 'bg-rose-50',
