@@ -328,6 +328,29 @@ export async function bulkCreateAssignments(
   return { success: rows.length, failed: [] };
 }
 
+/**
+ * Gán nhiều bài thi cùng lúc cho nhiều học viên.
+ * Mỗi phần tử trong `examConfigs` là 1 bài thi (loại + bài cụ thể).
+ * Tổng records tạo = examConfigs.length × student_emails.length.
+ */
+export async function bulkCreateMultiExamAssignments(
+  student_emails: string[],
+  examConfigs: Omit<CreateAssignmentDTO, 'student_email'>[],
+): Promise<{ success: number; failed: string[] }> {
+  const ctx = await requireAdminAndDb();
+  let totalSuccess = 0;
+  for (const config of examConfigs) {
+    const rows = await createAssignmentsInternal({
+      studentEmails: student_emails,
+      examConfig: config,
+      actorId: ctx.user.id,
+      actorName: ctx.profile.full_name,
+    });
+    totalSuccess += rows.length;
+  }
+  return { success: totalSuccess, failed: [] };
+}
+
 export async function createTeacherAssignment(dto: CreateAssignmentDTO): Promise<void> {
   const ctx = await requireActiveTeacherOrAdminAndDb();
   const managedIds =
@@ -356,6 +379,28 @@ export async function bulkCreateTeacherAssignments(
     teacherManagedStudentIds: managedIds,
   });
   return { success: rows.length, failed: [] };
+}
+
+/** Phiên bản teacher cho multi-exam cart. */
+export async function bulkCreateMultiExamTeacherAssignments(
+  student_emails: string[],
+  examConfigs: Omit<CreateAssignmentDTO, 'student_email'>[],
+): Promise<{ success: number; failed: string[] }> {
+  const ctx = await requireActiveTeacherOrAdminAndDb();
+  const managedIds =
+    ctx.profile.role === 'teacher' ? await getTeacherManagedStudentIds(ctx.db, ctx.user.id) : null;
+  let totalSuccess = 0;
+  for (const config of examConfigs) {
+    const rows = await createAssignmentsInternal({
+      studentEmails: student_emails,
+      examConfig: config,
+      actorId: ctx.user.id,
+      actorName: ctx.profile.full_name,
+      teacherManagedStudentIds: managedIds,
+    });
+    totalSuccess += rows.length;
+  }
+  return { success: totalSuccess, failed: [] };
 }
 
 export async function deleteAssignment(id: string): Promise<void> {

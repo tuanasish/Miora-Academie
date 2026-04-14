@@ -65,3 +65,24 @@ export function vietnamDayEndIso(ymd: string | null | undefined): string | null 
   const d = new Date(`${ymd.trim()}T23:59:59.999+07:00`);
   return Number.isNaN(d.getTime()) ? null : d.toISOString();
 }
+
+/**
+ * Trả về thời điểm hiện tại (hoặc `base`) theo múi giờ Việt Nam
+ * dưới dạng `YYYY-MM-DDTHH:mm` – phù hợp cho `<input type="datetime-local">`.
+ * Nếu truyền `offsetMinutes` sẽ cộng thêm phút vào kết quả.
+ */
+export function getNowVietnamLocalInput(offsetMinutes = 0, base: Date = new Date()): string {
+  const shifted = new Date(base.getTime() + offsetMinutes * 60_000);
+  const parts = new Intl.DateTimeFormat('sv-SE', {
+    timeZone: VIETNAM_TIME_ZONE,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).formatToParts(shifted);
+
+  const get = (type: string) => parts.find((p) => p.type === type)?.value ?? '00';
+  return `${get('year')}-${get('month')}-${get('day')}T${get('hour')}:${get('minute')}`;
+}

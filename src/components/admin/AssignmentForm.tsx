@@ -1,21 +1,27 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
   createAssignment,
-  bulkCreateAssignments,
+  bulkCreateMultiExamAssignments,
   createTeacherAssignment,
-  bulkCreateTeacherAssignments,
+  bulkCreateMultiExamTeacherAssignments,
   type CreateAssignmentDTO,
   type StudentProfile,
 } from '@/app/actions/assignment.actions';
-import { toVietnamDeadlineIso, VIETNAM_TIME_ZONE_LABEL } from '@/lib/exam/deadline';
+import {
+  toVietnamDeadlineIso,
+  VIETNAM_TIME_ZONE_LABEL,
+  getNowVietnamLocalInput,
+  isDueDateOverdue,
+} from '@/lib/exam/deadline';
 import {
   Headphones, BookOpen, PenLine, Mic, User, Users, AlertTriangle,
-  CheckCircle, X, Loader2, CheckSquare,
+  CheckCircle, X, Loader2, CheckSquare, Plus, Trash2, ShoppingCart,
 } from 'lucide-react';
 
+/* ───────── Types ───────── */
 type ExamType = 'listening' | 'reading' | 'writing' | 'speaking';
 
 interface ExamOption {
@@ -24,19 +30,49 @@ interface ExamOption {
   group?: string;
 }
 
+interface CartItem {
+  id: string; // unique key for React
+  examType: ExamType;
+  targetId: number;
+  examLabel: string;
+  /** Human-readable summary for display */
+  displayLabel: string;
+}
+
 interface AssignmentFormProps {
   students: StudentProfile[];
   scope?: 'admin' | 'teacher';
   cancelHref?: string;
 }
 
-const EXAM_TYPES: { value: ExamType; label: string; Icon: React.ComponentType<{ className?: string }>; color: string }[] = [
-  { value: 'listening', label: 'Compréhension Orale', Icon: Headphones, color: 'border-sky-400 bg-sky-50' },
-  { value: 'reading', label: 'Compréhension Écrite', Icon: BookOpen, color: 'border-emerald-400 bg-emerald-50' },
-  { value: 'writing', label: 'Expression Écrite', Icon: PenLine, color: 'border-violet-400 bg-violet-50' },
-  { value: 'speaking', label: 'Expression Orale', Icon: Mic, color: 'border-rose-400 bg-rose-50' },
+/* ───────── Constants ───────── */
+const EXAM_TYPES: { value: ExamType; label: string; Icon: React.ComponentType<{ className?: string }>; color: string; activeColor: string }[] = [
+  { value: 'listening', label: 'Compréhension Orale', Icon: Headphones, color: 'border-gray-200 bg-white hover:border-sky-300', activeColor: 'border-sky-400 bg-sky-50 ring-2 ring-sky-200' },
+  { value: 'reading', label: 'Compréhension Écrite', Icon: BookOpen, color: 'border-gray-200 bg-white hover:border-emerald-300', activeColor: 'border-emerald-400 bg-emerald-50 ring-2 ring-emerald-200' },
+  { value: 'writing', label: 'Expression Écrite', Icon: PenLine, color: 'border-gray-200 bg-white hover:border-violet-300', activeColor: 'border-violet-400 bg-violet-50 ring-2 ring-violet-200' },
+  { value: 'speaking', label: 'Expression Orale', Icon: Mic, color: 'border-gray-200 bg-white hover:border-rose-300', activeColor: 'border-rose-400 bg-rose-50 ring-2 ring-rose-200' },
 ];
 
+const EXAM_TYPE_LABEL_MAP: Record<ExamType, string> = {
+  listening: 'Compréhension Orale',
+  reading: 'Compréhension Écrite',
+  writing: 'Expression Écrite',
+  speaking: 'Expression Orale',
+};
+
+const EXAM_TYPE_ICON_MAP: Record<ExamType, React.ComponentType<{ className?: string }>> = {
+  listening: Headphones,
+  reading: BookOpen,
+  writing: PenLine,
+  speaking: Mic,
+};
+
+let _cartIdCounter = 0;
+function nextCartId() {
+  return `cart-${++_cartIdCounter}-${Date.now()}`;
+}
+
+/* ───────── Component ───────── */
 export function AssignmentForm({
   students,
   scope = 'admin',
@@ -53,22 +89,28 @@ export function AssignmentForm({
   // Mode: single or bulk
   const [mode, setMode] = useState<'single' | 'bulk'>('single');
 
-  // Form state
+  // Student selection
   const [studentEmail, setStudentEmail] = useState('');
   const [selectedEmails, setSelectedEmails] = useState<string[]>([]);
+
+  // Current exam picker state (used to build items for cart)
   const [examType, setExamType] = useState<ExamType | ''>('');
   const [targetId, setTargetId] = useState<number | ''>('');
-  const [examLabel, setExamLabel] = useState('');
-  const [dueDate, setDueDate] = useState('');
-  const [note, setNote] = useState('');
-
-  // Dynamic exam options
   const [examOptions, setExamOptions] = useState<ExamOption[]>([]);
   const [loadingOptions, setLoadingOptions] = useState(false);
 
+  // Cart – stores multiple exam items
+  const [cart, setCart] = useState<CartItem[]>([]);
+
+  // Shared fields
+  const [examLabel, setExamLabel] = useState('');
+  const [dueDate, setDueDate] = useState('');
+  const [dueDateWarning, setDueDateWarning] = useState('');
+  const [note, setNote] = useState('');
+
   const prevExamTypeRef = useRef<ExamType | ''>('');
 
-  // Pre-fill loại đề + nhãn từ URL (nút "Gán bài" từ ngân hàng đề)
+  /* ───────── URL pre-fill ───────── */
   useEffect(() => {
     const paramType = searchParams.get('type') as ExamType | null;
     const paramLabel = searchParams.get('label');
@@ -76,7 +118,6 @@ export function AssignmentForm({
     if (paramLabel) setExamLabel(paramLabel);
   }, [searchParams]);
 
-  // Đồng bộ bài cụ thể (serie / combinaison / partie) với URL; tránh race với effect tải options
   useEffect(() => {
     const urlType = searchParams.get('type') as ExamType | null;
     const rawId = searchParams.get('id');
@@ -98,7 +139,7 @@ export function AssignmentForm({
     }
   }, [examType, searchParams]);
 
-  // Load exam options when exam type changes
+  /* ───────── Load exam options ───────── */
   useEffect(() => {
     if (!examType) {
       setExamOptions([]);
@@ -165,72 +206,180 @@ export function AssignmentForm({
     }
   }, [examType]);
 
+  /* ───────── Due Date Validation ───────── */
+  const handleDueDateChange = useCallback((value: string) => {
+    if (!value) {
+      setDueDate('');
+      setDueDateWarning('');
+      return;
+    }
+    // Check if the chosen time is in the past
+    if (isDueDateOverdue(value)) {
+      const snapped = getNowVietnamLocalInput(60); // +1 hour
+      setDueDate(snapped);
+      setDueDateWarning('Thời gian hạn nộp không hợp lệ (nằm trong quá khứ). Hệ thống đã tự động điều chỉnh về thời điểm hiện tại +1 giờ.');
+    } else {
+      setDueDate(value);
+      setDueDateWarning('');
+    }
+  }, []);
+
+  /* ───────── Student toggles ───────── */
   const toggleStudent = (email: string) => {
     setSelectedEmails((prev) =>
       prev.includes(email) ? prev.filter((e) => e !== email) : [...prev, email]
     );
   };
 
-  const selectAll = () => {
-    const studentEmails = students.filter((s) => s.role === 'student').map((s) => s.email);
-    setSelectedEmails(studentEmails);
-  };
+  const studentsList = students.filter((s) => s.role === 'student');
+  const selectAll = () => setSelectedEmails(studentsList.map((s) => s.email));
   const deselectAll = () => setSelectedEmails([]);
 
+  /* ───────── Cart actions ───────── */
+  const addToCart = () => {
+    if (!examType || targetId === '') return;
+
+    // Prevent duplicates
+    const alreadyExists = cart.some(
+      (item) => item.examType === examType && item.targetId === Number(targetId)
+    );
+    if (alreadyExists) {
+      setError('Bài thi này đã có trong danh sách gán.');
+      return;
+    }
+
+    const selectedOption = examOptions.find((o) => o.value === Number(targetId));
+    const displayLabel = `${EXAM_TYPE_LABEL_MAP[examType]} – ${selectedOption?.label ?? `#${targetId}`}`;
+
+    setCart((prev) => [
+      ...prev,
+      {
+        id: nextCartId(),
+        examType: examType as ExamType,
+        targetId: Number(targetId),
+        examLabel: examLabel || '',
+        displayLabel,
+      },
+    ]);
+
+    // Reset picker for next selection
+    setExamType('');
+    setTargetId('');
+    setError('');
+  };
+
+  const removeFromCart = (id: string) => {
+    setCart((prev) => prev.filter((item) => item.id !== id));
+  };
+
+  /* ───────── Submit ───────── */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setSuccess('');
 
-    if (!examType || targetId === '') {
-      setError('Vui lòng chọn loại exam và bài cụ thể');
+    // Validate: must have at least 1 exam (either in cart or currently selected)
+    const finalCart = [...cart];
+    // If user has a current selection but hasn't added to cart, add it automatically
+    if (examType && targetId !== '') {
+      const alreadyExists = finalCart.some(
+        (item) => item.examType === examType && item.targetId === Number(targetId)
+      );
+      if (!alreadyExists) {
+        const selectedOption = examOptions.find((o) => o.value === Number(targetId));
+        finalCart.push({
+          id: nextCartId(),
+          examType: examType as ExamType,
+          targetId: Number(targetId),
+          examLabel: examLabel || '',
+          displayLabel: `${EXAM_TYPE_LABEL_MAP[examType as ExamType]} – ${selectedOption?.label ?? `#${targetId}`}`,
+        });
+      }
+    }
+
+    if (finalCart.length === 0) {
+      setError('Vui lòng chọn ít nhất 1 bài thi để gán.');
       return;
     }
 
     if (mode === 'single' && !studentEmail) {
-      setError('Vui lòng chọn học viên');
+      setError('Vui lòng chọn học viên.');
       return;
     }
     if (mode === 'bulk' && selectedEmails.length === 0) {
-      setError('Vui lòng chọn ít nhất 1 học viên');
+      setError('Vui lòng chọn ít nhất 1 học viên.');
       return;
     }
 
     setLoading(true);
     try {
-      const examConfig: Omit<CreateAssignmentDTO, 'student_email'> = {
-        exam_type: examType as ExamType,
-        serie_id: (examType === 'listening' || examType === 'reading') ? Number(targetId) : null,
-        combinaison_id: examType === 'writing' ? Number(targetId) : null,
-        partie_id: examType === 'speaking' ? Number(targetId) : null,
-        exam_label: examLabel || null,
+      const examConfigs = finalCart.map((item) => ({
+        exam_type: item.examType as ExamType,
+        serie_id: (item.examType === 'listening' || item.examType === 'reading') ? item.targetId : null,
+        combinaison_id: item.examType === 'writing' ? item.targetId : null,
+        partie_id: item.examType === 'speaking' ? item.targetId : null,
+        exam_label: item.examLabel || examLabel || null,
         due_date: toVietnamDeadlineIso(dueDate),
         note: note || null,
-      };
+      }));
 
-      if (mode === 'single') {
-        if (scope === 'teacher') {
-          await createTeacherAssignment({ ...examConfig, student_email: studentEmail });
+      const emails = mode === 'single' ? [studentEmail] : selectedEmails;
+
+      if (finalCart.length === 1) {
+        // Single exam → use original simple actions
+        const config = examConfigs[0];
+        if (mode === 'single') {
+          if (scope === 'teacher') {
+            await createTeacherAssignment({ ...config, student_email: studentEmail });
+          } else {
+            await createAssignment({ ...config, student_email: studentEmail });
+          }
         } else {
-          await createAssignment({ ...examConfig, student_email: studentEmail });
+          // Bulk students, 1 exam
+          if (scope === 'teacher') {
+            const { bulkCreateTeacherAssignments } = await import('@/app/actions/assignment.actions');
+            await bulkCreateTeacherAssignments(emails, config);
+          } else {
+            const { bulkCreateAssignments } = await import('@/app/actions/assignment.actions');
+            await bulkCreateAssignments(emails, config);
+          }
         }
-        router.push(listHref);
       } else {
-        const result =
-          scope === 'teacher'
-            ? await bulkCreateTeacherAssignments(selectedEmails, examConfig)
-            : await bulkCreateAssignments(selectedEmails, examConfig);
-        setSuccess(`Đã gán thành công cho ${result.success} học viên!`);
-        setSelectedEmails([]);
+        // Multiple exams → use multi-exam actions
+        if (scope === 'teacher') {
+          await bulkCreateMultiExamTeacherAssignments(emails, examConfigs);
+        } else {
+          await bulkCreateMultiExamAssignments(emails, examConfigs);
+        }
+      }
+
+      const totalAssignments = finalCart.length * emails.length;
+      setSuccess(
+        `Đã gán thành công ${finalCart.length} bài thi cho ${emails.length} học viên (${totalAssignments} lượt gán).`
+      );
+      // Reset form
+      setCart([]);
+      setExamType('');
+      setTargetId('');
+      setExamLabel('');
+      if (mode === 'single') {
+        // Navigate back for single mode
+        setTimeout(() => router.push(listHref), 1500);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Lỗi không xác định');
+      const raw = err instanceof Error ? err.message : 'Lỗi không xác định';
+      // Map known DB errors → friendly messages
+      if (raw.includes('duplicate key') || raw.includes('unique constraint')) {
+        setError('Một số học viên đã được gán chính xác bài thi này trước đó (trùng lặp). Vui lòng kiểm tra lại danh sách bài đã gán.');
+      } else {
+        setError(raw);
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  // Group options by group name for writing/speaking
+  /* ───────── Grouped options ───────── */
   const groupedOptions: Map<string, ExamOption[]> = new Map();
   examOptions.forEach((opt) => {
     const group = opt.group || '';
@@ -239,8 +388,7 @@ export function AssignmentForm({
   });
   const hasGroups = examOptions.some((o) => o.group);
 
-  const studentsList = students.filter((s) => s.role === 'student');
-
+  /* ───────── Render ───────── */
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {error && (
@@ -249,19 +397,19 @@ export function AssignmentForm({
         </div>
       )}
       {success && (
-        <div className="rounded-lg bg-emerald-50 border border-emerald-200 p-4 text-sm text-emerald-700">
-          {success}
+        <div className="rounded-lg bg-emerald-50 border border-emerald-200 p-4 text-sm text-emerald-700 flex items-center gap-2">
+          <CheckCircle className="w-4 h-4 shrink-0" /> {success}
         </div>
       )}
 
-      {/* Mode toggle */}
+      {/* ─── Mode toggle ─── */}
       <div>
         <label className="block text-sm font-semibold text-gray-700 mb-2">Chế độ gán</label>
         <div className="flex gap-2">
           <button
             type="button"
             onClick={() => setMode('single')}
-            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
+            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center gap-1.5 ${
               mode === 'single'
                 ? 'bg-blue-600 text-white'
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
@@ -283,7 +431,7 @@ export function AssignmentForm({
         </div>
       </div>
 
-      {/* Step 1: Student selection */}
+      {/* ─── Step 1: Student selection ─── */}
       <div>
         <label className="block text-sm font-semibold text-gray-700 mb-1.5">
           1. Học viên <span className="text-red-500">*</span>
@@ -306,7 +454,6 @@ export function AssignmentForm({
           </select>
         ) : (
           <div>
-            {/* Bulk controls */}
             <div className="flex gap-2 mb-2">
               <button type="button" onClick={selectAll} className="text-xs font-semibold text-blue-600 hover:text-blue-800 bg-blue-50 px-3 py-1.5 rounded-lg hover:bg-blue-100 transition-colors flex items-center gap-1">
                 <CheckSquare className="w-3 h-3" /> Chọn tất cả ({studentsList.length})
@@ -319,7 +466,6 @@ export function AssignmentForm({
               </span>
             </div>
 
-            {/* Student checkbox list */}
             <div className="max-h-48 overflow-y-auto border border-gray-200 rounded-lg divide-y divide-gray-100">
               {studentsList.length === 0 ? (
                 <p className="text-sm text-gray-400 p-4 text-center">Chưa có học viên nào</p>
@@ -351,11 +497,13 @@ export function AssignmentForm({
         )}
       </div>
 
-      {/* Step 2: Exam Type */}
-      <div>
-        <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-          2. Loại bài thi <span className="text-red-500">*</span>
+      {/* ─── Step 2: Exam picker + Add to Cart ─── */}
+      <div className="rounded-xl border-2 border-dashed border-gray-200 bg-gray-50/50 p-5 space-y-4">
+        <label className="block text-sm font-semibold text-gray-700">
+          2. Chọn bài thi <span className="text-red-500">*</span>
         </label>
+
+        {/* Exam type grid */}
         <div className="grid grid-cols-2 gap-3">
           {EXAM_TYPES.map((et) => (
             <button
@@ -363,9 +511,7 @@ export function AssignmentForm({
               type="button"
               onClick={() => setExamType(et.value)}
               className={`flex items-center gap-3 rounded-xl border-2 p-4 text-left transition-all ${
-                examType === et.value
-                  ? `${et.color} shadow-sm`
-                  : 'border-gray-200 bg-white hover:border-gray-300'
+                examType === et.value ? et.activeColor : et.color
               }`}
             >
               <et.Icon className="w-5 h-5" />
@@ -373,61 +519,113 @@ export function AssignmentForm({
             </button>
           ))}
         </div>
+
+        {/* Specific exam select */}
+        {examType && (
+          <div>
+            <label className="block text-sm font-medium text-gray-600 mb-1.5">
+              Bài cụ thể
+              {loadingOptions && <span className="text-gray-400 font-normal ml-2">Đang tải...</span>}
+            </label>
+            <select
+              value={targetId}
+              onChange={(e) => setTargetId(Number(e.target.value))}
+              className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+              disabled={loadingOptions}
+            >
+              <option value="">— Chọn bài —</option>
+              {hasGroups
+                ? Array.from(groupedOptions.entries()).map(([group, opts]) => (
+                    <optgroup key={group} label={group}>
+                      {opts.map((opt) => (
+                        <option key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </option>
+                      ))}
+                    </optgroup>
+                  ))
+                : examOptions.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+            </select>
+            <p className="text-xs text-gray-400 mt-1">
+              {examOptions.length} bài khả dụng
+            </p>
+          </div>
+        )}
+
+        {/* Add to cart button */}
+        <button
+          type="button"
+          onClick={addToCart}
+          disabled={!examType || targetId === ''}
+          className="w-full flex items-center justify-center gap-2 rounded-lg border-2 border-blue-200 bg-blue-50 px-4 py-2.5 text-sm font-semibold text-blue-700 hover:bg-blue-100 hover:border-blue-300 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+        >
+          <Plus className="w-4 h-4" /> Thêm vào danh sách gán
+        </button>
       </div>
 
-      {/* Step 3: Specific Exam Item (Dynamic) */}
-      {examType && (
+      {/* ─── Step 3: Cart ─── */}
+      {cart.length > 0 && (
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-            3. Bài cụ thể <span className="text-red-500">*</span>
-            {loadingOptions && <span className="text-gray-400 font-normal ml-2">Đang tải...</span>}
+          <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
+            <ShoppingCart className="w-4 h-4" />
+            3. Danh sách bài thi sẽ gán ({cart.length})
           </label>
-          <select
-            value={targetId}
-            onChange={(e) => setTargetId(Number(e.target.value))}
-            className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-            required
-            disabled={loadingOptions}
-          >
-            <option value="">— Chọn bài —</option>
-            {hasGroups
-              ? Array.from(groupedOptions.entries()).map(([group, opts]) => (
-                  <optgroup key={group} label={group}>
-                    {opts.map((opt) => (
-                      <option key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </option>
-                    ))}
-                  </optgroup>
-                ))
-              : examOptions.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-          </select>
-          <p className="text-xs text-gray-400 mt-1">
-            {examOptions.length} bài khả dụng
-          </p>
+
+          <div className="border border-gray-200 rounded-xl overflow-hidden divide-y divide-gray-100">
+            {cart.map((item) => {
+              const Icon = EXAM_TYPE_ICON_MAP[item.examType];
+              return (
+                <div
+                  key={item.id}
+                  className="flex items-center gap-3 px-4 py-3 bg-white hover:bg-gray-50 transition-colors"
+                >
+                  <Icon className="w-4 h-4 text-gray-500 shrink-0" />
+                  <span className="text-sm text-gray-800 font-medium flex-1 truncate">
+                    {item.displayLabel}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => removeFromCart(item.id)}
+                    className="text-gray-400 hover:text-red-500 transition-colors p-1 rounded-md hover:bg-red-50"
+                    title="Xoá khỏi danh sách"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              );
+            })}
+          </div>
         </div>
       )}
 
-      {/* Step 4: Optional Fields */}
+      {/* ─── Step 4: Shared fields ─── */}
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-            4. Hạn nộp <span className="text-gray-400 font-normal">(tùy chọn, giờ Việt Nam {VIETNAM_TIME_ZONE_LABEL})</span>
+            {cart.length > 0 ? '4.' : '3.'} Hạn nộp <span className="text-gray-400 font-normal">(tùy chọn, giờ Việt Nam {VIETNAM_TIME_ZONE_LABEL})</span>
           </label>
           <input
             type="datetime-local"
             value={dueDate}
-            onChange={(e) => setDueDate(e.target.value)}
+            onChange={(e) => handleDueDateChange(e.target.value)}
+            min={getNowVietnamLocalInput()}
             className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
             step={60}
           />
-          <p className="mt-1 text-xs text-gray-400">
-            Deadline sẽ được lưu và hiển thị theo giờ Việt Nam ({VIETNAM_TIME_ZONE_LABEL}).
-          </p>
+          {dueDateWarning ? (
+            <p className="mt-1.5 text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded-md px-3 py-2 flex items-start gap-1.5">
+              <AlertTriangle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+              {dueDateWarning}
+            </p>
+          ) : (
+            <p className="mt-1 text-xs text-gray-400">
+              Deadline sẽ được lưu và hiển thị theo giờ Việt Nam ({VIETNAM_TIME_ZONE_LABEL}).
+            </p>
+          )}
         </div>
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-1.5">
@@ -456,7 +654,18 @@ export function AssignmentForm({
         />
       </div>
 
-      {/* Submit */}
+      {/* ─── Submit summary & buttons ─── */}
+      {(cart.length > 0 || (examType && targetId !== '')) && (
+        <div className="rounded-lg bg-blue-50 border border-blue-200 px-4 py-3 text-sm text-blue-800">
+          <strong>Tóm tắt:</strong>{' '}
+          {(() => {
+            const examCount = cart.length + ((examType && targetId !== '' && !cart.some(c => c.examType === examType && c.targetId === Number(targetId))) ? 1 : 0);
+            const studentCount = mode === 'single' ? (studentEmail ? 1 : 0) : selectedEmails.length;
+            return `${examCount} bài thi × ${studentCount} học viên = ${examCount * studentCount} lượt gán`;
+          })()}
+        </div>
+      )}
+
       <div className="flex items-center gap-3 pt-2">
         <button
           type="submit"
@@ -465,9 +674,7 @@ export function AssignmentForm({
         >
           {loading
             ? <><Loader2 className="w-4 h-4 animate-spin" /> Đang gán...</>
-            : mode === 'single'
-              ? <><CheckCircle className="w-4 h-4" /> Gán bài cho học viên</>
-              : <><CheckCircle className="w-4 h-4" /> Gán cho {selectedEmails.length} học viên</>
+            : <><CheckCircle className="w-4 h-4" /> Gán bài</>
           }
         </button>
         <button
