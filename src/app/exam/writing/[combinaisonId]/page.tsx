@@ -1,7 +1,7 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
-  PenLine, ChevronLeft, Clock, Hash, Timer, Send, Play, Pause, RotateCcw, AlignLeft, CheckCircle2, Loader2,
+  PenLine, ChevronLeft, Clock, Hash, Timer, Send, AlignLeft, CheckCircle2, Loader2,
 } from "lucide-react";
 import { useCountdown, useStopwatch } from "@/hooks/useTimer";
 import Link from "next/link";
@@ -9,6 +9,7 @@ import { useParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { submitExam } from "@/lib/submitExam";
 import DeadlineNotice from "@/components/exam/DeadlineNotice";
+import AssignmentNoteNotice from "@/components/exam/AssignmentNoteNotice";
 import { useAssignmentDeadline } from "@/hooks/useAssignmentDeadline";
 
 const frenchKeys = [
@@ -67,6 +68,15 @@ export default function WritingExamPage() {
 
   const globalTimer = useCountdown(60 * 60, true);
   const stopwatch = useStopwatch(true);
+  const wcRef = useRef([0, 0, 0]);
+  const idlePauseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const clearIdlePauseTimer = () => {
+    if (idlePauseTimerRef.current) {
+      clearTimeout(idlePauseTimerRef.current);
+      idlePauseTimerRef.current = null;
+    }
+  };
 
   useEffect(() => {
     fetch("/data/writing.json")
@@ -109,21 +119,44 @@ export default function WritingExamPage() {
 
   const handleTaskSwitch = (idx: number) => {
     if (idx === activeTask) return;
-    const wasRunning = stopwatch.isRunning;
     const saved = [...taskTimes];
     saved[activeTask] = stopwatch.seconds;
     setTaskTimes(saved);
+    clearIdlePauseTimer();
     stopwatch.pause();
     stopwatch.setElapsed(saved[idx] ?? 0);
     setActiveTask(idx);
-    if (wasRunning) stopwatch.start();
   };
 
   const wordCount = (text: string) =>
     text.trim() === "" ? 0 : text.trim().split(/\s+/).length;
 
+  const markTypingForTask = (taskIndex: number, nextText: string) => {
+    const nextWc = wordCount(nextText);
+    const prevWc = wcRef.current[taskIndex] ?? 0;
+
+    // Chỉ tính thời gian khi "số chữ" thay đổi (đúng yêu cầu).
+    if (nextWc === prevWc) return;
+
+    wcRef.current[taskIndex] = nextWc;
+    clearIdlePauseTimer();
+    if (!stopwatch.isRunning) stopwatch.start();
+
+    // Ngừng gõ -> tự dừng đếm (xem thôi không tính).
+    idlePauseTimerRef.current = setTimeout(() => {
+      stopwatch.pause();
+    }, 2000);
+  };
+
   const insertChar = (char: string) => {
-    setTexts((prev) => { const n = [...prev]; n[activeTask] += char; return n; });
+    const taskIndex = activeTask;
+    setTexts((prev) => {
+      const n = [...prev];
+      const nextText = (n[taskIndex] ?? "") + char;
+      n[taskIndex] = nextText;
+      markTypingForTask(taskIndex, nextText);
+      return n;
+    });
   };
 
   if (loading) return (
@@ -195,6 +228,7 @@ export default function WritingExamPage() {
             Expression Écrite — <span className="text-violet-600">{item.titre}</span>
             <span className="text-slate-400 font-normal ml-2 text-sm">{item.monthName}</span>
           </h1>
+          <AssignmentNoteNotice note={deadline.note} />
         </div>
         <div className={`flex items-center gap-2 border font-mono font-bold px-4 py-1.5 rounded-full text-sm shrink-0 ${timerColor}`}>
           <Clock className="w-4 h-4" />
@@ -324,7 +358,14 @@ export default function WritingExamPage() {
                 placeholder="Commencez à écrire ici..."
                 value={texts[activeTask]}
                 onChange={(e) => {
-                  setTexts((prev) => { const n = [...prev]; n[activeTask] = e.target.value; return n; });
+                  const nextValue = e.target.value;
+                  const taskIndex = activeTask;
+                  setTexts((prev) => {
+                    const n = [...prev];
+                    n[taskIndex] = nextValue;
+                    return n;
+                  });
+                  markTypingForTask(taskIndex, nextValue);
                 }}
               />
             </div>
@@ -333,7 +374,7 @@ export default function WritingExamPage() {
 
         {/* RIGHT Panel */}
         <aside className="w-[340px] bg-white border-l border-slate-200 flex flex-col shrink-0 overflow-y-auto">
-          {/* Stopwatch */}
+          {/* Stopwatch (auto: chỉ chạy khi gõ) */}
           <div className="p-4 border-b border-slate-100">
             <div className="flex items-center gap-2 mb-3">
               <Timer className="w-4 h-4 text-violet-600" />
@@ -342,17 +383,9 @@ export default function WritingExamPage() {
             <div className="text-2xl font-mono font-bold text-violet-700 text-center bg-violet-50 rounded-xl py-2">
               {stopwatch.formatted}
             </div>
-            <div className="flex gap-2 mt-2">
-              <button
-                onClick={stopwatch.isRunning ? stopwatch.pause : stopwatch.start}
-                className="flex-1 flex items-center justify-center gap-1 text-xs py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-600 transition-colors"
-              >
-                {stopwatch.isRunning ? <><Pause className="w-3 h-3" />Pause</> : <><Play className="w-3 h-3" />Reprendre</>}
-              </button>
-              <button onClick={stopwatch.reset} className="px-2 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-400 transition-colors">
-                <RotateCcw className="w-3 h-3" />
-              </button>
-            </div>
+            <p className="mt-2 text-xs text-slate-400 text-center">
+              Tự chạy khi bạn gõ (số chữ thay đổi) · Dừng khi bạn ngừng gõ.
+            </p>
           </div>
 
           {/* Word count */}

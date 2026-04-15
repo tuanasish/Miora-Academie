@@ -138,7 +138,7 @@ export async function getTeacherSubmissions(filters?: {
 
   let query = db
     .from('exam_submissions')
-    .select('id, student_email, exam_type, submitted_at, score, serie_id, combinaison_id, partie_id, time_spent_seconds, word_counts, admin_score, admin_feedback, graded_at, graded_by')
+    .select('id, student_email, exam_type, submitted_at, score, serie_id, combinaison_id, partie_id, time_spent_seconds, word_counts, admin_score, admin_feedback, graded_at, graded_by, teacher_viewed_at')
     .in('student_email', studentEmails)
     .order('submitted_at', { ascending: false })
     .limit(500);

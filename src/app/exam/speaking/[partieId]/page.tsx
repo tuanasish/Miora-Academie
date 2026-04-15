@@ -11,6 +11,7 @@ import { createClient } from "@/lib/supabase/client";
 import { submitExam } from "@/lib/submitExam";
 import { playExamChime } from "@/lib/playExamChime";
 import DeadlineNotice from "@/components/exam/DeadlineNotice";
+import AssignmentNoteNotice from "@/components/exam/AssignmentNoteNotice";
 import { useAssignmentDeadline } from "@/hooks/useAssignmentDeadline";
 
 interface Sujet {
@@ -621,6 +622,7 @@ export default function SpeakingExamPage() {
             Expression Orale — <span className="text-rose-600">Jour {partie.jour}</span>
             <span className="text-slate-400 font-normal ml-2 text-sm">{monthName}</span>
           </h1>
+          <AssignmentNoteNotice note={deadline.note} />
         </div>
         <div className="flex items-center gap-1 bg-slate-100 rounded-xl p-1">
           <button

@@ -37,6 +37,8 @@ interface AssignmentRow {
 }
 
 interface SubmissionRow {
+  id: string;
+  submitted_at: string;
   serie_id: number | null;
   combinaison_id: number | null;
   partie_id: number | null;
@@ -58,6 +60,7 @@ export function AssignedExamListPage({
   const supabase = createClient();
   const [assignments, setAssignments] = useState<AssignmentRow[]>([]);
   const [completedTargets, setCompletedTargets] = useState<Set<number>>(new Set());
+  const [latestSubmissionIdByTarget, setLatestSubmissionIdByTarget] = useState<Map<number, string>>(new Map());
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<FilterMode>('all');
 
@@ -84,7 +87,7 @@ export function AssignedExamListPage({
             .order('assigned_at', { ascending: false }),
           supabase
             .from('exam_submissions')
-            .select('serie_id, combinaison_id, partie_id')
+            .select('id, submitted_at, serie_id, combinaison_id, partie_id')
             .eq('student_email', user.email)
             .eq('exam_type', examType),
         ]);
@@ -92,15 +95,23 @@ export function AssignedExamListPage({
         if (!active) return;
 
         const doneTargets = new Set<number>();
-        for (const row of (submissionRows ?? []) as SubmissionRow[]) {
+        const latestByTarget = new Map<number, { id: string; submitted_at: string }>();
+        const sortedSubs = ((submissionRows ?? []) as SubmissionRow[]).slice().sort((a, b) => {
+          return new Date(b.submitted_at).getTime() - new Date(a.submitted_at).getTime();
+        });
+        for (const row of sortedSubs) {
           const value = row[targetField];
           if (typeof value === 'number') {
             doneTargets.add(value);
+            if (!latestByTarget.has(value)) {
+              latestByTarget.set(value, { id: row.id, submitted_at: row.submitted_at });
+            }
           }
         }
 
         setAssignments((assignmentRows ?? []) as AssignmentRow[]);
         setCompletedTargets(doneTargets);
+        setLatestSubmissionIdByTarget(new Map(Array.from(latestByTarget.entries()).map(([k, v]) => [k, v.id])));
       } finally {
         if (active) setLoading(false);
       }
@@ -124,6 +135,7 @@ export function AssignedExamListPage({
           completed,
           overdue,
           dueDateLabel: formatDueDate(assignment.due_date),
+          latestSubmissionId: latestSubmissionIdByTarget.get(targetId) ?? null,
         };
       })
       .filter(Boolean) as Array<
@@ -132,9 +144,10 @@ export function AssignedExamListPage({
         completed: boolean;
         overdue: boolean;
         dueDateLabel: string | null;
+        latestSubmissionId: string | null;
       }
     >;
-  }, [assignments, completedTargets, targetField]);
+  }, [assignments, completedTargets, latestSubmissionIdByTarget, targetField]);
 
   const filteredItems = items.filter((item) => {
     if (filter === 'completed') return item.completed;
@@ -223,10 +236,18 @@ export function AssignedExamListPage({
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredItems.map((item) => (
-              <Link
+            {filteredItems.map((item) => {
+              const isCompletedWithActions =
+                item.completed && (examType === 'writing' || examType === 'listening' || examType === 'reading');
+              const CardWrapper: React.ElementType = isCompletedWithActions ? 'div' : Link;
+              const wrapperProps = isCompletedWithActions
+                ? { role: 'group' }
+                : { href: buildHref(item.targetId) };
+
+              return (
+              <CardWrapper
                 key={item.id}
-                href={buildHref(item.targetId)}
+                {...wrapperProps}
                 className={`group relative bg-[#faf8f5] rounded-2xl border-2 p-5 hover:shadow-lg transition-all duration-200 ${
                   item.completed
                     ? 'border-emerald-200 hover:border-emerald-300'
@@ -291,12 +312,36 @@ export function AssignedExamListPage({
                   }`}
                 >
                   <Play className="w-4 h-4 fill-current" />
-                  {item.completed ? 'Xem lại / làm lại' : 'Commencer'}
+                  {isCompletedWithActions ? 'Chọn hành động' : item.completed ? 'Xem lại / làm lại' : 'Commencer'}
                 </div>
 
-                <div className="absolute inset-0 rounded-2xl bg-[#f05e23]/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-              </Link>
-            ))}
+                {isCompletedWithActions && (
+                  <div className="mt-3 grid grid-cols-2 gap-2">
+                    <Link
+                      href={item.latestSubmissionId ? `/dashboard/submissions/${item.latestSubmissionId}` : '/dashboard'}
+                      className={`inline-flex items-center justify-center rounded-xl px-3 py-2 text-xs font-semibold border transition-colors ${
+                        item.latestSubmissionId
+                          ? 'border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
+                          : 'border-slate-200 bg-slate-100 text-slate-400 cursor-not-allowed pointer-events-none'
+                      }`}
+                      title={item.latestSubmissionId ? 'Xem lại bài đã nộp' : 'Chưa có bài nộp để xem lại'}
+                    >
+                      Xem lại
+                    </Link>
+                    <Link
+                      href={buildHref(item.targetId)}
+                      className="inline-flex items-center justify-center rounded-xl px-3 py-2 text-xs font-semibold border border-[#e4ddd1] bg-white text-[#5d5d5d] hover:bg-[#f3efe6] transition-colors"
+                      title="Làm lại bài này"
+                    >
+                      Làm lại
+                    </Link>
+                  </div>
+                )}
+
+                <div className="pointer-events-none absolute inset-0 rounded-2xl bg-[#f05e23]/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+              </CardWrapper>
+              );
+            })}
           </div>
         )}
       </main>

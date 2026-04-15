@@ -10,12 +10,14 @@ interface AssignmentDeadlineState {
   dueDate: string | null;
   formattedDueDate: string | null;
   isOverdue: boolean;
+  note: string | null;
 }
 
 const EMPTY_STATE: AssignmentDeadlineState = {
   dueDate: null,
   formattedDueDate: null,
   isOverdue: false,
+  note: null,
 };
 
 export function useAssignmentDeadline(examType: ExamType, targetId: number) {
@@ -42,7 +44,7 @@ export function useAssignmentDeadline(examType: ExamType, targetId: number) {
 
       let query = supabase
         .from('exam_assignments')
-        .select('due_date, assigned_at')
+        .select('due_date, note, assigned_at')
         .eq('student_email', user.email)
         .eq('exam_type', examType)
         .order('assigned_at', { ascending: false })
@@ -58,12 +60,14 @@ export function useAssignmentDeadline(examType: ExamType, targetId: number) {
 
       const { data } = await query;
       const dueDate = data?.[0]?.due_date ?? null;
+      const note = data?.[0]?.note ?? null;
 
       if (!cancelled) {
         setState({
           dueDate,
           formattedDueDate: formatDueDate(dueDate),
           isOverdue: isDueDateOverdue(dueDate),
+          note,
         });
       }
     }

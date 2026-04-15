@@ -26,6 +26,7 @@ export interface McqSubmissionReviewProps {
   animateRows?: boolean;
   className?: string;
   titleClassName?: string;
+  showUnansweredNotice?: boolean;
 }
 
 const LABELS = ["A", "B", "C", "D"];
@@ -49,6 +50,7 @@ export default function McqSubmissionReview({
   animateRows = false,
   className = "",
   titleClassName = "font-display font-bold text-[#3d3d3d] mb-3",
+  showUnansweredNotice = true,
 }: McqSubmissionReviewProps) {
   const sorted = [...questions].sort((a, b) => {
     const oa = a.orderIndex ?? a.id;
@@ -144,7 +146,7 @@ export default function McqSubmissionReview({
                     {formatQuestionMeta(q2, idx)}
                   </p>
                 </div>
-                {notAnswered && (
+                {notAnswered && showUnansweredNotice && (
                   <p className="text-[11px] sm:text-xs font-semibold text-red-700 flex items-center gap-2 shrink-0 w-full sm:w-auto sm:justify-end">
                     <span className="w-2 h-2 rounded-full bg-red-500 shrink-0" aria-hidden />
                     Học viên đã bỏ trống câu này.

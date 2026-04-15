@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
-import { BookOpen, ChevronLeft, ChevronRight, Clock, Send, Flag } from "lucide-react";
+import { BookOpen, ChevronLeft, ChevronRight, Clock, Send, Flag, NotebookPen } from "lucide-react";
 import { useCountdown } from "@/hooks/useTimer";
 import { useKeyboardNav } from "@/hooks/useKeyboardNav";
 import Link from "next/link";
@@ -12,6 +12,7 @@ import SubmitConfirmModal from "@/components/exam/SubmitConfirmModal";
 import ScoreReveal from "@/components/exam/ScoreReveal";
 import McqSubmissionReview from "@/components/exam/McqSubmissionReview";
 import DeadlineNotice from "@/components/exam/DeadlineNotice";
+import AssignmentNoteNotice from "@/components/exam/AssignmentNoteNotice";
 import { useAssignmentDeadline } from "@/hooks/useAssignmentDeadline";
 
 interface Question {
@@ -47,6 +48,8 @@ export default function ReadingSerieExamPage() {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [loadedImageUrl, setLoadedImageUrl] = useState<string | null>(null);
   const deadline = useAssignmentDeadline("reading", serieId);
+  const [showNote, setShowNote] = useState(false);
+  const [questionNotes, setQuestionNotes] = useState<Record<number, string>>({});
 
   const timer = useCountdown(TOTAL_SECONDS, true);
 
@@ -60,6 +63,24 @@ export default function ReadingSerieExamPage() {
         setLoading(false);
       })
       .catch(() => setLoading(false));
+  }, [serieId]);
+
+  // Load saved notes for this serie from localStorage
+  useEffect(() => {
+    if (!Number.isInteger(serieId) || serieId <= 0) return;
+    if (typeof window === "undefined") return;
+
+    const next: Record<number, string> = {};
+    for (let i = 0; i < window.localStorage.length; i++) {
+      const key = window.localStorage.key(i);
+      if (!key) continue;
+      const prefix = `note:reading:${serieId}:`;
+      if (!key.startsWith(prefix)) continue;
+      const qId = Number(key.slice(prefix.length));
+      if (!Number.isInteger(qId)) continue;
+      next[qId] = window.localStorage.getItem(key) ?? "";
+    }
+    setQuestionNotes(next);
   }, [serieId]);
 
   const q = questions[currentQ];
@@ -92,6 +113,19 @@ export default function ReadingSerieExamPage() {
       return next;
     });
   }, [q, currentQ]);
+
+  const setNoteForQuestion = useCallback((questionId: number, value: string) => {
+    setQuestionNotes((prev) => ({ ...prev, [questionId]: value }));
+    if (typeof window !== "undefined") {
+      try {
+        const key = `note:reading:${serieId}:${questionId}`;
+        if (!value.trim()) window.localStorage.removeItem(key);
+        else window.localStorage.setItem(key, value);
+      } catch {
+        // ignore storage failures
+      }
+    }
+  }, [serieId]);
 
   const goPrev = useCallback(() => setCurrentQ((c) => Math.max(0, c - 1)), []);
   const goNext = useCallback(() => setCurrentQ((c) => Math.min(total - 1, c + 1)), [total]);
@@ -184,6 +218,7 @@ export default function ReadingSerieExamPage() {
           <h1 className="font-display font-bold text-[#3d3d3d] truncate">
             <span className="hidden md:inline">Compréhension Écrite — </span>Série {serieId}
           </h1>
+          <AssignmentNoteNotice note={deadline.note} />
         </div>
         <div className={`flex items-center gap-2 font-mono font-bold text-sm shrink-0 ${timerColor} ${timerWarning ? "anim-pulse-glow rounded-lg px-2 py-1" : ""}`}>
           <Clock className="w-4 h-4" />
@@ -238,6 +273,21 @@ export default function ReadingSerieExamPage() {
               <Flag className="w-3 h-3" />
               {flagged.has(currentQ) ? "Marquée" : "Marquer"}
             </button>
+            <button
+              type="button"
+              onClick={() => setShowNote((v) => !v)}
+              className={`flex items-center gap-1 text-xs px-2.5 py-1 rounded-full transition-all ${
+                showNote
+                  ? "bg-amber-100 text-amber-800 font-semibold"
+                  : (questionNotes[q?.id ?? -1]?.trim()
+                      ? "bg-amber-50 text-amber-800 hover:bg-amber-100"
+                      : "bg-[#ede8dd] text-[#888] hover:text-amber-700")
+              }`}
+              disabled={!q}
+            >
+              <NotebookPen className="w-3 h-3" />
+              Ghi chú
+            </button>
             <span className="hidden lg:inline text-[10px] text-[#bbb] ml-auto">
               A/B/C/D · ←→ · F flag
             </span>
@@ -272,6 +322,21 @@ export default function ReadingSerieExamPage() {
           <div className="bg-[#faf8f5] rounded-xl border border-[#e4ddd1] p-4 sm:p-5">
             <p className="text-[#3d3d3d] leading-relaxed text-sm sm:text-base">{q.prompt}</p>
           </div>
+
+          {showNote && q && (
+            <div className="bg-amber-50 rounded-xl border border-amber-200 p-3 sm:p-4">
+              <label className="block text-xs font-semibold text-amber-800 mb-1">
+                Ghi chú cho câu {currentQ + 1}
+              </label>
+              <textarea
+                value={questionNotes[q.id] ?? ""}
+                onChange={(e) => setNoteForQuestion(q.id, e.target.value)}
+                placeholder="Nhập ghi chú của bạn cho câu này..."
+                rows={3}
+                className="w-full rounded-lg border border-amber-200 bg-white px-3 py-2 text-sm text-amber-950 focus:ring-2 focus:ring-amber-300 focus:border-amber-300 outline-none transition resize-none"
+              />
+            </div>
+          )}
 
           <div className="grid grid-cols-2 gap-2 sm:gap-3 max-w-2xl items-stretch">
             {q.options.map((opt, idx) => {

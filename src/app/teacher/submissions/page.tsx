@@ -218,13 +218,21 @@ export default async function TeacherSubmissionsPage({ searchParams }: PageProps
                 const detailHref = `/teacher/submissions/${submission.id}`;
                 const needsManualReview =
                   submission.exam_type === 'writing' || submission.exam_type === 'speaking';
+                const unread = submission.teacher_viewed_at === null || submission.teacher_viewed_at === undefined;
 
                 return (
-                  <tr key={submission.id} className="hover:bg-gray-50 transition-colors align-middle">
+                  <tr
+                    key={submission.id}
+                    className={`transition-colors align-middle ${
+                      unread ? 'bg-gray-100/80' : 'bg-white'
+                    } hover:bg-gray-50`}
+                  >
                     <td className="p-0 align-middle">
                       <Link
                         href={detailHref}
-                        className="block px-4 py-3 text-blue-600 font-medium hover:underline"
+                        className={`block px-4 py-3 text-blue-600 hover:underline ${
+                          unread ? 'font-semibold' : 'font-medium'
+                        }`}
                       >
                         {submission.student_email}
                       </Link>
@@ -239,25 +247,25 @@ export default async function TeacherSubmissionsPage({ searchParams }: PageProps
                       </Link>
                     </td>
                     <td className="p-0 align-middle">
-                      <Link href={detailHref} className="block px-4 py-3 font-medium text-gray-700">
+                      <Link href={detailHref} className={`block px-4 py-3 text-gray-700 ${unread ? 'font-semibold' : 'font-medium'}`}>
                         {examRef(submission)}
                       </Link>
                     </td>
                     <td className="p-0 align-middle">
-                      <Link href={detailHref} className="block px-4 py-3 font-semibold text-gray-800">
+                      <Link href={detailHref} className={`block px-4 py-3 text-gray-800 ${unread ? 'font-bold' : 'font-semibold'}`}>
                         {scoreDisplay(submission)}
                       </Link>
                     </td>
                     <td className="p-0 align-middle">
                       <Link
                         href={detailHref}
-                        className="flex items-center gap-1 px-4 py-3 text-gray-500"
+                        className={`flex items-center gap-1 px-4 py-3 text-gray-500 ${unread ? 'font-semibold' : ''}`}
                       >
                         <Clock className="w-3 h-3" /> {fmtTime(submission.time_spent_seconds)}
                       </Link>
                     </td>
                     <td className="p-0 align-middle">
-                      <Link href={detailHref} className="block px-4 py-3 text-xs text-gray-500">
+                      <Link href={detailHref} className={`block px-4 py-3 text-xs text-gray-500 ${unread ? 'font-semibold' : ''}`}>
                         {fmtDate(submission.submitted_at)}
                       </Link>
                     </td>

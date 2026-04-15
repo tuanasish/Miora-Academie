@@ -37,6 +37,8 @@ interface CartItem {
   examLabel: string;
   /** Human-readable summary for display */
   displayLabel: string;
+  /** Ghi chú riêng cho từng bài (vd: làm câu 1–20) */
+  note: string;
 }
 
 interface AssignmentFormProps {
@@ -106,7 +108,8 @@ export function AssignmentForm({
   const [examLabel, setExamLabel] = useState('');
   const [dueDate, setDueDate] = useState('');
   const [dueDateWarning, setDueDateWarning] = useState('');
-  const [note, setNote] = useState('');
+  /** Ghi chú khi chỉ chọn 1 bài trực tiếp (chưa thêm vào giỏ) */
+  const [pendingNote, setPendingNote] = useState('');
 
   const prevExamTypeRef = useRef<ExamType | ''>('');
 
@@ -259,17 +262,25 @@ export function AssignmentForm({
         targetId: Number(targetId),
         examLabel: examLabel || '',
         displayLabel,
+        note: pendingNote,
       },
     ]);
 
     // Reset picker for next selection
     setExamType('');
     setTargetId('');
+    setPendingNote('');
     setError('');
   };
 
   const removeFromCart = (id: string) => {
     setCart((prev) => prev.filter((item) => item.id !== id));
+  };
+
+  const updateCartItemNote = (id: string, value: string) => {
+    setCart((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, note: value } : item)),
+    );
   };
 
   /* ───────── Submit ───────── */
@@ -293,6 +304,7 @@ export function AssignmentForm({
           targetId: Number(targetId),
           examLabel: examLabel || '',
           displayLabel: `${EXAM_TYPE_LABEL_MAP[examType as ExamType]} – ${selectedOption?.label ?? `#${targetId}`}`,
+          note: pendingNote,
         });
       }
     }
@@ -320,7 +332,7 @@ export function AssignmentForm({
         partie_id: item.examType === 'speaking' ? item.targetId : null,
         exam_label: item.examLabel || examLabel || null,
         due_date: toVietnamDeadlineIso(dueDate),
-        note: note || null,
+        note: item.note.trim() ? item.note.trim() : null,
       }));
 
       const emails = mode === 'single' ? [studentEmail] : selectedEmails;
@@ -362,6 +374,7 @@ export function AssignmentForm({
       setExamType('');
       setTargetId('');
       setExamLabel('');
+      setPendingNote('');
       if (mode === 'single') {
         // Navigate back for single mode
         setTimeout(() => router.push(listHref), 1500);
@@ -581,20 +594,34 @@ export function AssignmentForm({
               return (
                 <div
                   key={item.id}
-                  className="flex items-center gap-3 px-4 py-3 bg-white hover:bg-gray-50 transition-colors"
+                  className="px-4 py-3 bg-white hover:bg-gray-50/80 transition-colors space-y-2"
                 >
-                  <Icon className="w-4 h-4 text-gray-500 shrink-0" />
-                  <span className="text-sm text-gray-800 font-medium flex-1 truncate">
-                    {item.displayLabel}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => removeFromCart(item.id)}
-                    className="text-gray-400 hover:text-red-500 transition-colors p-1 rounded-md hover:bg-red-50"
-                    title="Xoá khỏi danh sách"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                  <div className="flex items-start gap-3">
+                    <Icon className="w-4 h-4 text-gray-500 shrink-0 mt-0.5" />
+                    <span className="text-sm text-gray-800 font-medium flex-1 min-w-0">
+                      {item.displayLabel}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => removeFromCart(item.id)}
+                      className="text-gray-400 hover:text-red-500 transition-colors p-1 rounded-md hover:bg-red-50 shrink-0"
+                      title="Xoá khỏi danh sách"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <div className="pl-7">
+                    <label className="block text-xs font-medium text-gray-500 mb-1">
+                      Ghi chú cho bài này <span className="text-gray-400 font-normal">(tùy chọn)</span>
+                    </label>
+                    <textarea
+                      value={item.note}
+                      onChange={(e) => updateCartItemNote(item.id, e.target.value)}
+                      placeholder="VD: Làm từ câu 1–20"
+                      rows={2}
+                      className="w-full rounded-lg border border-gray-200 px-3 py-2 text-xs text-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition resize-none"
+                    />
+                  </div>
                 </div>
               );
             })}
@@ -641,18 +668,51 @@ export function AssignmentForm({
         </div>
       </div>
 
-      <div>
-        <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-          Ghi chú <span className="text-gray-400 font-normal">(tùy chọn)</span>
-        </label>
-        <textarea
-          value={note}
-          onChange={(e) => setNote(e.target.value)}
-          placeholder="Ghi chú cho học viên..."
-          rows={2}
-          className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition resize-none"
-        />
-      </div>
+      {(() => {
+        const hasPendingSelection =
+          Boolean(examType) &&
+          targetId !== '' &&
+          !cart.some((c) => c.examType === examType && c.targetId === Number(targetId));
+
+        if (cart.length === 0) {
+          return (
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+                Ghi chú <span className="text-gray-400 font-normal">(tùy chọn, cho bài đang chọn)</span>
+              </label>
+              <textarea
+                value={pendingNote}
+                onChange={(e) => setPendingNote(e.target.value)}
+                placeholder="Ghi chú cho học viên..."
+                rows={2}
+                className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition resize-none"
+              />
+            </div>
+          );
+        }
+
+        return (
+          <div className="space-y-2">
+            <p className="text-xs text-gray-500">
+              Ghi chú cho từng bài đã thêm vào danh sách: nhập trong từng mục ở mục 3 (bên trên).
+            </p>
+            {hasPendingSelection && (
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+                  Ghi chú <span className="text-gray-400 font-normal">(bài đang chọn, sẽ gán kèm khi nộp)</span>
+                </label>
+                <textarea
+                  value={pendingNote}
+                  onChange={(e) => setPendingNote(e.target.value)}
+                  placeholder="VD: Làm từ câu 1–30"
+                  rows={2}
+                  className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition resize-none"
+                />
+              </div>
+            )}
+          </div>
+        );
+      })()}
 
       {/* ─── Submit summary & buttons ─── */}
       {(cart.length > 0 || (examType && targetId !== '')) && (

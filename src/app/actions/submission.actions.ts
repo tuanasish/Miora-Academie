@@ -40,6 +40,7 @@ export interface SubmissionRow {
   graded_by?: string | null;
   graded_email_sent_at?: string | null;
   student_feedback_viewed_at?: string | null;
+  teacher_viewed_at?: string | null;
 }
 
 async function fetchSubmissionById(
@@ -98,7 +99,7 @@ export async function getSubmissions(filters?: {
 
   let query = db
     .from('exam_submissions')
-    .select('id, student_email, student_id, exam_type, submitted_at, score, serie_id, combinaison_id, partie_id, time_spent_seconds, word_counts, admin_score, admin_feedback, graded_at, graded_by, graded_email_sent_at, student_feedback_viewed_at')
+    .select('id, student_email, student_id, exam_type, submitted_at, score, serie_id, combinaison_id, partie_id, time_spent_seconds, word_counts, admin_score, admin_feedback, graded_at, graded_by, graded_email_sent_at, student_feedback_viewed_at, teacher_viewed_at')
     .order('submitted_at', { ascending: false })
     .limit(hasFilters ? 500 : 200);
 
@@ -362,5 +363,29 @@ export async function markSubmissionFeedbackViewed(id: string): Promise<boolean>
 
   await touchLearningActivity(user.id, 'feedback_view');
   revalidateSubmissionViews(id);
+  return true;
+}
+
+export async function markSubmissionTeacherViewed(id: string): Promise<boolean> {
+  const ctx = await requireActiveTeacherOrAdminAndDb();
+  const sub = await fetchSubmissionById(ctx.db as Awaited<ReturnType<typeof requireAdminAndDb>>['db'], id);
+  if (!sub) return false;
+
+  if (ctx.profile.role === 'teacher') {
+    try {
+      await requireOwnedStudentResource({ studentEmail: sub.student_email });
+    } catch {
+      return false;
+    }
+  }
+
+  if (sub.teacher_viewed_at) return false;
+
+  const now = new Date().toISOString();
+  const { error } = await ctx.db
+    .from('exam_submissions')
+    .update({ teacher_viewed_at: now })
+    .eq('id', id);
+  if (error) throw new Error(`Lỗi cập nhật teacher_viewed_at: ${error.message}`);
   return true;
 }

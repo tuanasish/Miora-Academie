@@ -134,6 +134,7 @@ export default async function DashboardSubmissionReviewPage({ params }: PageProp
             variant="full"
             title="Correction"
             animateRows={false}
+            showUnansweredNotice={false}
           />
         )}
 

@@ -85,15 +85,19 @@ async function sendEmail(params: { to: string[]; subject: string; html: string }
   const to = Array.from(new Set(params.to.filter(Boolean)));
   if (to.length === 0) return;
 
-  const { error } = await resend.emails.send({
-    from: FROM_EMAIL,
-    to,
-    subject: params.subject,
-    html: params.html,
-  });
+  try {
+    const { error } = await resend.emails.send({
+      from: FROM_EMAIL,
+      to,
+      subject: params.subject,
+      html: params.html,
+    });
 
-  if (error) {
-    throw new Error(error.message);
+    if (error) {
+      console.warn(`[email] Gửi email thất bại (không ảnh hưởng chức năng chính): ${error.message}`);
+    }
+  } catch (err) {
+    console.warn(`[email] Gửi email thất bại:`, err instanceof Error ? err.message : err);
   }
 }
 

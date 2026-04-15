@@ -230,6 +230,14 @@ export default function DashboardPage() {
                 <Settings className="w-3.5 h-3.5" /> Quản trị
               </Link>
             )}
+            {userRole === "student" && (
+              <Link
+                href="/dashboard/flashcards"
+                className="text-xs font-semibold text-amber-800 bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-lg hover:bg-amber-100 transition-colors inline-flex items-center gap-1.5"
+              >
+                <BookOpen className="w-3.5 h-3.5" /> Flashcards
+              </Link>
+            )}
             <div className="text-right hidden sm:block">
               {userName && <p className="text-sm font-semibold text-[#3d3d3d]">{userName}</p>}
               <p className="text-[11px] text-[#aaa]">{userEmail}</p>
@@ -456,6 +464,18 @@ export default function DashboardPage() {
                             >
                               Bắt đầu <ArrowRight className="w-3.5 h-3.5" />
                             </Link>
+                          )}
+
+                          {/* Redo for listening/reading even if done */}
+                          {done && hasTarget && (a.exam_type === "listening" || a.exam_type === "reading") && (
+                            <div className="shrink-0 flex flex-col items-end gap-2">
+                              <Link
+                                href={href}
+                                className="flex items-center gap-1.5 border border-[#e4ddd1] bg-white hover:bg-[#f3efe6] font-semibold text-xs text-[#5d5d5d] px-4 py-2.5 rounded-xl transition-all shadow-sm"
+                              >
+                                Làm lại <ArrowRight className="w-3.5 h-3.5" />
+                              </Link>
+                            </div>
                           )}
                           {!done && !hasTarget && (
                             <div className="text-[11px] text-red-600 bg-red-50 border border-red-200 rounded-lg px-2.5 py-1.5 shrink-0">

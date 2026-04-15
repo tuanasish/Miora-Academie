@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { getTeacherAccessibleSubmission } from '@/app/actions/submission.actions';
+import { getTeacherAccessibleSubmission, markSubmissionTeacherViewed } from '@/app/actions/submission.actions';
 import { gradeTeacherSubmission } from '@/app/actions/teacher.actions';
 import GradeSubmitButton from '@/components/admin/GradeSubmitButton';
 import { notFound, redirect } from 'next/navigation';
@@ -53,6 +53,8 @@ export default async function TeacherSubmissionDetailPage({ params, searchParams
 
   const subRaw = await getTeacherAccessibleSubmission(id);
   if (!subRaw) notFound();
+  // Mark as "opened" for teacher inbox styling
+  await markSubmissionTeacherViewed(id);
 
   const sub = await submissionWithSpeakingPlaybackUrls(subRaw);
   const submission = sub;
