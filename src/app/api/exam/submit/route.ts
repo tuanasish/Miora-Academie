@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
 
 import { touchLearningActivity } from '@/app/actions/streak.actions';
+import { logAuditEventSafely } from '@/lib/audit';
 import { sendSubmissionEmails, buildExamRef } from '@/lib/notifications/email';
 import { requireActiveStudentAndDb } from '@/lib/supabase/adminAuth';
 
@@ -55,10 +56,44 @@ export async function POST(request: NextRequest) {
       student_id: ctx.user.id,
     };
 
-    const { error } = await ctx.db.from('exam_submissions').insert([insertPayload]);
+    const { data: insertedRows, error } = await ctx.db
+      .from('exam_submissions')
+      .insert([insertPayload])
+      .select('id')
+      .limit(1);
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
+    const insertedSubmissionId = insertedRows?.[0]?.id ?? null;
+
+    const examRef = buildExamRef({
+      examType: payload.exam_type,
+      serieId: payload.serie_id,
+      combinaisonId: payload.combinaison_id,
+      partieId: payload.partie_id,
+    });
+
+    await logAuditEventSafely(ctx.db, {
+      actorId: ctx.user.id,
+      actorEmail: ctx.profile.email,
+      actorName: ctx.profile.full_name,
+      actorRole: ctx.profile.role,
+      action: 'submission.create',
+      targetType: 'exam_submission',
+      targetId: insertedSubmissionId,
+      targetLabel: `${ctx.user.email ?? 'student'} · ${examRef}`,
+      metadata: {
+        student_email: ctx.user.email ?? null,
+        exam_type: payload.exam_type,
+        exam_ref: examRef,
+        serie_id: payload.serie_id ?? null,
+        combinaison_id: payload.combinaison_id ?? null,
+        partie_id: payload.partie_id ?? null,
+        score: payload.score ?? null,
+        time_spent_seconds: payload.time_spent_seconds ?? null,
+        word_counts: payload.word_counts ?? null,
+      },
+    });
 
     try {
       await touchLearningActivity(ctx.user.id, 'submission');
@@ -87,12 +122,7 @@ export async function POST(request: NextRequest) {
       await sendSubmissionEmails({
         studentEmail: ctx.user.email ?? '',
         examType: payload.exam_type,
-        examRef: buildExamRef({
-          examType: payload.exam_type,
-          serieId: payload.serie_id,
-          combinaisonId: payload.combinaison_id,
-          partieId: payload.partie_id,
-        }),
+        examRef,
         timeSpentSeconds: payload.time_spent_seconds,
         wordCounts: payload.word_counts,
         teacherEmail,

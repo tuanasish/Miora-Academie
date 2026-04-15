@@ -12,7 +12,8 @@ import {
 } from 'lucide-react';
 
 import { formatDueDate, isDueDateOverdue } from '@/lib/exam/deadline';
-import { getTeacherAssignments, type Assignment } from '@/app/actions/assignment.actions';
+import DeleteAssignmentButton from '@/components/admin/DeleteAssignmentButton';
+import { deleteTeacherAssignment, getTeacherAssignments, type Assignment } from '@/app/actions/assignment.actions';
 
 const EXAM_META: Record<
   string,
@@ -62,6 +63,12 @@ export default async function TeacherAssignmentsPage({ searchParams }: PageProps
   });
 
   const studentOptions = Array.from(new Set(assignments.map((assignment) => assignment.student_email))).sort();
+
+  async function handleDelete(formData: FormData) {
+    'use server';
+    const id = formData.get('id') as string;
+    await deleteTeacherAssignment(id);
+  }
 
   return (
     <div>
@@ -147,6 +154,7 @@ export default async function TeacherAssignmentsPage({ searchParams }: PageProps
                 <th className="text-left px-4 py-3 font-semibold text-gray-600">Hạn nộp</th>
                 <th className="text-left px-4 py-3 font-semibold text-gray-600">Ngày giao</th>
                 <th className="text-left px-4 py-3 font-semibold text-gray-600">Ghi chú</th>
+                <th className="text-right px-4 py-3 font-semibold text-gray-600">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -189,6 +197,12 @@ export default async function TeacherAssignmentsPage({ searchParams }: PageProps
                       ) : (
                         '—'
                       )}
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <form action={handleDelete}>
+                        <input type="hidden" name="id" value={assignment.id} />
+                        <DeleteAssignmentButton />
+                      </form>
                     </td>
                   </tr>
                 );

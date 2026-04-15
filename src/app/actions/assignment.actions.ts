@@ -509,6 +509,52 @@ export async function bulkCreateMultiExamTeacherAssignments(
   return { success: totalSuccess, failed: [] };
 }
 
+export async function deleteTeacherAssignment(id: string): Promise<void> {
+  const ctx = await requireActiveTeacherOrAdminAndDb();
+  const { db } = ctx;
+
+  const { data: existing, error: fetchError } = await db
+    .from('exam_assignments')
+    .select('id, student_id, student_email, exam_type, serie_id, combinaison_id, partie_id, exam_label')
+    .eq('id', id)
+    .maybeSingle();
+
+  if (fetchError) throw new Error(`Lỗi lấy assignment cần xóa: ${fetchError.message}`);
+  if (!existing) throw new Error('Không tìm thấy assignment cần xóa.');
+
+  if (ctx.profile.role === 'teacher') {
+    const managedIds = await getTeacherManagedStudentIds(db, ctx.user.id);
+    const studentId = existing.student_id;
+    if (!studentId || !managedIds.includes(studentId)) {
+      throw new Error('Bạn không có quyền xóa assignment này.');
+    }
+  }
+
+  const { error } = await db.from('exam_assignments').delete().eq('id', id);
+  if (error) throw new Error(`Lỗi xóa assignment: ${error.message}`);
+
+  await logAuditEventSafely(db, {
+    actorId: ctx.user.id,
+    actorEmail: ctx.profile.email,
+    actorName: ctx.profile.full_name,
+    actorRole: ctx.profile.role,
+    action: 'assignment.delete',
+    targetType: 'exam_assignment',
+    targetId: id,
+    targetLabel: existing.student_email ?? id,
+    metadata: {
+      student_email: existing.student_email ?? null,
+      exam_type: existing.exam_type ?? null,
+      serie_id: existing.serie_id ?? null,
+      combinaison_id: existing.combinaison_id ?? null,
+      partie_id: existing.partie_id ?? null,
+      exam_label: existing.exam_label ?? null,
+    },
+  });
+
+  revalidateAssignmentViews();
+}
+
 export async function deleteAssignment(id: string): Promise<void> {
   const ctx = await requireAdminAndDb();
   const { db } = ctx;
