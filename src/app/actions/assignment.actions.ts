@@ -11,8 +11,112 @@ import {
 } from '@/lib/supabase/adminAuth';
 import { sendAssignmentEmail, buildExamRef } from '@/lib/notifications/email';
 import { vietnamDayEndIso, vietnamDayStartIso } from '@/lib/exam/deadline';
+import { assignmentExamKey as formatAssignmentExamKey } from '@/lib/exam/assignmentKeys';
 
 type ExamType = 'listening' | 'reading' | 'writing' | 'speaking';
+
+function rowToAssignmentExamKey(row: {
+  exam_type: ExamType;
+  serie_id: number | null;
+  combinaison_id: number | null;
+  partie_id: number | null;
+}): string | null {
+  if (row.exam_type === 'listening' || row.exam_type === 'reading') {
+    if (row.serie_id == null) return null;
+    return formatAssignmentExamKey(row.exam_type, row.serie_id);
+  }
+  if (row.exam_type === 'writing') {
+    if (row.combinaison_id == null) return null;
+    return formatAssignmentExamKey('writing', row.combinaison_id);
+  }
+  if (row.partie_id == null) return null;
+  return formatAssignmentExamKey('speaking', row.partie_id);
+}
+
+async function assertNoExistingAssignmentForExam(
+  db: SupabaseClient,
+  studentEmails: string[],
+  examConfig: Omit<CreateAssignmentDTO, 'student_email'>,
+) {
+  const normalized = [...new Set(studentEmails.map((e) => e.trim().toLowerCase()).filter(Boolean))];
+  if (normalized.length === 0) return;
+
+  let q = db
+    .from('exam_assignments')
+    .select('student_email')
+    .in('student_email', normalized)
+    .eq('exam_type', examConfig.exam_type);
+
+  if (examConfig.exam_type === 'listening' || examConfig.exam_type === 'reading') {
+    if (examConfig.serie_id == null) {
+      throw new Error('Thiếu serie_id cho bài nghe/đọc.');
+    }
+    q = q.eq('serie_id', examConfig.serie_id);
+  } else if (examConfig.exam_type === 'writing') {
+    if (examConfig.combinaison_id == null) {
+      throw new Error('Thiếu combinaison_id cho bài viết.');
+    }
+    q = q.eq('combinaison_id', examConfig.combinaison_id);
+  } else {
+    if (examConfig.partie_id == null) {
+      throw new Error('Thiếu partie_id cho bài nói.');
+    }
+    q = q.eq('partie_id', examConfig.partie_id);
+  }
+
+  const { data, error } = await q.limit(5);
+  if (error) throw new Error(`Kiểm tra trùng bài gán: ${error.message}`);
+  if (data && data.length > 0) {
+    const emails = [...new Set(data.map((r) => r.student_email))];
+    throw new Error(
+      `Bài thi này đã được gán trước đó cho: ${emails.join(', ')}. Xóa bài gán cũ trong danh sách giao bài trước khi gán lại.`,
+    );
+  }
+}
+
+/**
+ * Tập khóa bài đã gán (record còn trong DB) cho **bất kỳ** học viên nào trong danh sách.
+ * Dùng để chặn chọn trùng trên form gán bài.
+ */
+export async function getAlreadyAssignedExamKeysForRecipients(
+  recipientEmails: string[],
+): Promise<string[]> {
+  const ctx = await requireActiveTeacherOrAdminAndDb();
+  const { db, profile, user } = ctx;
+
+  const normalized = [...new Set(recipientEmails.map((e) => e.trim().toLowerCase()).filter(Boolean))];
+  if (normalized.length === 0) return [];
+
+  let queryEmails = normalized;
+  if (profile.role === 'teacher') {
+    const managedIds = await getTeacherManagedStudentIds(db, user.id);
+    if (managedIds.length === 0) return [];
+    const { data: profs, error: profErr } = await db
+      .from('profiles')
+      .select('email, id')
+      .in('email', normalized)
+      .eq('role', 'student');
+    if (profErr) throw new Error(`Lỗi kiểm tra học viên: ${profErr.message}`);
+    queryEmails = (profs ?? [])
+      .filter((p: { id: string }) => managedIds.includes(p.id))
+      .map((p: { email: string }) => p.email.trim().toLowerCase());
+    if (queryEmails.length === 0) return [];
+  }
+
+  const { data, error } = await db
+    .from('exam_assignments')
+    .select('exam_type, serie_id, combinaison_id, partie_id')
+    .in('student_email', queryEmails);
+
+  if (error) throw new Error(`Lỗi lấy bài đã gán: ${error.message}`);
+
+  const keys = new Set<string>();
+  for (const row of data ?? []) {
+    const k = rowToAssignmentExamKey(row as Parameters<typeof rowToAssignmentExamKey>[0]);
+    if (k) keys.add(k);
+  }
+  return Array.from(keys);
+}
 
 export interface Assignment {
   id: string;
@@ -172,6 +276,8 @@ async function createAssignmentsInternal(params: {
       assigned_by: params.actorId,
     };
   });
+
+  await assertNoExistingAssignmentForExam(db, params.studentEmails, params.examConfig);
 
   const { data, error } = await db
     .from('exam_assignments')

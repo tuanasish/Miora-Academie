@@ -7,9 +7,11 @@ import {
   bulkCreateMultiExamAssignments,
   createTeacherAssignment,
   bulkCreateMultiExamTeacherAssignments,
+  getAlreadyAssignedExamKeysForRecipients,
   type CreateAssignmentDTO,
   type StudentProfile,
 } from '@/app/actions/assignment.actions';
+import { assignmentExamKey } from '@/lib/exam/assignmentKeys';
 import {
   toVietnamDeadlineIso,
   VIETNAM_TIME_ZONE_LABEL,
@@ -19,6 +21,7 @@ import {
 import {
   Headphones, BookOpen, PenLine, Mic, User, Users, AlertTriangle,
   CheckCircle, X, Loader2, CheckSquare, Plus, Trash2, ShoppingCart,
+  ChevronDown,
 } from 'lucide-react';
 
 /* ───────── Types ───────── */
@@ -111,7 +114,12 @@ export function AssignmentForm({
   /** Ghi chú khi chỉ chọn 1 bài trực tiếp (chưa thêm vào giỏ) */
   const [pendingNote, setPendingNote] = useState('');
 
+  const [assignedExamKeys, setAssignedExamKeys] = useState<string[]>([]);
+  const [loadingAssignedKeys, setLoadingAssignedKeys] = useState(false);
+
   const prevExamTypeRef = useRef<ExamType | ''>('');
+  const [examPickerOpen, setExamPickerOpen] = useState(false);
+  const examPickerWrapRef = useRef<HTMLDivElement>(null);
 
   /* ───────── URL pre-fill ───────── */
   useEffect(() => {
@@ -209,6 +217,71 @@ export function AssignmentForm({
     }
   }, [examType]);
 
+  /* ───────── Khóa bài đã gán ───────── */
+  const recipientEmailsKey =
+    mode === 'single'
+      ? studentEmail.trim().toLowerCase()
+      : [...selectedEmails].sort().join('\0');
+
+  useEffect(() => {
+    let cancelled = false;
+    const run = async () => {
+      const emails =
+        mode === 'single'
+          ? studentEmail.trim()
+            ? [studentEmail.trim().toLowerCase()]
+            : []
+          : selectedEmails.map((e) => e.trim().toLowerCase()).filter(Boolean);
+      if (emails.length === 0) {
+        setAssignedExamKeys([]);
+        return;
+      }
+      setLoadingAssignedKeys(true);
+      try {
+        const keys = await getAlreadyAssignedExamKeysForRecipients(emails);
+        if (!cancelled) setAssignedExamKeys(keys);
+      } catch {
+        if (!cancelled) setAssignedExamKeys([]);
+      } finally {
+        if (!cancelled) setLoadingAssignedKeys(false);
+      }
+    };
+    void run();
+    return () => {
+      cancelled = true;
+    };
+  }, [mode, recipientEmailsKey]);
+
+  const isExamAlreadyAssigned = useCallback(
+    (et: ExamType, targetNum: number) => assignedExamKeys.includes(assignmentExamKey(et, targetNum)),
+    [assignedExamKeys],
+  );
+
+  useEffect(() => {
+    if (!examType || targetId === '') return;
+    if (isExamAlreadyAssigned(examType as ExamType, Number(targetId))) {
+      setTargetId('');
+    }
+  }, [examType, targetId, assignedExamKeys, isExamAlreadyAssigned]);
+
+  useEffect(() => {
+    if (!examPickerOpen) return;
+    const onDoc = (e: MouseEvent) => {
+      if (examPickerWrapRef.current && !examPickerWrapRef.current.contains(e.target as Node)) {
+        setExamPickerOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', onDoc);
+    return () => document.removeEventListener('mousedown', onDoc);
+  }, [examPickerOpen]);
+
+  useEffect(() => {
+    const taken = new Set(assignedExamKeys);
+    setCart((prev) =>
+      prev.filter((item) => !taken.has(assignmentExamKey(item.examType, item.targetId))),
+    );
+  }, [assignedExamKeys]);
+
   /* ───────── Due Date Validation ───────── */
   const handleDueDateChange = useCallback((value: string) => {
     if (!value) {
@@ -241,6 +314,11 @@ export function AssignmentForm({
   /* ───────── Cart actions ───────── */
   const addToCart = () => {
     if (!examType || targetId === '') return;
+
+    if (isExamAlreadyAssigned(examType as ExamType, Number(targetId))) {
+      setError('Bài này đã được gán cho học viên đã chọn.');
+      return;
+    }
 
     // Prevent duplicates
     const alreadyExists = cart.some(
@@ -314,6 +392,13 @@ export function AssignmentForm({
       return;
     }
 
+    const taken = new Set(assignedExamKeys);
+    const conflict = finalCart.find((item) => taken.has(assignmentExamKey(item.examType, item.targetId)));
+    if (conflict) {
+      setError(`Bài "${conflict.displayLabel}" trùng với bài đã gán.`);
+      return;
+    }
+
     if (mode === 'single' && !studentEmail) {
       setError('Vui lòng chọn học viên.');
       return;
@@ -383,7 +468,7 @@ export function AssignmentForm({
       const raw = err instanceof Error ? err.message : 'Lỗi không xác định';
       // Map known DB errors → friendly messages
       if (raw.includes('duplicate key') || raw.includes('unique constraint')) {
-        setError('Một số học viên đã được gán chính xác bài thi này trước đó (trùng lặp). Vui lòng kiểm tra lại danh sách bài đã gán.');
+        setError('Bài thi này đã được gán trùng.');
       } else {
         setError(raw);
       }
@@ -400,6 +485,11 @@ export function AssignmentForm({
     groupedOptions.get(group)!.push(opt);
   });
   const hasGroups = examOptions.some((o) => o.group);
+
+  const currentPickerBlocked =
+    Boolean(examType) &&
+    targetId !== '' &&
+    isExamAlreadyAssigned(examType as ExamType, Number(targetId));
 
   /* ───────── Render ───────── */
   return (
@@ -522,7 +612,10 @@ export function AssignmentForm({
             <button
               key={et.value}
               type="button"
-              onClick={() => setExamType(et.value)}
+              onClick={() => {
+                setExamType(et.value);
+                setExamPickerOpen(false);
+              }}
               className={`flex items-center gap-3 rounded-xl border-2 p-4 text-left transition-all ${
                 examType === et.value ? et.activeColor : et.color
               }`}
@@ -533,39 +626,127 @@ export function AssignmentForm({
           ))}
         </div>
 
-        {/* Specific exam select */}
+        {/* Bài cụ thể — dropdown nổi (giống select native) */}
         {examType && (
           <div>
             <label className="block text-sm font-medium text-gray-600 mb-1.5">
               Bài cụ thể
               {loadingOptions && <span className="text-gray-400 font-normal ml-2">Đang tải...</span>}
             </label>
-            <select
-              value={targetId}
-              onChange={(e) => setTargetId(Number(e.target.value))}
-              className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-              disabled={loadingOptions}
-            >
-              <option value="">— Chọn bài —</option>
-              {hasGroups
-                ? Array.from(groupedOptions.entries()).map(([group, opts]) => (
-                    <optgroup key={group} label={group}>
-                      {opts.map((opt) => (
-                        <option key={opt.value} value={opt.value}>
-                          {opt.label}
-                        </option>
-                      ))}
-                    </optgroup>
-                  ))
-                : examOptions.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </option>
-                  ))}
-            </select>
-            <p className="text-xs text-gray-400 mt-1">
-              {examOptions.length} bài khả dụng
-            </p>
+            {loadingOptions || loadingAssignedKeys ? (
+              <p className="text-sm text-gray-400 py-3">Đang tải…</p>
+            ) : (
+              <div ref={examPickerWrapRef} className="relative">
+                <button
+                  type="button"
+                  id="assignment-exam-target-trigger"
+                  aria-haspopup="listbox"
+                  aria-expanded={examPickerOpen}
+                  onClick={() => setExamPickerOpen((o) => !o)}
+                  className="flex w-full items-center justify-between gap-2 rounded-lg border border-gray-300 bg-white px-4 py-3 text-left text-sm shadow-sm transition hover:border-gray-400 hover:bg-gray-50/80 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <span
+                    className={
+                      targetId === ''
+                        ? 'text-gray-400'
+                        : 'truncate font-medium text-gray-900'
+                    }
+                  >
+                    {targetId === ''
+                      ? '— Chọn bài —'
+                      : examOptions.find((o) => o.value === Number(targetId))?.label ?? `#${targetId}`}
+                  </span>
+                  <ChevronDown
+                    className={`h-5 w-5 shrink-0 text-gray-500 transition-transform ${examPickerOpen ? 'rotate-180' : ''}`}
+                    aria-hidden
+                  />
+                </button>
+
+                {examPickerOpen && (
+                  <div
+                    className="absolute left-0 right-0 z-[100] mt-1 max-h-[min(28rem,60vh)] overflow-y-auto rounded-xl border border-gray-200 bg-white py-1 shadow-xl ring-1 ring-black/10"
+                    role="listbox"
+                    aria-labelledby="assignment-exam-target-trigger"
+                  >
+                    {hasGroups
+                      ? Array.from(groupedOptions.entries()).map(([group, opts]) => (
+                          <div key={group}>
+                            <div className="sticky top-0 z-[1] bg-gray-100 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide text-gray-500">
+                              {group}
+                            </div>
+                            {opts.map((opt) => {
+                              const blocked = isExamAlreadyAssigned(examType as ExamType, opt.value);
+                              const selected = targetId !== '' && Number(targetId) === opt.value;
+                              return (
+                                <button
+                                  key={opt.value}
+                                  type="button"
+                                  disabled={blocked}
+                                  role="option"
+                                  aria-selected={selected}
+                                  onClick={() => {
+                                    if (blocked) return;
+                                    setTargetId(opt.value);
+                                    setExamPickerOpen(false);
+                                  }}
+                                  className={`flex w-full items-center justify-between gap-2 px-3 py-2.5 text-left text-sm transition-colors ${
+                                    blocked
+                                      ? 'cursor-not-allowed bg-gray-50 text-gray-400 opacity-60'
+                                      : selected
+                                        ? 'bg-blue-50 font-semibold text-blue-900'
+                                        : 'text-gray-800 hover:bg-gray-50'
+                                  }`}
+                                >
+                                  <span className="min-w-0 truncate">{opt.label}</span>
+                                  {blocked ? (
+                                    <span className="shrink-0 rounded border border-gray-200 bg-gray-100 px-1.5 py-0.5 text-[10px] font-bold uppercase text-gray-500">
+                                      Đã gán
+                                    </span>
+                                  ) : null}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        ))
+                      : examOptions.map((opt) => {
+                          const blocked = isExamAlreadyAssigned(examType as ExamType, opt.value);
+                          const selected = targetId !== '' && Number(targetId) === opt.value;
+                          return (
+                            <button
+                              key={opt.value}
+                              type="button"
+                              disabled={blocked}
+                              role="option"
+                              aria-selected={selected}
+                              onClick={() => {
+                                if (blocked) return;
+                                setTargetId(opt.value);
+                                setExamPickerOpen(false);
+                              }}
+                              className={`flex w-full items-center justify-between gap-2 border-b border-gray-50 px-3 py-2.5 text-left text-sm transition-colors last:border-b-0 ${
+                                blocked
+                                  ? 'cursor-not-allowed bg-gray-50 text-gray-400 opacity-60'
+                                  : selected
+                                    ? 'bg-blue-50 font-semibold text-blue-900'
+                                    : 'text-gray-800 hover:bg-gray-50'
+                              }`}
+                            >
+                              <span className="min-w-0 truncate">{opt.label}</span>
+                              {blocked ? (
+                                <span className="shrink-0 rounded border border-gray-200 bg-gray-100 px-1.5 py-0.5 text-[10px] font-bold uppercase text-gray-500">
+                                  Đã gán
+                                </span>
+                              ) : null}
+                            </button>
+                          );
+                        })}
+                  </div>
+                )}
+              </div>
+            )}
+            {!loadingOptions && !loadingAssignedKeys && (
+              <p className="text-xs text-gray-400 mt-1">{examOptions.length} bài trong danh mục</p>
+            )}
           </div>
         )}
 
@@ -573,7 +754,7 @@ export function AssignmentForm({
         <button
           type="button"
           onClick={addToCart}
-          disabled={!examType || targetId === ''}
+          disabled={!examType || targetId === '' || currentPickerBlocked || loadingAssignedKeys}
           className="w-full flex items-center justify-center gap-2 rounded-lg border-2 border-blue-200 bg-blue-50 px-4 py-2.5 text-sm font-semibold text-blue-700 hover:bg-blue-100 hover:border-blue-300 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
         >
           <Plus className="w-4 h-4" /> Thêm vào danh sách gán

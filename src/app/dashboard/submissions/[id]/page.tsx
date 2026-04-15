@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, BookOpen, Headphones } from "lucide-react";
 
-import McqSubmissionReview from "@/components/exam/McqSubmissionReview";
+import DashboardSubmissionMcqSection from "@/components/exam/DashboardSubmissionMcqSection";
 import { getSubmissionIfOwner, markSubmissionFeedbackViewed } from "@/app/actions/submission.actions";
 import { getMcqQuestionsForSerie } from "@/lib/exam/loadMcqExamData";
 import { storedAnswersToIndices } from "@/lib/exam/mcqAnswers";
@@ -127,8 +127,10 @@ export default async function DashboardSubmissionReviewPage({ params }: PageProp
       <div className="max-w-4xl mx-auto px-4 mt-8">
         
         {/* MCQ Details */}
-        {(sub.exam_type === "listening" || sub.exam_type === "reading") && mcqQuestions && (
-          <McqSubmissionReview
+        {(sub.exam_type === "listening" || sub.exam_type === "reading") && mcqQuestions && sub.serie_id != null && (
+          <DashboardSubmissionMcqSection
+            examType={sub.exam_type}
+            serieId={sub.serie_id}
             questions={mcqQuestions}
             userAnswerByQuestionId={storedAnswersToIndices(sub.answers)}
             variant="full"

@@ -186,10 +186,11 @@ export default function ListeningSerieExamPage() {
     const correctCount = questions.filter((q2) => answers[q2.id] === q2.correctAnswerIndex).length;
     return (
       <ScoreReveal serieId={serieId} correct={correctCount} total={total} examType="listening">
-        <div className="max-w-3xl mx-auto px-4 mt-6">
+        <div className="max-w-3xl mx-auto px-4 mt-6 pb-8">
           <McqSubmissionReview
             questions={questions}
             userAnswerByQuestionId={answers}
+            questionNotesById={questionNotes}
             variant="full"
             title="📋 Correction"
             animateRows

@@ -1,9 +1,9 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import {
   PenLine, ChevronLeft, Clock, Hash, Timer, Send, AlignLeft, CheckCircle2, Loader2,
 } from "lucide-react";
-import { useCountdown, useStopwatch } from "@/hooks/useTimer";
+import { useCountdown } from "@/hooks/useTimer";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -67,16 +67,36 @@ export default function WritingExamPage() {
   const deadline = useAssignmentDeadline("writing", combinaisonId);
 
   const globalTimer = useCountdown(60 * 60, true);
-  const stopwatch = useStopwatch(true);
-  const wcRef = useRef([0, 0, 0]);
-  const idlePauseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const clearIdlePauseTimer = () => {
-    if (idlePauseTimerRef.current) {
-      clearTimeout(idlePauseTimerRef.current);
-      idlePauseTimerRef.current = null;
-    }
-  };
+  /** Mốc bắt đầu đoạn đang chạy của task hiện tại (giây thực). null = tạm dừng cho đến khi gõ lại (task cũ). */
+  const sessionStartMsRef = useRef<number | null>(null);
+  const [, setTick] = useState(0);
+
+  const flushSessionIntoTaskTimes = useCallback((taskIndex: number) => {
+    if (sessionStartMsRef.current == null) return;
+    const add = Math.floor((Date.now() - sessionStartMsRef.current) / 1000);
+    sessionStartMsRef.current = null;
+    if (add <= 0) return;
+    setTaskTimes((prev) => {
+      const next = [...prev];
+      next[taskIndex] += add;
+      return next;
+    });
+  }, []);
+
+  /** Giây hiển thị: thời gian đã cộng dồn + đoạn đang chạy (1 giây thật = +1, không gắn với từ/ký tự). */
+  const secondsForTask = useCallback(
+    (taskIndex: number) => {
+      const base = taskTimes[taskIndex];
+      if (taskIndex !== activeTask) return base;
+      if (sessionStartMsRef.current == null) return base;
+      return base + Math.floor((Date.now() - sessionStartMsRef.current) / 1000);
+    },
+    [taskTimes, activeTask],
+  );
+
+  const formatChrono = (sec: number) =>
+    `${String(Math.floor(sec / 60)).padStart(2, "0")}:${String(sec % 60).padStart(2, "0")}`;
 
   useEffect(() => {
     fetch("/data/writing.json")
@@ -88,6 +108,19 @@ export default function WritingExamPage() {
       })
       .catch(() => setLoading(false));
   }, [combinaisonId]);
+
+  /** Bắt đầu bài: tâche hiện tại tự đếm theo thời gian thực. */
+  useEffect(() => {
+    if (!item || submitted) return;
+    sessionStartMsRef.current = Date.now();
+  }, [combinaisonId, submitted, item]);
+
+  /** Re-render mỗi giây khi đang làm bài để đồng hồ chạy mượt. */
+  useEffect(() => {
+    if (!item || submitted) return;
+    const id = setInterval(() => setTick((t) => t + 1), 1000);
+    return () => clearInterval(id);
+  }, [item, submitted]);
 
   const tasks = item
     ? [
@@ -119,42 +152,35 @@ export default function WritingExamPage() {
 
   const handleTaskSwitch = (idx: number) => {
     if (idx === activeTask) return;
-    const saved = [...taskTimes];
-    saved[activeTask] = stopwatch.seconds;
-    setTaskTimes(saved);
-    clearIdlePauseTimer();
-    stopwatch.pause();
-    stopwatch.setElapsed(saved[idx] ?? 0);
+
+    flushSessionIntoTaskTimes(activeTask);
+
+    const alreadyWorkedOnDestination = taskTimes[idx] > 0 || texts[idx].trim().length > 0;
+    if (alreadyWorkedOnDestination) {
+      sessionStartMsRef.current = null;
+    } else {
+      sessionStartMsRef.current = Date.now();
+    }
+
     setActiveTask(idx);
   };
 
   const wordCount = (text: string) =>
     text.trim() === "" ? 0 : text.trim().split(/\s+/).length;
 
-  const markTypingForTask = (taskIndex: number, nextText: string) => {
-    const nextWc = wordCount(nextText);
-    const prevWc = wcRef.current[taskIndex] ?? 0;
-
-    // Chỉ tính thời gian khi "số chữ" thay đổi (đúng yêu cầu).
-    if (nextWc === prevWc) return;
-
-    wcRef.current[taskIndex] = nextWc;
-    clearIdlePauseTimer();
-    if (!stopwatch.isRunning) stopwatch.start();
-
-    // Ngừng gõ -> tự dừng đếm (xem thôi không tính).
-    idlePauseTimerRef.current = setTimeout(() => {
-      stopwatch.pause();
-    }, 2000);
+  /** Quay lại task cũ: đồng hừ đếm khi gõ/sửa lại. */
+  const resumeSessionIfPaused = () => {
+    if (sessionStartMsRef.current === null) {
+      sessionStartMsRef.current = Date.now();
+    }
   };
 
   const insertChar = (char: string) => {
     const taskIndex = activeTask;
+    resumeSessionIfPaused();
     setTexts((prev) => {
       const n = [...prev];
-      const nextText = (n[taskIndex] ?? "") + char;
-      n[taskIndex] = nextText;
-      markTypingForTask(taskIndex, nextText);
+      n[taskIndex] = (n[taskIndex] ?? "") + char;
       return n;
     });
   };
@@ -245,7 +271,7 @@ export default function WritingExamPage() {
           </div>
           <div className="flex flex-col p-3 gap-2">
             {tasks.map((t, idx) => {
-              const thisTime = idx === activeTask ? stopwatch.seconds : taskTimes[idx];
+              const thisTime = secondsForTask(idx);
               const mins = String(Math.floor(thisTime / 60)).padStart(2, "0");
               const secs = String(thisTime % 60).padStart(2, "0");
               const wc2 = wordCount(texts[idx]);
@@ -273,9 +299,12 @@ export default function WritingExamPage() {
               onClick={async () => {
                 setSubmitting(true);
                 setSubmitError(null);
-                // Save final task time
                 const finalTimes = [...taskTimes];
-                finalTimes[activeTask] = stopwatch.seconds;
+                if (sessionStartMsRef.current != null) {
+                  finalTimes[activeTask] += Math.floor(
+                    (Date.now() - sessionStartMsRef.current) / 1000,
+                  );
+                }
                 const supabase = createClient();
                 const { data: { user } } = await supabase.auth.getUser();
                 const wc = texts.map((t) => t.trim() === "" ? 0 : t.trim().split(/\s+/).length);
@@ -360,12 +389,12 @@ export default function WritingExamPage() {
                 onChange={(e) => {
                   const nextValue = e.target.value;
                   const taskIndex = activeTask;
+                  resumeSessionIfPaused();
                   setTexts((prev) => {
                     const n = [...prev];
                     n[taskIndex] = nextValue;
                     return n;
                   });
-                  markTypingForTask(taskIndex, nextValue);
                 }}
               />
             </div>
@@ -381,10 +410,11 @@ export default function WritingExamPage() {
               <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Chrono de tâche</span>
             </div>
             <div className="text-2xl font-mono font-bold text-violet-700 text-center bg-violet-50 rounded-xl py-2">
-              {stopwatch.formatted}
+              {formatChrono(secondsForTask(activeTask))}
             </div>
             <p className="mt-2 text-xs text-slate-400 text-center">
-              Tự chạy khi bạn gõ (số chữ thay đổi) · Dừng khi bạn ngừng gõ.
+              Đếm thời gian thực (1 giây = 1 giây) · Task mới tự chạy · Quay lại task cũ: giữ thời gian đã lưu, gõ
+              tiếp thì cộng thêm.
             </p>
           </div>
 

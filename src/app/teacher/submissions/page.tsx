@@ -223,54 +223,67 @@ export default async function TeacherSubmissionsPage({ searchParams }: PageProps
                 return (
                   <tr
                     key={submission.id}
-                    className={`transition-colors align-middle ${
-                      unread ? 'bg-gray-100/80' : 'bg-white'
-                    } hover:bg-gray-50`}
+                    className={`align-middle transition-colors border-b border-gray-200/90 ${
+                      unread
+                        ? 'bg-[#dadce0] shadow-[inset_4px_0_0_0_#1a73e8,inset_0_1px_0_rgba(255,255,255,0.35)] hover:bg-[#cfd3d9]'
+                        : 'bg-white hover:bg-[#f6f8fc]'
+                    }`}
                   >
                     <td className="p-0 align-middle">
                       <Link
                         href={detailHref}
-                        className={`block px-4 py-3 text-blue-600 hover:underline ${
-                          unread ? 'font-semibold' : 'font-medium'
+                        className={`block px-4 py-3.5 text-[#1a73e8] hover:underline ${
+                          unread ? 'font-bold' : 'font-medium'
                         }`}
                       >
                         {submission.student_email}
                       </Link>
                     </td>
                     <td className="p-0 align-middle">
-                      <Link href={detailHref} className="block px-4 py-3">
+                      <Link href={detailHref} className="block px-4 py-3.5">
                         <span
-                          className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold ${badge.cls}`}
+                          className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold ${badge.cls} ${
+                            unread ? 'ring-1 ring-slate-400/40' : ''
+                          }`}
                         >
                           <BadgeIcon className="w-3 h-3" /> {badge.label}
                         </span>
                       </Link>
                     </td>
                     <td className="p-0 align-middle">
-                      <Link href={detailHref} className={`block px-4 py-3 text-gray-700 ${unread ? 'font-semibold' : 'font-medium'}`}>
+                      <Link
+                        href={detailHref}
+                        className={`block px-4 py-3.5 text-gray-800 ${unread ? 'font-bold' : 'font-medium'}`}
+                      >
                         {examRef(submission)}
                       </Link>
                     </td>
                     <td className="p-0 align-middle">
-                      <Link href={detailHref} className={`block px-4 py-3 text-gray-800 ${unread ? 'font-bold' : 'font-semibold'}`}>
+                      <Link
+                        href={detailHref}
+                        className={`block px-4 py-3.5 text-gray-900 ${unread ? 'font-extrabold' : 'font-semibold'}`}
+                      >
                         {scoreDisplay(submission)}
                       </Link>
                     </td>
                     <td className="p-0 align-middle">
                       <Link
                         href={detailHref}
-                        className={`flex items-center gap-1 px-4 py-3 text-gray-500 ${unread ? 'font-semibold' : ''}`}
+                        className={`flex items-center gap-1 px-4 py-3.5 ${unread ? 'font-bold text-gray-700' : 'text-gray-500'}`}
                       >
-                        <Clock className="w-3 h-3" /> {fmtTime(submission.time_spent_seconds)}
+                        <Clock className="w-3 h-3 shrink-0 opacity-80" /> {fmtTime(submission.time_spent_seconds)}
                       </Link>
                     </td>
                     <td className="p-0 align-middle">
-                      <Link href={detailHref} className={`block px-4 py-3 text-xs text-gray-500 ${unread ? 'font-semibold' : ''}`}>
+                      <Link
+                        href={detailHref}
+                        className={`block px-4 py-3.5 text-xs ${unread ? 'font-bold text-gray-700' : 'font-medium text-gray-500'}`}
+                      >
                         {fmtDate(submission.submitted_at)}
                       </Link>
                     </td>
                     <td className="p-0 align-middle">
-                      <Link href={detailHref} className="flex min-h-[2.75rem] items-center px-4 py-3">
+                      <Link href={detailHref} className="flex min-h-[2.75rem] items-center px-4 py-3.5">
                         {graded ? (
                           <span className="inline-flex shrink-0 items-center whitespace-nowrap rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-bold text-emerald-700">
                             Đã chấm
@@ -280,7 +293,13 @@ export default async function TeacherSubmissionsPage({ searchParams }: PageProps
                             Chờ chấm
                           </span>
                         ) : (
-                          <span className="shrink-0 whitespace-nowrap text-xs text-gray-400">
+                          <span
+                            className={`shrink-0 whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-bold ${
+                              unread
+                                ? 'bg-slate-500/25 text-slate-800 ring-1 ring-slate-500/30'
+                                : 'text-gray-400'
+                            }`}
+                          >
                             Tự chấm
                           </span>
                         )}

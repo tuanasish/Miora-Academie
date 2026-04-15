@@ -1,7 +1,7 @@
 "use client";
 
 import { indexToLetter } from "@/lib/exam/mcqAnswers";
-import { Volume2 } from "lucide-react";
+import { StickyNote, Volume2 } from "lucide-react";
 
 export interface McqReviewQuestion {
   id: number;
@@ -19,6 +19,8 @@ export interface McqSubmissionReviewProps {
   questions: McqReviewQuestion[];
   /** Per question id: selected option index, or omit if unanswered */
   userAnswerByQuestionId: Record<number, number>;
+  /** Ghi chú lúc làm bài (localStorage / state), theo question id */
+  questionNotesById?: Record<number, string>;
   /** compact: badges only; full: four options with green/red fill */
   variant?: "compact" | "full";
   title?: string;
@@ -45,6 +47,7 @@ function formatQuestionMeta(q: McqReviewQuestion, zeroBasedIndex: number): strin
 export default function McqSubmissionReview({
   questions,
   userAnswerByQuestionId,
+  questionNotesById,
   variant = "full",
   title = "Correction",
   animateRows = false,
@@ -72,6 +75,8 @@ export default function McqSubmissionReview({
           const delayStyle = animateRows
             ? { animationDelay: `${Math.min(idx * 0.03, 0.5)}s` }
             : undefined;
+          const noteRaw = questionNotesById?.[q2.id];
+          const noteTrimmed = noteRaw?.trim() ?? "";
 
           if (variant === "compact") {
             return (
@@ -156,6 +161,24 @@ export default function McqSubmissionReview({
 
               <div className="mx-auto w-full max-w-2xl space-y-3 pt-2">
                 <p className="text-sm text-[#3d3d3d] leading-snug text-center">{q2.prompt}</p>
+
+                {noteTrimmed ? (
+                  <div
+                    role="note"
+                    aria-label="Ghi chú lúc làm bài"
+                    className="flex gap-3 rounded-2xl border border-[#e8e2d8] bg-gradient-to-b from-[#fffcfa] to-[#faf7f2] px-3.5 py-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.75)] sm:px-4"
+                  >
+                    <div
+                      className="flex h-9 w-9 shrink-0 items-center justify-center self-start rounded-xl bg-white/80 text-[#d4a574] ring-1 ring-[#eadfd0]/80"
+                      aria-hidden
+                    >
+                      <StickyNote className="h-4 w-4" strokeWidth={1.75} />
+                    </div>
+                    <p className="min-w-0 flex-1 whitespace-pre-wrap break-words text-[13px] leading-[1.65] text-[#3a3632]">
+                      {noteTrimmed}
+                    </p>
+                  </div>
+                ) : null}
 
                 {q2.audioUrl && (
                   <div

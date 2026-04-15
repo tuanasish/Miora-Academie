@@ -1,8 +1,10 @@
 "use client";
 import { useEffect, useState, useMemo } from "react";
-import { CheckCircle2, ArrowLeft, ChevronRight, Trophy, Star, Target, BookmarkPlus } from "lucide-react";
+import { CheckCircle2, ArrowLeft, ChevronRight, Trophy, Star, Target } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { FlashcardCreateModal } from "@/components/flashcards/FlashcardCreateModal";
+import { FloatingFlashcardDock } from "@/components/exam/FloatingFlashcardDock";
 
 interface Props {
   serieId: number;
@@ -60,12 +62,12 @@ export default function ScoreReveal({ serieId, correct, total, examType, childre
   const listHref = `/exam/${examType}`;
   const nextHref = serieId < 40 ? `/exam/${examType}/${serieId + 1}` : null;
   const [flashOpen, setFlashOpen] = useState(false);
-  const flashcardsHref = "/dashboard/flashcards";
+  const pathname = usePathname();
 
   const confettiColors = ["#f05e23", "#f59e0b", "#10b981", "#8b5cf6", "#ec4899", "#06b6d4"];
 
   return (
-    <div className="min-h-screen bg-[#f3efe6] pb-12">
+    <div className="min-h-screen bg-[#f3efe6] pb-28">
       {/* Confetti */}
       {showConfetti && (
         <div className="fixed inset-0 pointer-events-none z-50">
@@ -134,20 +136,6 @@ export default function ScoreReveal({ serieId, correct, total, examType, childre
             className="flex items-center gap-2 text-sm text-[#5d5d5d] border border-[#e4ddd1] rounded-xl px-4 py-2.5 hover:bg-[#f3efe6] transition-colors">
             <ArrowLeft className="w-4 h-4" />Liste des séries
           </Link>
-          <button
-            type="button"
-            onClick={() => setFlashOpen(true)}
-            className="flex items-center gap-2 text-sm bg-amber-600 text-white rounded-xl px-4 py-2.5 hover:bg-amber-700 transition-colors font-semibold"
-          >
-            <BookmarkPlus className="w-4 h-4" />
-            Tạo flashcard
-          </button>
-          <Link
-            href={flashcardsHref}
-            className="flex items-center gap-2 text-sm text-amber-800 border border-amber-200 bg-amber-50 rounded-xl px-4 py-2.5 hover:bg-amber-100 transition-colors font-semibold"
-          >
-            Xem flashcards
-          </Link>
           {nextHref && (
             <Link href={nextHref}
               className="flex items-center gap-2 text-sm bg-[#f05e23] text-white rounded-xl px-4 py-2.5 hover:bg-[#d85118] transition-colors font-semibold">
@@ -160,6 +148,7 @@ export default function ScoreReveal({ serieId, correct, total, examType, childre
       {/* Correction list (passed as children) */}
       {showContent && children}
 
+      <FloatingFlashcardDock onOpenCreate={() => setFlashOpen(true)} returnPathOverride={pathname ?? undefined} />
       <FlashcardCreateModal
         open={flashOpen}
         onClose={() => setFlashOpen(false)}

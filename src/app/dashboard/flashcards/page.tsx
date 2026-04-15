@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { Trash2, Loader2, BookOpen, ArrowLeft, ChevronLeft, ChevronRight, Shuffle, Plus, Pencil, Check, X } from "lucide-react";
+import { Trash2, Loader2, BookOpen, ArrowLeft, ChevronLeft, ChevronRight, Shuffle, Plus, Pencil, Check, X, ClipboardList } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 type ExamType = "listening" | "reading" | "writing" | "speaking" | null;
 
@@ -24,6 +24,35 @@ function examLabel(examType: ExamType) {
   if (examType === "writing") return "Viết";
   if (examType === "speaking") return "Nói";
   return "—";
+}
+
+function safeInternalPath(path: string | null): string | null {
+  if (!path || !path.startsWith("/") || path.startsWith("//")) return null;
+  return path;
+}
+
+/** Nút quay lại trang xem đáp án khi mở flashcards từ correction (query `returnTo`). */
+function CorrectionBackButton() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const back = safeInternalPath(searchParams.get("returnTo"));
+  if (!back) return null;
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        try {
+          router.push(back);
+        } catch {
+          if (typeof window !== "undefined") window.location.href = back;
+        }
+      }}
+      className="inline-flex items-center gap-2 text-sm font-semibold text-amber-900 border border-amber-300 bg-amber-50 rounded-xl px-4 py-2.5 hover:bg-amber-100 transition-colors"
+    >
+      <ClipboardList className="w-4 h-4 shrink-0" />
+      Quay lại xem đáp án
+    </button>
+  );
 }
 
 export default function FlashcardsPage() {
@@ -96,7 +125,10 @@ export default function FlashcardsPage() {
   return (
     <div className="min-h-screen bg-[#f3efe6] px-4 py-8">
       <div className="max-w-4xl mx-auto">
-        <div className="flex items-center gap-3 mb-6">
+        <div className="flex flex-wrap items-center gap-3 mb-6">
+          <Suspense fallback={null}>
+            <CorrectionBackButton />
+          </Suspense>
           <button
             type="button"
             onClick={() => {
@@ -519,4 +551,3 @@ export default function FlashcardsPage() {
     </div>
   );
 }
-
