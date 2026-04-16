@@ -443,8 +443,8 @@ export default async function TeacherSubmissionDetailPage({ params, searchParams
                 name="admin_score"
                 min={0}
                 max={ADMIN_GRADE_MAX}
-                step={0.5}
-                inputMode="decimal"
+                step={1}
+                inputMode="numeric"
                 defaultValue={sub.admin_score ?? ''}
                 required
                 className="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-lg font-bold text-gray-800 focus:ring-2 focus:ring-violet-300 focus:border-violet-400 outline-none"

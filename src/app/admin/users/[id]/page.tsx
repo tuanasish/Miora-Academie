@@ -3,6 +3,7 @@ import { notFound, redirect } from 'next/navigation';
 import { ArrowLeft, SquarePen } from 'lucide-react';
 
 import { deactivateUser, getUserById, updateUserProfile } from '@/app/actions/user.actions';
+import { HardDeleteUserButton } from './HardDeleteUserButton';
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -136,6 +137,8 @@ export default async function AdminEditUserPage({ params }: PageProps) {
             Disable tài khoản
           </button>
         </form>
+
+        <HardDeleteUserButton userId={user.id} userEmail={user.email} />
       </div>
     </div>
   );

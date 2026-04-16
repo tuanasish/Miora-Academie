@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { LayoutDashboard, Users, FileCheck, ClipboardList } from 'lucide-react';
+import { LayoutDashboard, Users, FileCheck, ClipboardList, Library } from 'lucide-react';
 
 import { getCurrentUserProfile } from '@/lib/supabase/adminAuth';
 import { ASSETS } from '@/components/landing/landing-data';
@@ -54,6 +54,9 @@ export default async function TeacherLayout({
           </Link>
           <Link href="/teacher/submissions" className="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-md font-medium hover:bg-purple-50 hover:text-purple-600 transition-colors">
             <FileCheck className="w-4 h-4" /> Chấm bài
+          </Link>
+          <Link href="/teacher/exams" className="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-md font-medium hover:bg-purple-50 hover:text-purple-600 transition-colors">
+            <Library className="w-4 h-4" /> Ngân hàng đề
           </Link>
         </nav>
       </aside>

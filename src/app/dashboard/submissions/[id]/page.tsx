@@ -217,7 +217,7 @@ export default async function DashboardSubmissionReviewPage({ params }: PageProp
                     {reviewForTask && reviewForTask.length > 0 ? (
                       <div 
                         className="prose prose-sm max-w-none text-blue-900 leading-relaxed prose-headings:text-blue-900 prose-p:text-blue-900"
-                        dangerouslySetInnerHTML={{ __html: plainTextToReviewHtml(reviewForTask) }}
+                        dangerouslySetInnerHTML={{ __html: reviewForTask }}
                       />
                     ) : (
                       <p className="text-sm text-blue-900 whitespace-pre-wrap leading-relaxed">

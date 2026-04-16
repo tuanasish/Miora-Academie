@@ -289,6 +289,40 @@ export async function deactivateUser(id: string): Promise<void> {
   await updateUserStatus(id, 'disabled');
 }
 
+export async function hardDeleteUser(id: string): Promise<void> {
+  const ctx = await requireAdminAndDb();
+  const { db } = ctx;
+
+  const { data: beforeProfile } = await db
+    .from('profiles')
+    .select('email, full_name, role')
+    .eq('id', id)
+    .maybeSingle();
+
+  const { error: authError } = await db.auth.admin.deleteUser(id);
+  if (authError) {
+    throw new Error(`Lỗi xóa user từ hệ thống Auth: ${authError.message}`);
+  }
+
+  // Thử xóa profile phòng trường hợp FK không có ON DELETE CASCADE
+  await db.from('profiles').delete().eq('id', id);
+  // (Thực tế nếu `db.auth.admin.deleteUser` chặn do Foreign Key constraint, nó sẽ ném lỗi ngay dòng trên)
+
+  await logAuditEventSafely(db, {
+    ...buildAuditActor(ctx),
+    action: 'user.hard_delete',
+    targetType: 'profile',
+    targetId: id,
+    targetLabel: beforeProfile?.email || id,
+    metadata: {
+      deleted_role: beforeProfile?.role,
+      deleted_name: beforeProfile?.full_name,
+    },
+  });
+
+  revalidateUserAdminViews();
+}
+
 async function validateTeacherStudentPair(db: NonNullable<ReturnType<typeof createPrivilegedSupabase>>, teacherId: string, studentId: string) {
   const { data: profiles, error } = await db
     .from('profiles')
