@@ -27,8 +27,30 @@ export async function getMyStreak(): Promise<StudentStreakData> {
 
   if (error || !data) return { current_streak: 0, longest_streak: 0, last_activity_date: null };
 
+  // Auto-reset stale streak on read (fallback khi cron không chạy)
+  let currentStreak = data.current_streak ?? 0;
+  if (currentStreak > 0 && data.last_activity_date) {
+    const now = new Date();
+    const vnNow = new Date(now.getTime() + 7 * 60 * 60 * 1000);
+    const todayStr = vnNow.toISOString().slice(0, 10);
+    const yesterday = new Date(vnNow);
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = yesterday.toISOString().slice(0, 10);
+
+    // Nếu last_activity cũ hơn hôm qua -> streak đã mất
+    if (data.last_activity_date < yesterdayStr) {
+      currentStreak = 0;
+      // Fire-and-forget: cập nhật DB
+      void supabase
+        .from('streaks')
+        .update({ current_streak: 0, updated_at: new Date().toISOString() })
+        .eq('student_id', user.id)
+        .then();
+    }
+  }
+
   return {
-    current_streak: data.current_streak ?? 0,
+    current_streak: currentStreak,
     longest_streak: data.highest_streak ?? 0,
     last_activity_date: data.last_activity_date ?? null,
   };

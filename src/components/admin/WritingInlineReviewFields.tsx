@@ -1,11 +1,16 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { useState } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { Mark, mergeAttributes } from '@tiptap/core';
+import { TextSelection } from '@tiptap/pm/state';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
+import { SuggestionDeleteMark } from '@/lib/tiptap/SuggestionDeleteMark';
+import { SuggestionInsertMark } from '@/lib/tiptap/SuggestionInsertMark';
+import { generateSuggestionId, createSuggestion } from '@/lib/exam/suggestions';
+import type { Suggestion, ReviewMode, WritingTaskKey } from '@/lib/exam/writingReview';
 import {
   AlertCircle,
   Bold,
@@ -18,9 +23,12 @@ import {
   Undo2,
   Redo2,
   PenTool,
+  Pencil,
+  MessageSquarePlus,
+  Eye,
 } from 'lucide-react';
 
-type WritingTaskKey = 't1' | 't2' | 't3';
+// ── Types ────────────────────────────────────────────
 
 interface WritingTaskReviewField {
   key: WritingTaskKey;
@@ -28,6 +36,8 @@ interface WritingTaskReviewField {
   originalHtml: string;
   initialHtml: string;
 }
+
+// ── Existing marks (editing mode) ────────────────────
 
 const ReviewErrorMark = Mark.create({
   name: 'reviewError',
@@ -69,23 +79,33 @@ const ReviewFixMark = Mark.create({
   },
 });
 
+// ── Shared ToolbarButton ─────────────────────────────
+
 function ToolbarButton({
   active,
   children,
   onClick,
+  disabled,
+  title,
 }: {
   active?: boolean;
   children: ReactNode;
   onClick: () => void;
+  disabled?: boolean;
+  title?: string;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
+      disabled={disabled}
+      title={title}
       className={`inline-flex items-center gap-1 rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-colors ${
-        active
-          ? 'border-violet-300 bg-violet-100 text-violet-800'
-          : 'border-gray-200 bg-white text-gray-600 hover:border-violet-200 hover:text-violet-700'
+        disabled
+          ? 'pointer-events-none border-gray-100 bg-gray-50 text-gray-300'
+          : active
+            ? 'border-violet-300 bg-violet-100 text-violet-800'
+            : 'border-gray-200 bg-white text-gray-600 hover:border-violet-200 hover:text-violet-700'
       }`}
     >
       {children}
@@ -93,30 +113,269 @@ function ToolbarButton({
   );
 }
 
+// ── Mode Switcher ────────────────────────────────────
+
+type EditorMode = 'editing' | 'suggesting' | 'viewing';
+
+const MODE_TABS: { mode: EditorMode; icon: typeof Pencil; label: string; desc: string }[] = [
+  { mode: 'editing', icon: Pencil, label: 'Chỉnh sửa', desc: 'Sửa trực tiếp trên bài' },
+  { mode: 'suggesting', icon: MessageSquarePlus, label: 'Đề xuất', desc: 'Tạo đề xuất sửa cho học viên' },
+  { mode: 'viewing', icon: Eye, label: 'Xem', desc: 'Xem trước kết quả' },
+];
+
+function ReviewModeSwitcher({
+  mode,
+  onModeChange,
+  suggestionCount,
+}: {
+  mode: EditorMode;
+  onModeChange: (mode: EditorMode) => void;
+  suggestionCount: number;
+}) {
+  return (
+    <div className="flex items-center gap-1 rounded-xl border border-gray-200 bg-gray-50 p-1">
+      {MODE_TABS.map((tab) => {
+        const Icon = tab.icon;
+        const isActive = mode === tab.mode;
+        return (
+          <button
+            key={tab.mode}
+            type="button"
+            onClick={() => onModeChange(tab.mode)}
+            title={tab.desc}
+            className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
+              isActive
+                ? tab.mode === 'suggesting'
+                  ? 'bg-emerald-600 text-white shadow-sm'
+                  : tab.mode === 'viewing'
+                    ? 'bg-gray-700 text-white shadow-sm'
+                    : 'bg-violet-600 text-white shadow-sm'
+                : 'text-gray-500 hover:bg-white hover:text-gray-700 hover:shadow-sm'
+            }`}
+          >
+            <Icon className="h-3.5 w-3.5" />
+            {tab.label}
+            {tab.mode === 'suggesting' && suggestionCount > 0 && (
+              <span className={`ml-0.5 rounded-full px-1.5 py-0.5 text-[10px] font-bold leading-none ${
+                isActive ? 'bg-white/20 text-white' : 'bg-emerald-100 text-emerald-700'
+              }`}>
+                {suggestionCount}
+              </span>
+            )}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+// ── Per-Task Editor ──────────────────────────────────
+
 function WritingTaskReviewEditor({
   field,
   onChange,
+  onSuggestionsChange,
+  initialSuggestions,
 }: {
   field: WritingTaskReviewField;
   onChange: (html: string) => void;
+  onSuggestionsChange: (suggestions: Suggestion[]) => void;
+  initialSuggestions: Suggestion[];
 }) {
-  const [correctionText, setCorrectionText] = useState('');
+  const [mode, setMode] = useState<EditorMode>('editing');
   const [actionError, setActionError] = useState<string | null>(null);
+  const [suggestions, setSuggestions] = useState<Suggestion[]>(initialSuggestions);
+
+  const modeRef = useRef(mode);
+  useEffect(() => {
+    modeRef.current = mode;
+  }, [mode]);
+
+  const suggestionsRef = useRef(suggestions);
+  useEffect(() => {
+    suggestionsRef.current = suggestions;
+  }, [suggestions]);
+
+  const updateSuggestions = useCallback(
+    (newSuggestions: Suggestion[]) => {
+      setSuggestions(newSuggestions);
+      onSuggestionsChange(newSuggestions);
+    },
+    [onSuggestionsChange],
+  );
 
   const editor = useEditor({
-    extensions: [StarterKit, Underline, ReviewErrorMark, ReviewFixMark],
+    extensions: [
+      StarterKit,
+      Underline,
+      ReviewErrorMark,
+      ReviewFixMark,
+      SuggestionDeleteMark,
+      SuggestionInsertMark,
+    ],
     content: field.initialHtml,
+    editable: true,
     editorProps: {
       attributes: {
         class:
           'prose prose-sm max-w-none min-h-[220px] p-4 text-gray-900 leading-relaxed focus:outline-none',
       },
+      handleKeyDown(view, event) {
+        if (modeRef.current !== 'suggesting') return false;
+        
+        // Handle auto-delete track changes on Backspace/Delete
+        if (event.key === 'Backspace' || event.key === 'Delete') {
+          const { from, to, empty } = view.state.selection;
+          if (!empty) {
+            const originalText = view.state.doc.textBetween(from, to, ' ');
+            const sgId = generateSuggestionId();
+            
+            const tr = view.state.tr;
+            // mark selection as deleted
+            tr.addMark(from, to, view.state.schema.marks.suggestionDelete.create({ suggestionId: sgId }));
+            
+            // move cursor to the end
+            tr.setSelection(TextSelection.create(tr.doc, to));
+            view.dispatch(tr);
+            
+            const newSg = createSuggestion('delete', originalText, '');
+            newSg.id = sgId;
+            setTimeout(() => {
+              updateSuggestions([...suggestionsRef.current, newSg]);
+            }, 0);
+            
+            return true;
+          }
+        }
+        return false;
+      },
+      handleTextInput(view, from, to, text) {
+        if (modeRef.current !== 'suggesting') return false;
+        const deleteMarkType = view.state.schema.marks.suggestionDelete;
+        
+        // If they are typing inside an active Suggestion Insert mark, let ProseMirror handle it 
+        // to extend the inclusive mark seamlessly.
+        const activeMarks = view.state.doc.resolve(from).marks();
+        if (activeMarks.some(m => m.type.name === 'suggestionInsert')) {
+            return false;
+        }
+
+        // 1. selection replacement
+        if (from !== to) {
+          const originalText = view.state.doc.textBetween(from, to, ' ');
+          const sgId = generateSuggestionId();
+          
+          const tr = view.state.tr;
+          tr.addMark(from, to, view.state.schema.marks.suggestionDelete.create({ suggestionId: sgId }));
+          tr.setSelection(TextSelection.create(tr.doc, to));
+          
+          const insertMark = view.state.schema.marks.suggestionInsert.create({ suggestionId: sgId });
+          tr.setStoredMarks([]);
+          tr.insertText(text, to, to);
+          // Never let newly typed text inherit a delete mark.
+          tr.removeMark(to, to + text.length, deleteMarkType);
+          tr.addMark(to, to + text.length, insertMark);
+          tr.setSelection(TextSelection.create(tr.doc, to + text.length));
+          tr.addStoredMark(insertMark);
+          
+          view.dispatch(tr);
+          
+          const newSg = createSuggestion('replace', originalText, text);
+          newSg.id = sgId;
+          setTimeout(() => {
+            updateSuggestions([...suggestionsRef.current, newSg]);
+          }, 0);
+          
+          return true;
+        }
+        
+        // 2. auto insert track changes
+        if (from === to) {
+          const sgId = generateSuggestionId();
+          const tr = view.state.tr;
+          
+          const insertMark = view.state.schema.marks.suggestionInsert.create({ suggestionId: sgId });
+          tr.setStoredMarks([]);
+          tr.insertText(text, from, to);
+          // Never let newly typed text inherit a delete mark.
+          tr.removeMark(from, from + text.length, deleteMarkType);
+          tr.addMark(from, from + text.length, insertMark);
+          tr.setSelection(TextSelection.create(tr.doc, from + text.length));
+          tr.addStoredMark(insertMark);
+          
+          view.dispatch(tr);
+          
+          const newSg = createSuggestion('insert', '', text);
+          newSg.id = sgId;
+          setTimeout(() => {
+            updateSuggestions([...suggestionsRef.current, newSg]);
+          }, 0);
+          
+          return true;
+        }
+        return false;
+      }
     },
     onUpdate: ({ editor: currentEditor }) => {
       onChange(currentEditor.getHTML());
+      
+      if (modeRef.current === 'suggesting') {
+          // Sync HTML texts into React suggestions state so UI card is always updated when inclusive marks grow
+          const json = currentEditor.getJSON();
+          const suggestionTexts: Record<string, string> = {};
+          
+          const walk = (node: any) => {
+              if (node.text && node.marks) {
+                  const insertMark = node.marks.find((m: any) => m.type === 'suggestionInsert');
+                  if (insertMark && insertMark.attrs?.suggestionId) {
+                      const id = insertMark.attrs.suggestionId;
+                      suggestionTexts[id] = (suggestionTexts[id] || '') + node.text;
+                  }
+              }
+              if (node.content) {
+                  node.content.forEach(walk);
+              }
+          };
+          walk(json);
+          
+          let hasChanges = false;
+          const currentSuggestions = [...suggestionsRef.current];
+          for (const sg of currentSuggestions) {
+              if (sg.type === 'replace' || sg.type === 'insert') {
+                  const currentTextInEditor = suggestionTexts[sg.id] || '';
+                  if (currentTextInEditor !== sg.suggestedText) {
+                      sg.suggestedText = currentTextInEditor;
+                      hasChanges = true;
+                  }
+              }
+          }
+          
+          if (hasChanges) {
+             updateSuggestions(currentSuggestions);
+          }
+      }
     },
     immediatelyRender: false,
   });
+
+  // Update editable when mode changes
+  const handleModeChange = useCallback(
+    (newMode: EditorMode) => {
+      const prevMode = modeRef.current;
+      setMode(newMode);
+      setActionError(null);
+      if (editor) {
+        // Leaving suggesting mode: clear transient marks so next typing in editing mode
+        // doesn't inherit suggestion insert/delete styling.
+        if (prevMode === 'suggesting' && newMode !== 'suggesting') {
+          const tr = editor.state.tr.setStoredMarks([]);
+          editor.view.dispatch(tr);
+        }
+        editor.setEditable(newMode !== 'viewing');
+      }
+    },
+    [editor],
+  );
 
   if (!editor) {
     return (
@@ -129,80 +388,23 @@ function WritingTaskReviewEditor({
   const resetToOriginal = () => {
     editor.commands.setContent(field.originalHtml);
     onChange(field.originalHtml);
-    setCorrectionText('');
     setActionError(null);
+    updateSuggestions([]);
   };
 
-  const markSelectionAsError = () => {
-    if (editor.state.selection.empty) {
-      setActionError('Bôi đen phần học viên sai trước khi tô đỏ.');
-      return;
-    }
-
-    setActionError(null);
-    editor.chain().focus().setMark('reviewError').run();
-  };
-
-  const clearReviewMarks = () => {
-    if (editor.state.selection.empty) {
-      setActionError('Bôi đen đoạn cần bỏ đánh dấu trước khi xóa mark.');
-      return;
-    }
-
-    setActionError(null);
-    editor.chain().focus().unsetMark('reviewError').unsetMark('reviewFix').run();
-  };
-
-  const insertCorrectionInline = () => {
-    const value = correctionText.trim();
-    if (!value) {
-      setActionError('Nhập nội dung sửa trước khi chèn cạnh bên.');
-      return;
-    }
-
-    setActionError(null);
-
-    if (editor.state.selection.empty) {
-      editor
-        .chain()
-        .focus()
-        .insertContent([
-          { type: 'text', text: ' ' },
-          { type: 'text', text: value, marks: [{ type: 'reviewFix' }] },
-        ])
-        .run();
-    } else {
-      const selectedText = editor.state.doc.textBetween(
-        editor.state.selection.from,
-        editor.state.selection.to,
-        ' ',
-      );
-
-      editor
-        .chain()
-        .focus()
-        .insertContent([
-          { type: 'text', text: selectedText, marks: [{ type: 'reviewError' }] },
-          { type: 'text', text: ' ' },
-          { type: 'text', text: value, marks: [{ type: 'reviewFix' }] },
-        ])
-        .run();
-    }
-
-    setCorrectionText('');
-  };
-
+  // ── Render ──
   return (
     <div className="rounded-2xl border border-violet-200 bg-white shadow-sm">
+      {/* Header: Mode Switcher + Reset */}
       <div className="flex flex-col gap-3 border-b border-violet-100 px-4 py-4">
         <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
-          <div>
-            <p className="text-sm font-semibold text-gray-800">{field.label} — Bản chấm trực tiếp</p>
-            <p className="mt-1 text-xs leading-relaxed text-gray-500">
-              Bôi đen đoạn sai rồi bấm <span className="font-semibold">Tô đỏ lỗi</span>. Nếu muốn sửa ngay bên cạnh,
-              nhập bản đúng vào ô <span className="font-semibold">Sửa thành...</span> rồi bấm{' '}
-              <span className="font-semibold">Chèn sửa cạnh bên</span>.
-            </p>
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+            <p className="text-sm font-semibold text-gray-800">{field.label}</p>
+            <ReviewModeSwitcher
+              mode={mode}
+              onModeChange={handleModeChange}
+              suggestionCount={suggestions.filter((s) => s.status === 'pending').length}
+            />
           </div>
           <button
             type="button"
@@ -214,80 +416,115 @@ function WritingTaskReviewEditor({
           </button>
         </div>
 
-        <div className="flex flex-wrap gap-2">
-          <ToolbarButton active={editor.isActive('reviewError')} onClick={markSelectionAsError}>
-            <AlertCircle className="h-3.5 w-3.5" /> Tô đỏ lỗi
-          </ToolbarButton>
-          <ToolbarButton onClick={clearReviewMarks}>
-            <CircleOff className="h-3.5 w-3.5" /> Bỏ đánh dấu
-          </ToolbarButton>
-          <ToolbarButton active={editor.isActive('bold')} onClick={() => editor.chain().focus().toggleBold().run()}>
-            <Bold className="h-3.5 w-3.5" /> Đậm
-          </ToolbarButton>
-          <ToolbarButton active={editor.isActive('italic')} onClick={() => editor.chain().focus().toggleItalic().run()}>
-            <Italic className="h-3.5 w-3.5" /> Nghiêng
-          </ToolbarButton>
-          <ToolbarButton active={editor.isActive('underline')} onClick={() => editor.chain().focus().toggleUnderline().run()}>
-            <UnderlineIcon className="h-3.5 w-3.5" /> Gạch chân
-          </ToolbarButton>
-          <ToolbarButton active={editor.isActive('bulletList')} onClick={() => editor.chain().focus().toggleBulletList().run()}>
-            <List className="h-3.5 w-3.5" /> Gạch đầu dòng
-          </ToolbarButton>
-          <ToolbarButton onClick={() => editor.chain().focus().undo().run()}>
-            <Undo2 className="h-3.5 w-3.5" /> Undo
-          </ToolbarButton>
-          <ToolbarButton onClick={() => editor.chain().focus().redo().run()}>
-            <Redo2 className="h-3.5 w-3.5" /> Redo
-          </ToolbarButton>
-        </div>
+        {/* Mode description */}
+        <p className="text-xs leading-relaxed text-gray-500">
+          {mode === 'editing' && (
+            <>
+              Chỉnh sửa trực tiếp trên bài làm của học viên. Sử dụng thanh công cụ để bôi đậm, in nghiêng nếu cần thiết.
+            </>
+          )}
+          {mode === 'suggesting' && (
+            <>
+              <span className="font-semibold text-emerald-700">Tự động đề xuất:</span> Bôi đen đoạn cần sửa rồi gõ phím trực tiếp! Hệ thống tự gạch bỏ <span className="text-red-600 line-through">bản cũ</span> và thêm <span className="font-semibold text-emerald-700 underline">bản mới</span> màu xanh lá bên cạnh để học viên duyệt.
+            </>
+          )}
+          {mode === 'viewing' && 'Xem trước bài viết với tất cả đánh dấu. Không thể chỉnh sửa ở chế độ này.'}
+        </p>
 
-        <div className="flex flex-col gap-2 rounded-xl border border-violet-100 bg-[#fffaf5] p-3 lg:flex-row lg:items-center">
-          <label className="text-xs font-semibold text-gray-600 lg:min-w-[82px]">Sửa thành...</label>
-          <input
-            type="text"
-            value={correctionText}
-            onChange={(event) => setCorrectionText(event.target.value)}
-            className="min-w-0 flex-1 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-800 outline-none transition-colors focus:border-violet-300 focus:ring-2 focus:ring-violet-100"
-            placeholder="Ví dụ: mes parents"
-          />
-          <button
-            type="button"
-            onClick={insertCorrectionInline}
-            className="inline-flex items-center justify-center gap-1 rounded-lg bg-violet-600 px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-violet-700"
-          >
-            <Sparkles className="h-3.5 w-3.5" /> Chèn sửa cạnh bên
-          </button>
-        </div>
+        {/* ── Editing Mode Toolbar ── */}
+        {mode === 'editing' && (
+          <>
+            <div className="flex flex-wrap gap-2">
+              <ToolbarButton active={editor.isActive('bold')} onClick={() => editor.chain().focus().toggleBold().run()}>
+                <Bold className="h-3.5 w-3.5" /> Đậm
+              </ToolbarButton>
+              <ToolbarButton active={editor.isActive('italic')} onClick={() => editor.chain().focus().toggleItalic().run()}>
+                <Italic className="h-3.5 w-3.5" /> Nghiêng
+              </ToolbarButton>
+              <ToolbarButton active={editor.isActive('underline')} onClick={() => editor.chain().focus().toggleUnderline().run()}>
+                <UnderlineIcon className="h-3.5 w-3.5" /> Gạch chân
+              </ToolbarButton>
+              <ToolbarButton active={editor.isActive('bulletList')} onClick={() => editor.chain().focus().toggleBulletList().run()}>
+                <List className="h-3.5 w-3.5" /> Gạch đầu dòng
+              </ToolbarButton>
+              <ToolbarButton onClick={() => editor.chain().focus().undo().run()}>
+                <Undo2 className="h-3.5 w-3.5" /> Undo
+              </ToolbarButton>
+              <ToolbarButton onClick={() => editor.chain().focus().redo().run()}>
+                <Redo2 className="h-3.5 w-3.5" /> Redo
+              </ToolbarButton>
+            </div>
+          </>
+        )}
+
+        {/* ── Suggesting Mode Toolbar ── */}
+        {mode === 'suggesting' && (
+          <>
+            <div className="flex flex-wrap gap-2">
+              <ToolbarButton onClick={() => editor.chain().focus().undo().run()}>
+                <Undo2 className="h-3.5 w-3.5" /> Undo
+              </ToolbarButton>
+              <ToolbarButton onClick={() => editor.chain().focus().redo().run()}>
+                <Redo2 className="h-3.5 w-3.5" /> Redo
+              </ToolbarButton>
+            </div>
+          </>
+        )}
+
+        {/* ── Viewing Mode Info ── */}
+        {mode === 'viewing' && (
+          <div className="rounded-xl border border-gray-100 bg-gray-50 p-3">
+            <p className="text-xs text-gray-500">
+              👁️ Xem trước — đây là bản học viên sẽ thấy sau khi bạn submit chấm điểm.
+            </p>
+          </div>
+        )}
 
         {actionError && (
           <p className="text-xs font-medium text-red-600">{actionError}</p>
         )}
       </div>
 
-      <EditorContent editor={editor} className="bg-[#fffdf9]" />
+      <EditorContent
+        editor={editor}
+        className="bg-[#fffdf9]"
+      />
     </div>
   );
 }
 
+// ── Main Component ───────────────────────────────────
+
 export default function WritingInlineReviewFields({
   fields,
+  initialMode = 'editing',
 }: {
   fields: WritingTaskReviewField[];
+  initialMode?: ReviewMode;
 }) {
   const [htmlByTask, setHtmlByTask] = useState<Record<WritingTaskKey, string>>(() => ({
-    t1: fields.find((field) => field.key === 't1')?.initialHtml ?? '<p></p>',
-    t2: fields.find((field) => field.key === 't2')?.initialHtml ?? '<p></p>',
-    t3: fields.find((field) => field.key === 't3')?.initialHtml ?? '<p></p>',
+    t1: fields.find((f) => f.key === 't1')?.initialHtml ?? '<p></p>',
+    t2: fields.find((f) => f.key === 't2')?.initialHtml ?? '<p></p>',
+    t3: fields.find((f) => f.key === 't3')?.initialHtml ?? '<p></p>',
   }));
+
+  const [suggestionsByTask, setSuggestionsByTask] = useState<Record<WritingTaskKey, Suggestion[]>>(() => ({
+    t1: [],
+    t2: [],
+    t3: [],
+  }));
+
+  const [reviewMode, setReviewMode] = useState<ReviewMode>(initialMode);
 
   return (
     <div className="space-y-4">
       <div className="rounded-2xl border border-violet-200 bg-violet-50/70 px-4 py-3">
         <p className="flex items-center gap-2 text-sm font-semibold text-violet-900">
-          <PenTool className="h-4 w-4" /> Chấm trực tiếp trên bài viết
+          <PenTool className="h-4 w-4" /> Chấm bài viết
         </p>
         <p className="mt-1 text-xs leading-relaxed text-violet-700">
-          Người chấm có thể đánh dấu lỗi và sửa trực tiếp trên bản sao của bài làm. Bài gốc của học viên vẫn được giữ nguyên ở phần trên.
+          Chọn chế độ <span className="font-semibold">Chỉnh sửa</span> để sửa trực tiếp, hoặc{' '}
+          <span className="font-semibold text-emerald-700">Đề xuất</span> để gợi ý sửa cho học viên tự quyết định.
         </p>
       </div>
 
@@ -301,10 +538,38 @@ export default function WritingInlineReviewFields({
                 [field.key]: html,
               }));
             }}
+            onSuggestionsChange={(sgs) => {
+              setSuggestionsByTask((current) => ({
+                ...current,
+                [field.key]: sgs,
+              }));
+            }}
+            initialSuggestions={[]}
           />
           <input type="hidden" name={`writing_review_${field.key}_html`} value={htmlByTask[field.key]} />
         </div>
       ))}
+
+      {/* Hidden fields for mode and suggestions data */}
+      <input type="hidden" name="writing_review_mode" value={reviewMode} />
+      <input
+        type="hidden"
+        name="writing_review_suggestions"
+        value={JSON.stringify(suggestionsByTask)}
+      />
+
+      {/* Summary message */}
+      {(suggestionsByTask.t1.length > 0 || suggestionsByTask.t2.length > 0 || suggestionsByTask.t3.length > 0) && (
+        <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 shadow-sm mt-4">
+          <p className="text-sm font-semibold text-emerald-800">Tổng kết đề xuất</p>
+          <ul className="text-xs text-emerald-700 mt-2 list-disc list-inside">
+            {suggestionsByTask.t1.length > 0 && <li>Task 1: Đã tạo {suggestionsByTask.t1.length} đề xuất</li>}
+            {suggestionsByTask.t2.length > 0 && <li>Task 2: Đã tạo {suggestionsByTask.t2.length} đề xuất</li>}
+            {suggestionsByTask.t3.length > 0 && <li>Task 3: Đã tạo {suggestionsByTask.t3.length} đề xuất</li>}
+          </ul>
+          <p className="text-xs text-emerald-600 mt-2 italic">Lưu ý: Học viên sẽ cần tự duyệt từng đề xuất này.</p>
+        </div>
+      )}
     </div>
   );
 }

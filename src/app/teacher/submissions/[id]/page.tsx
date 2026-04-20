@@ -118,6 +118,13 @@ export default async function TeacherSubmissionDetailPage({ params, searchParams
           t3: plainTextToReviewHtml(submission.writing_task3),
         };
 
+        const mode = (formData.get('writing_review_mode') as string) || 'editing';
+        let suggestions;
+        try {
+          const rawSuggestions = formData.get('writing_review_suggestions');
+          if (rawSuggestions) suggestions = JSON.parse(rawSuggestions as string);
+        } catch {}
+
         const submittedTasks = {
           t1: (formData.get('writing_review_t1_html') as string) || writingReview?.tasks.t1 || originalTasks.t1,
           t2: (formData.get('writing_review_t2_html') as string) || writingReview?.tasks.t2 || originalTasks.t2,
@@ -125,9 +132,11 @@ export default async function TeacherSubmissionDetailPage({ params, searchParams
         };
 
         const hasCustomReview = (['t1', 't2', 't3'] as const).some((taskKey) => submittedTasks[taskKey] !== originalTasks[taskKey]);
-        if (!hasCustomReview) return null;
+        const hasSuggestions = suggestions && (suggestions.t1?.length > 0 || suggestions.t2?.length > 0 || suggestions.t3?.length > 0);
 
-        return serializeWritingReviewMarkup(submittedTasks);
+        if (!hasCustomReview && !hasSuggestions) return null;
+
+        return serializeWritingReviewMarkup(submittedTasks, mode as 'editing' | 'suggesting', suggestions);
       })();
       await gradeTeacherSubmission(id, score, feedback, reviewNotes);
     } catch (error) {

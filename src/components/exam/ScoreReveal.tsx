@@ -10,6 +10,7 @@ interface Props {
   serieId: number;
   correct: number;
   total: number;
+  tcfScore: number;
   examType: "listening" | "reading";
   children?: React.ReactNode; // correction list
 }
@@ -32,9 +33,10 @@ function useCountUp(target: number, duration = 1500) {
   return value;
 }
 
-export default function ScoreReveal({ serieId, correct, total, examType, children }: Props) {
+export default function ScoreReveal({ serieId, correct, total, tcfScore, examType, children }: Props) {
   const pct = Math.round((correct / total) * 100);
-  const animatedScore = useCountUp(correct);
+  const animatedTcf = useCountUp(tcfScore);
+  const animatedCorrect = useCountUp(correct);
   const animatedPct = useCountUp(pct);
   const [showConfetti, setShowConfetti] = useState(false);
   const [showContent, setShowContent] = useState(false);
@@ -100,10 +102,13 @@ export default function ScoreReveal({ serieId, correct, total, examType, childre
         {/* Animated score */}
         <div className="mt-4 anim-count-up" style={{ animationDelay: "0.3s" }}>
           <span className="text-5xl font-display font-extrabold text-[#f05e23]">
-            {animatedScore}
+            {animatedTcf}
           </span>
-          <span className="text-2xl font-display font-bold text-[#888]">/{total}</span>
+          <span className="text-2xl font-display font-bold text-[#888]">/699</span>
         </div>
+        <p className="text-sm text-[#aaa] mt-1 anim-fade-in" style={{ animationDelay: "0.5s" }}>
+          {animatedCorrect}/{total} bonnes réponses
+        </p>
 
         {/* Percentage bar */}
         <div className="max-w-xs mx-auto mt-4">

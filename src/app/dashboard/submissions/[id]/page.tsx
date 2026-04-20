@@ -11,6 +11,7 @@ import { parseWritingReviewMarkup, plainTextToReviewHtml } from '@/lib/exam/writ
 import { ADMIN_GRADE_MAX } from '@/lib/exam/adminGrading';
 import { submissionWithSpeakingPlaybackUrls } from '@/lib/supabase/signSpeakingSubmissionUrl';
 import { PenLine, Mic, Clock, Download, FileText, AlignLeft, MessageSquare } from "lucide-react";
+import { WritingSuggestionReview } from "@/components/exam/WritingSuggestionReview";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -214,9 +215,16 @@ export default async function DashboardSubmissionReviewPage({ params }: PageProp
                   {/* Admin corrected answer or raw student answer */}
                   <div className="bg-sky-50 border border-sky-200 rounded-xl p-4">
                     <p className="text-xs font-bold text-blue-700 uppercase tracking-wider mb-2">Chi tiết bài làm</p>
-                    {reviewForTask && reviewForTask.length > 0 ? (
+                    {(writingReview as any)?.version === 'v2' && (writingReview as any)?.mode === 'suggesting' ? (
+                      <WritingSuggestionReview
+                        submissionId={id}
+                        taskKey={t.key}
+                        initialHtml={reviewForTask || ''}
+                        initialSuggestions={(writingReview as any)?.suggestions?.[t.key] || []}
+                      />
+                    ) : reviewForTask && reviewForTask.length > 0 ? (
                       <div 
-                        className="prose prose-sm max-w-none text-blue-900 leading-relaxed prose-headings:text-blue-900 prose-p:text-blue-900"
+                        className="prose prose-sm max-w-none text-blue-900 leading-relaxed prose-headings:text-blue-900 prose-p:text-blue-900 [&_span[data-suggestion-type]]:bg-transparent [&_span[data-suggestion-type]]:text-inherit [&_span[data-suggestion-type]]:line-through-none"
                         dangerouslySetInnerHTML={{ __html: reviewForTask }}
                       />
                     ) : (

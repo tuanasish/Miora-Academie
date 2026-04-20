@@ -184,8 +184,9 @@ export default function ListeningSerieExamPage() {
   // ═══════════════════ SUBMITTED — Score Reveal ═══════════════════
   if (submitted) {
     const correctCount = questions.filter((q2) => answers[q2.id] === q2.correctAnswerIndex).length;
+    const tcfScore = questions.reduce((sum, q2) => sum + (answers[q2.id] === q2.correctAnswerIndex ? (q2.points || 0) : 0), 0);
     return (
-      <ScoreReveal serieId={serieId} correct={correctCount} total={total} examType="listening">
+      <ScoreReveal serieId={serieId} correct={correctCount} total={total} tcfScore={tcfScore} examType="listening">
         <div className="max-w-3xl mx-auto px-4 mt-6 pb-8">
           <McqSubmissionReview
             questions={questions}

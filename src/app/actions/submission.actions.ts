@@ -389,3 +389,82 @@ export async function markSubmissionTeacherViewed(id: string): Promise<boolean> 
   if (error) throw new Error(`Lỗi cập nhật teacher_viewed_at: ${error.message}`);
   return true;
 }
+
+// ──────────────────────────────────────────────────────
+// Suggestion Response Actions
+// ──────────────────────────────────────────────────────
+
+import { parseWritingReviewMarkup } from '@/lib/exam/writingReview';
+import { respondToSuggestion, respondToAllSuggestions as respondToAll } from '@/lib/exam/suggestions';
+
+export async function handleSuggestionResponse(
+  id: string,
+  taskKey: 't1' | 't2' | 't3',
+  suggestionId: string,
+  action: 'accept' | 'reject',
+): Promise<{ success: true; newHtml: string } | { error: string }> {
+  try {
+    const { db, user } = await requireActiveStudentAndDb();
+    const sub = await fetchSubmissionById(db, id);
+    
+    if (!sub) return { error: 'Không tìm thấy bài nộp' };
+    if (sub.student_id !== user.id && sub.student_email !== user.email) {
+      return { error: 'Không có quyền truy cập' };
+    }
+    if (!sub.notes) return { error: 'Không có đề xuất nào để xử lý' };
+
+    const markup = parseWritingReviewMarkup(sub.notes);
+    if (!markup || (markup as any).version !== 'v2') return { error: 'Format chấm điểm không hỗ trợ đề xuất' };
+
+    const updatedMarkup = respondToSuggestion(markup as any, taskKey, suggestionId, action);
+    const newHtml = updatedMarkup.tasks[taskKey];
+
+    const { error: dbError } = await db
+      .from('exam_submissions')
+      .update({ notes: JSON.stringify(updatedMarkup) })
+      .eq('id', id);
+
+    if (dbError) throw dbError;
+
+    revalidateSubmissionViews(id);
+    return { success: true, newHtml };
+  } catch (err: any) {
+    return { error: err.message || 'Lỗi xử lý đề xuất' };
+  }
+}
+
+export async function handleBulkSuggestionResponse(
+  id: string,
+  taskKey: 't1' | 't2' | 't3',
+  action: 'accept' | 'reject',
+): Promise<{ success: true; newHtml: string } | { error: string }> {
+  try {
+    const { db, user } = await requireActiveStudentAndDb();
+    const sub = await fetchSubmissionById(db, id);
+    
+    if (!sub) return { error: 'Không tìm thấy bài nộp' };
+    if (sub.student_id !== user.id && sub.student_email !== user.email) {
+      return { error: 'Không có quyền truy cập' };
+    }
+    if (!sub.notes) return { error: 'Không có đề xuất nào để xử lý' };
+
+    const markup = parseWritingReviewMarkup(sub.notes);
+    if (!markup || (markup as any).version !== 'v2') return { error: 'Format chấm điểm không hỗ trợ đề xuất' };
+
+    const updatedMarkup = respondToAll(markup as any, taskKey, action);
+    const newHtml = updatedMarkup.tasks[taskKey];
+
+    const { error: dbError } = await db
+      .from('exam_submissions')
+      .update({ notes: JSON.stringify(updatedMarkup) })
+      .eq('id', id);
+
+    if (dbError) throw dbError;
+
+    revalidateSubmissionViews(id);
+    return { success: true, newHtml };
+  } catch (err: any) {
+    return { error: err.message || 'Lỗi xử lý đề xuất hàng loạt' };
+  }
+}
+
