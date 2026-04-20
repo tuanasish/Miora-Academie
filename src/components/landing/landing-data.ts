@@ -1,5 +1,5 @@
 export const ASSETS = {
-  logo: "https://www.figma.com/api/mcp/asset/76035ed9-22f1-42e9-b003-6ba304a425c1",
+  logo: "/logo-mark-with-tagline.png",
   challengeIcon1: "https://www.figma.com/api/mcp/asset/717bd302-f56a-45fb-973b-8a7de691b0fa",
   challengeIcon2: "https://www.figma.com/api/mcp/asset/bfb7c531-7b73-4d41-866d-95ac04c7e092",
   challengeIcon3: "https://www.figma.com/api/mcp/asset/617b16e6-af73-40ed-8569-62b8716a222c",
