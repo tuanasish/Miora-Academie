@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 
 import { getCurrentUserProfile } from '@/lib/supabase/adminAuth';
+import { ASSETS } from '@/components/landing/landing-data';
 
 export const metadata: Metadata = {
   title: 'Admin Dashboard',
@@ -32,9 +33,17 @@ export default async function AdminLayout({
       {/* Sidebar */}
       <aside className="w-64 bg-white shadow flex-shrink-0 border-r border-gray-200">
         <div className="p-6">
-          <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
-            Miora Admin
-          </h2>
+          <Link href="/admin" className="inline-flex flex-col gap-1.5">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={ASSETS.logo}
+              alt="Miora"
+              className="h-10 w-auto max-w-full object-contain object-left"
+            />
+            <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">
+              Admin
+            </span>
+          </Link>
         </div>
         <nav className="mt-6 flex flex-col gap-1 px-4">
           <Link href="/admin" className="flex items-center gap-3 px-4 py-3 text-gray-700 bg-gray-50 rounded-md font-medium hover:bg-blue-50 hover:text-blue-600 transition-colors">
