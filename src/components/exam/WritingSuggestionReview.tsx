@@ -8,7 +8,6 @@ import {
 } from '@/app/actions/submission.actions';
 import { Suggestion, WritingTaskKey } from '@/lib/exam/writingReview';
 import { SuggestionReviewCard } from './SuggestionReviewCard';
-import '@/styles/writing-review.css';
 
 export function WritingSuggestionReview({
   submissionId,
