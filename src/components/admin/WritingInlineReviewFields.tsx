@@ -901,7 +901,6 @@ export default function WritingInlineReviewFields({
             {suggestionsByTask.t2.length > 0 && <li>Task 2: Đã tạo {suggestionsByTask.t2.length} đề xuất</li>}
             {suggestionsByTask.t3.length > 0 && <li>Task 3: Đã tạo {suggestionsByTask.t3.length} đề xuất</li>}
           </ul>
-          <p className="text-xs text-emerald-600 mt-2 italic">Lưu ý: Học viên sẽ cần tự duyệt từng đề xuất này.</p>
         </div>
       )}
     </div>
