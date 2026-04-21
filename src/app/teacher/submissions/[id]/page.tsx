@@ -434,12 +434,17 @@ export default async function TeacherSubmissionDetailPage({ params, searchParams
           <form action={handleGrade} className="mt-4 space-y-4">
             {sub.exam_type === 'writing' && (
               <WritingInlineReviewFields
+                submissionId={id}
                 fields={writingTasks.map((task) => ({
                   key: task.key,
                   label: task.label,
                   originalHtml: plainTextToReviewHtml(task.text),
                   initialHtml: writingReview?.tasks[task.key] ?? plainTextToReviewHtml(task.text),
                 }))}
+                initialMode={writingReview && 'mode' in writingReview ? writingReview.mode : 'editing'}
+                initialSuggestionsByTask={
+                  writingReview && 'suggestions' in writingReview ? writingReview.suggestions : undefined
+                }
               />
             )}
 

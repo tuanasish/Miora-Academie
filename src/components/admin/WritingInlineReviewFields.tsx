@@ -9,19 +9,29 @@ import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
 import { SuggestionDeleteMark } from '@/lib/tiptap/SuggestionDeleteMark';
 import { SuggestionInsertMark } from '@/lib/tiptap/SuggestionInsertMark';
-import { generateSuggestionId, createSuggestion } from '@/lib/exam/suggestions';
+import {
+  applySuggestionToHtml,
+  createSuggestion,
+  generateSuggestionId,
+  rejectSuggestionFromHtml,
+} from '@/lib/exam/suggestions';
 import type { Suggestion, ReviewMode, WritingTaskKey } from '@/lib/exam/writingReview';
 import {
-  AlertCircle,
+  acceptAllWritingAiSuggestions,
+  generateWritingAiSuggestions,
+  undoWritingAiSuggestion,
+} from '@/app/actions/submission.actions';
+import {
   Bold,
-  CircleOff,
   Italic,
   List,
   RotateCcw,
-  Sparkles,
+  WandSparkles,
   Underline as UnderlineIcon,
   Undo2,
   Redo2,
+  CheckCheck,
+  Rewind,
   PenTool,
   Pencil,
   MessageSquarePlus,
@@ -172,18 +182,25 @@ function ReviewModeSwitcher({
 // ── Per-Task Editor ──────────────────────────────────
 
 function WritingTaskReviewEditor({
+  submissionId,
   field,
   onChange,
+  onModeChange,
   onSuggestionsChange,
   initialSuggestions,
 }: {
+  submissionId: string;
   field: WritingTaskReviewField;
   onChange: (html: string) => void;
+  onModeChange: (mode: EditorMode) => void;
   onSuggestionsChange: (suggestions: Suggestion[]) => void;
   initialSuggestions: Suggestion[];
 }) {
   const [mode, setMode] = useState<EditorMode>('editing');
   const [actionError, setActionError] = useState<string | null>(null);
+  const [isAiRunning, setIsAiRunning] = useState(false);
+  const [isAcceptingAll, setIsAcceptingAll] = useState(false);
+  const [isUndoingSuggestion, setIsUndoingSuggestion] = useState(false);
   const [suggestions, setSuggestions] = useState<Suggestion[]>(initialSuggestions);
 
   const modeRef = useRef(mode);
@@ -358,11 +375,83 @@ function WritingTaskReviewEditor({
     immediatelyRender: false,
   });
 
+  const getActiveSuggestionId = useCallback(() => {
+    if (!editor) return null;
+    const { from } = editor.state.selection;
+    const marks = editor.state.doc.resolve(from).marks();
+    const mark = marks.find(
+      (item) => item.type.name === 'suggestionDelete' || item.type.name === 'suggestionInsert',
+    );
+    const suggestionId = mark?.attrs?.suggestionId;
+    return typeof suggestionId === 'string' ? suggestionId : null;
+  }, [editor]);
+
+  const findTextRangeInEditor = useCallback(
+    (needle: string): { from: number; to: number } | null => {
+      if (!editor || !needle) return null;
+      const doc = editor.state.doc;
+      let found: { from: number; to: number } | null = null;
+
+      doc.descendants((node, pos) => {
+        if (found || !node.isText || !node.text) return;
+        const idx = node.text.indexOf(needle);
+        if (idx >= 0) {
+          found = {
+            from: pos + idx,
+            to: pos + idx + needle.length,
+          };
+        }
+      });
+
+      return found;
+    },
+    [editor],
+  );
+
+  const applySuggestionToEditor = useCallback(
+    (suggestion: Suggestion): boolean => {
+      if (!editor) return false;
+      const tr = editor.state.tr;
+      const deleteMark = editor.state.schema.marks.suggestionDelete;
+      const insertMark = editor.state.schema.marks.suggestionInsert.create({
+        suggestionId: suggestion.id,
+      });
+
+      if (suggestion.type === 'insert') {
+        const at = editor.state.selection.to;
+        tr.insertText(suggestion.suggestedText, at, at);
+        tr.addMark(at, at + suggestion.suggestedText.length, insertMark);
+        tr.setSelection(TextSelection.create(tr.doc, at + suggestion.suggestedText.length));
+        editor.view.dispatch(tr);
+        return true;
+      }
+
+      const target = findTextRangeInEditor(suggestion.originalText);
+      if (!target) return false;
+
+      if (suggestion.type === 'delete') {
+        tr.addMark(target.from, target.to, deleteMark.create({ suggestionId: suggestion.id }));
+        tr.setSelection(TextSelection.create(tr.doc, target.to));
+        editor.view.dispatch(tr);
+        return true;
+      }
+
+      tr.addMark(target.from, target.to, deleteMark.create({ suggestionId: suggestion.id }));
+      tr.insertText(suggestion.suggestedText, target.to, target.to);
+      tr.addMark(target.to, target.to + suggestion.suggestedText.length, insertMark);
+      tr.setSelection(TextSelection.create(tr.doc, target.to + suggestion.suggestedText.length));
+      editor.view.dispatch(tr);
+      return true;
+    },
+    [editor, findTextRangeInEditor],
+  );
+
   // Update editable when mode changes
   const handleModeChange = useCallback(
     (newMode: EditorMode) => {
       const prevMode = modeRef.current;
       setMode(newMode);
+      onModeChange(newMode);
       setActionError(null);
       if (editor) {
         // Leaving suggesting mode: clear transient marks so next typing in editing mode
@@ -374,7 +463,7 @@ function WritingTaskReviewEditor({
         editor.setEditable(newMode !== 'viewing');
       }
     },
-    [editor],
+    [editor, onModeChange],
   );
 
   if (!editor) {
@@ -390,6 +479,97 @@ function WritingTaskReviewEditor({
     onChange(field.originalHtml);
     setActionError(null);
     updateSuggestions([]);
+  };
+
+  const handleRunAi = async () => {
+    if (mode !== 'suggesting' || !editor) return;
+    setIsAiRunning(true);
+    setActionError(null);
+    try {
+      const result = await generateWritingAiSuggestions({
+        submissionId,
+        taskKey: field.key,
+        taskHtml: editor.getHTML(),
+      });
+
+      const created: Suggestion[] = [];
+      for (const suggestion of result.suggestions) {
+        const applied = applySuggestionToEditor(suggestion);
+        if (applied) {
+          created.push(suggestion);
+        }
+      }
+
+      if (created.length > 0) {
+        updateSuggestions([...suggestionsRef.current, ...created]);
+      } else {
+        setActionError(result.message ?? 'AI chưa tìm thấy vị trí phù hợp để gắn đề xuất.');
+      }
+    } catch (error) {
+      setActionError(error instanceof Error ? error.message : 'Không thể gọi AI lúc này.');
+    } finally {
+      setIsAiRunning(false);
+    }
+  };
+
+  const handleAcceptAll = async () => {
+    if (!editor) return;
+    const pending = suggestionsRef.current.filter((item) => item.status === 'pending');
+    if (pending.length === 0) {
+      setActionError('Không có đề xuất đang chờ để chấp nhận.');
+      return;
+    }
+
+    setIsAcceptingAll(true);
+    setActionError(null);
+    try {
+      let nextHtml = editor.getHTML();
+      for (const item of pending) {
+        nextHtml = applySuggestionToHtml(nextHtml, item.id);
+      }
+
+      editor.commands.setContent(nextHtml);
+      updateSuggestions(
+        suggestionsRef.current.map((item) =>
+          item.status === 'pending' ? { ...item, status: 'accepted' } : item,
+        ),
+      );
+
+      await acceptAllWritingAiSuggestions({
+        submissionId,
+        taskKey: field.key,
+        suggestionIds: pending.map((item) => item.id),
+      });
+    } catch (error) {
+      setActionError(error instanceof Error ? error.message : 'Không thể chấp nhận toàn bộ đề xuất.');
+    } finally {
+      setIsAcceptingAll(false);
+    }
+  };
+
+  const handleUndoCurrentSuggestion = async () => {
+    if (!editor) return;
+    const suggestionId = getActiveSuggestionId();
+    if (!suggestionId) {
+      setActionError('Đặt con trỏ vào đoạn đang được đề xuất rồi bấm Undo đề xuất.');
+      return;
+    }
+
+    setIsUndoingSuggestion(true);
+    setActionError(null);
+    try {
+      const nextHtml = rejectSuggestionFromHtml(editor.getHTML(), suggestionId);
+      editor.commands.setContent(nextHtml);
+      updateSuggestions(suggestionsRef.current.filter((item) => item.id !== suggestionId));
+      await undoWritingAiSuggestion({
+        submissionId,
+        suggestionId,
+      });
+    } catch (error) {
+      setActionError(error instanceof Error ? error.message : 'Không thể undo đề xuất này.');
+    } finally {
+      setIsUndoingSuggestion(false);
+    }
   };
 
   // ── Render ──
@@ -461,6 +641,27 @@ function WritingTaskReviewEditor({
         {mode === 'suggesting' && (
           <>
             <div className="flex flex-wrap gap-2">
+              <ToolbarButton
+                onClick={handleRunAi}
+                disabled={isAiRunning}
+                title="Sinh đề xuất tự động bằng Gemini"
+              >
+                <WandSparkles className="h-3.5 w-3.5" /> {isAiRunning ? 'Đang chạy AI...' : 'AI đề xuất'}
+              </ToolbarButton>
+              <ToolbarButton
+                onClick={handleAcceptAll}
+                disabled={isAcceptingAll}
+                title="Chấp nhận tất cả đề xuất đang chờ"
+              >
+                <CheckCheck className="h-3.5 w-3.5" /> {isAcceptingAll ? 'Đang áp dụng...' : 'Accept all'}
+              </ToolbarButton>
+              <ToolbarButton
+                onClick={handleUndoCurrentSuggestion}
+                disabled={isUndoingSuggestion}
+                title="Undo đề xuất tại vị trí con trỏ"
+              >
+                <Rewind className="h-3.5 w-3.5" /> {isUndoingSuggestion ? 'Đang hoàn tác...' : 'Undo đề xuất'}
+              </ToolbarButton>
               <ToolbarButton onClick={() => editor.chain().focus().undo().run()}>
                 <Undo2 className="h-3.5 w-3.5" /> Undo
               </ToolbarButton>
@@ -496,11 +697,15 @@ function WritingTaskReviewEditor({
 // ── Main Component ───────────────────────────────────
 
 export default function WritingInlineReviewFields({
+  submissionId,
   fields,
   initialMode = 'editing',
+  initialSuggestionsByTask,
 }: {
+  submissionId: string;
   fields: WritingTaskReviewField[];
   initialMode?: ReviewMode;
+  initialSuggestionsByTask?: Partial<Record<WritingTaskKey, Suggestion[]>>;
 }) {
   const [htmlByTask, setHtmlByTask] = useState<Record<WritingTaskKey, string>>(() => ({
     t1: fields.find((f) => f.key === 't1')?.initialHtml ?? '<p></p>',
@@ -509,12 +714,21 @@ export default function WritingInlineReviewFields({
   }));
 
   const [suggestionsByTask, setSuggestionsByTask] = useState<Record<WritingTaskKey, Suggestion[]>>(() => ({
-    t1: [],
-    t2: [],
-    t3: [],
+    t1: initialSuggestionsByTask?.t1 ?? [],
+    t2: initialSuggestionsByTask?.t2 ?? [],
+    t3: initialSuggestionsByTask?.t3 ?? [],
   }));
 
-  const [reviewMode, setReviewMode] = useState<ReviewMode>(initialMode);
+  const [modeByTask, setModeByTask] = useState<Record<WritingTaskKey, EditorMode>>({
+    t1: initialMode === 'suggesting' ? 'suggesting' : 'editing',
+    t2: initialMode === 'suggesting' ? 'suggesting' : 'editing',
+    t3: initialMode === 'suggesting' ? 'suggesting' : 'editing',
+  });
+
+  const reviewMode: ReviewMode =
+    modeByTask.t1 === 'suggesting' || modeByTask.t2 === 'suggesting' || modeByTask.t3 === 'suggesting'
+      ? 'suggesting'
+      : 'editing';
 
   return (
     <div className="space-y-4">
@@ -531,11 +745,18 @@ export default function WritingInlineReviewFields({
       {fields.map((field) => (
         <div key={field.key}>
           <WritingTaskReviewEditor
+            submissionId={submissionId}
             field={field}
             onChange={(html) => {
               setHtmlByTask((current) => ({
                 ...current,
                 [field.key]: html,
+              }));
+            }}
+            onModeChange={(mode) => {
+              setModeByTask((current) => ({
+                ...current,
+                [field.key]: mode,
               }));
             }}
             onSuggestionsChange={(sgs) => {
@@ -544,7 +765,7 @@ export default function WritingInlineReviewFields({
                 [field.key]: sgs,
               }));
             }}
-            initialSuggestions={[]}
+            initialSuggestions={initialSuggestionsByTask?.[field.key] ?? []}
           />
           <input type="hidden" name={`writing_review_${field.key}_html`} value={htmlByTask[field.key]} />
         </div>

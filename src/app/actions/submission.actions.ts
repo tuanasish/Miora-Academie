@@ -13,6 +13,18 @@ import { sendFeedbackEmail, buildExamRef } from '@/lib/notifications/email';
 import { vietnamDayEndIso, vietnamDayStartIso } from '@/lib/exam/deadline';
 import { ADMIN_GRADE_MAX } from '@/lib/exam/adminGrading';
 import { touchLearningActivity } from '@/app/actions/streak.actions';
+import {
+  parseWritingReviewMarkup,
+  serializeWritingReviewMarkupV2,
+  type Suggestion,
+  type WritingTaskKey,
+  type WritingTasksSuggestions,
+} from '@/lib/exam/writingReview';
+import {
+  respondToSuggestion,
+  respondToAllSuggestions as respondToAll,
+} from '@/lib/exam/suggestions';
+import { generateGeminiWritingSuggestions } from '@/lib/ai/geminiWriting';
 
 export interface SubmissionRow {
   id: string;
@@ -390,13 +402,6 @@ export async function markSubmissionTeacherViewed(id: string): Promise<boolean> 
   return true;
 }
 
-// ──────────────────────────────────────────────────────
-// Suggestion Response Actions
-// ──────────────────────────────────────────────────────
-
-import { parseWritingReviewMarkup } from '@/lib/exam/writingReview';
-import { respondToSuggestion, respondToAllSuggestions as respondToAll } from '@/lib/exam/suggestions';
-
 export async function handleSuggestionResponse(
   id: string,
   taskKey: 't1' | 't2' | 't3',
@@ -414,14 +419,20 @@ export async function handleSuggestionResponse(
     if (!sub.notes) return { error: 'Không có đề xuất nào để xử lý' };
 
     const markup = parseWritingReviewMarkup(sub.notes);
-    if (!markup || (markup as any).version !== 'v2') return { error: 'Format chấm điểm không hỗ trợ đề xuất' };
+    if (!markup || markup.version !== 2) return { error: 'Format chấm điểm không hỗ trợ đề xuất' };
 
-    const updatedMarkup = respondToSuggestion(markup as any, taskKey, suggestionId, action);
+    const updatedMarkup = respondToSuggestion(markup, taskKey, suggestionId, action);
     const newHtml = updatedMarkup.tasks[taskKey];
 
     const { error: dbError } = await db
       .from('exam_submissions')
-      .update({ notes: JSON.stringify(updatedMarkup) })
+      .update({
+        notes: serializeWritingReviewMarkupV2(
+          updatedMarkup.mode,
+          updatedMarkup.tasks,
+          updatedMarkup.suggestions,
+        ),
+      })
       .eq('id', id);
 
     if (dbError) throw dbError;
@@ -449,14 +460,20 @@ export async function handleBulkSuggestionResponse(
     if (!sub.notes) return { error: 'Không có đề xuất nào để xử lý' };
 
     const markup = parseWritingReviewMarkup(sub.notes);
-    if (!markup || (markup as any).version !== 'v2') return { error: 'Format chấm điểm không hỗ trợ đề xuất' };
+    if (!markup || markup.version !== 2) return { error: 'Format chấm điểm không hỗ trợ đề xuất' };
 
-    const updatedMarkup = respondToAll(markup as any, taskKey, action);
+    const updatedMarkup = respondToAll(markup, taskKey, action);
     const newHtml = updatedMarkup.tasks[taskKey];
 
     const { error: dbError } = await db
       .from('exam_submissions')
-      .update({ notes: JSON.stringify(updatedMarkup) })
+      .update({
+        notes: serializeWritingReviewMarkupV2(
+          updatedMarkup.mode,
+          updatedMarkup.tasks,
+          updatedMarkup.suggestions,
+        ),
+      })
       .eq('id', id);
 
     if (dbError) throw dbError;
@@ -466,5 +483,148 @@ export async function handleBulkSuggestionResponse(
   } catch (err: any) {
     return { error: err.message || 'Lỗi xử lý đề xuất hàng loạt' };
   }
+}
+
+function stripHtml(html: string): string {
+  return html
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/p>/gi, '\n')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function emptySuggestions(): WritingTasksSuggestions {
+  return { t1: [], t2: [], t3: [] };
+}
+
+function normalizeSuggestion(raw: {
+  id: string;
+  type: 'replace' | 'insert' | 'delete';
+  originalText: string;
+  suggestedText: string;
+  reason: string;
+  severity: 'low' | 'medium' | 'high';
+  createdAt: string;
+}): Suggestion {
+  return {
+    id: raw.id,
+    type: raw.type,
+    originalText: raw.originalText,
+    suggestedText: raw.suggestedText,
+    status: 'pending',
+    createdAt: raw.createdAt,
+  };
+}
+
+export async function generateWritingAiSuggestions(input: {
+  submissionId: string;
+  taskKey: WritingTaskKey;
+  taskHtml: string;
+}): Promise<{ suggestions: Suggestion[]; message?: string }> {
+  const ctx = await requireActiveTeacherOrAdminAndDb();
+  const sub = await fetchSubmissionById(ctx.db, input.submissionId);
+  if (!sub) throw new Error('SUBMISSION_NOT_FOUND');
+  if (sub.exam_type !== 'writing') throw new Error('NOT_WRITING_SUBMISSION');
+
+  if (ctx.profile.role === 'teacher') {
+    await requireOwnedStudentResource({ studentEmail: sub.student_email });
+  }
+
+  const plainText = stripHtml(input.taskHtml);
+  if (!plainText) return { suggestions: [], message: 'Bài viết trống, không thể tạo đề xuất.' };
+
+  const generated = await generateGeminiWritingSuggestions(input.taskKey, plainText);
+  if (generated.length === 0) return { suggestions: [], message: 'AI không tìm thấy đề xuất phù hợp.' };
+
+  const now = new Date().toISOString();
+  const payload = generated.map((item) => ({
+    submission_id: input.submissionId,
+    task_key: input.taskKey,
+    source: 'gemini',
+    suggestion_type: item.type,
+    original_text: item.originalText,
+    suggested_text: item.suggestedText,
+    reason: item.reason,
+    severity: item.severity,
+    status: 'pending',
+    created_by: ctx.user.id,
+  }));
+
+  const { data, error } = await ctx.db
+    .from('submission_ai_suggestions')
+    .insert(payload)
+    .select('id, suggestion_type, original_text, suggested_text');
+
+  if (error) {
+    throw new Error(`Không thể lưu AI suggestions: ${error.message}`);
+  }
+
+  const suggestions = (data ?? []).map((row) =>
+    normalizeSuggestion({
+      id: row.id,
+      type: row.suggestion_type,
+      originalText: row.original_text,
+      suggestedText: row.suggested_text,
+      reason: '',
+      severity: 'medium',
+      createdAt: now,
+    }),
+  );
+
+  return { suggestions };
+}
+
+export async function acceptAllWritingAiSuggestions(input: {
+  submissionId: string;
+  taskKey: WritingTaskKey;
+  suggestionIds: string[];
+}): Promise<void> {
+  if (input.suggestionIds.length === 0) return;
+  const ctx = await requireActiveTeacherOrAdminAndDb();
+  const sub = await fetchSubmissionById(ctx.db, input.submissionId);
+  if (!sub) throw new Error('SUBMISSION_NOT_FOUND');
+  if (ctx.profile.role === 'teacher') {
+    await requireOwnedStudentResource({ studentEmail: sub.student_email });
+  }
+
+  const { error } = await ctx.db
+    .from('submission_ai_suggestions')
+    .update({
+      status: 'accepted',
+      updated_at: new Date().toISOString(),
+    })
+    .eq('submission_id', input.submissionId)
+    .eq('task_key', input.taskKey)
+    .in('id', input.suggestionIds);
+
+  if (error) throw new Error(`Không thể cập nhật trạng thái suggestion: ${error.message}`);
+}
+
+export async function undoWritingAiSuggestion(input: {
+  submissionId: string;
+  suggestionId: string;
+}): Promise<void> {
+  const ctx = await requireActiveTeacherOrAdminAndDb();
+  const sub = await fetchSubmissionById(ctx.db, input.submissionId);
+  if (!sub) throw new Error('SUBMISSION_NOT_FOUND');
+  if (ctx.profile.role === 'teacher') {
+    await requireOwnedStudentResource({ studentEmail: sub.student_email });
+  }
+
+  const { error } = await ctx.db
+    .from('submission_ai_suggestions')
+    .update({
+      status: 'undone',
+      updated_at: new Date().toISOString(),
+    })
+    .eq('submission_id', input.submissionId)
+    .eq('id', input.suggestionId);
+
+  if (error) throw new Error(`Không thể undo AI suggestion: ${error.message}`);
 }
 
