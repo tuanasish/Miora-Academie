@@ -7,7 +7,7 @@ export interface Suggestion {
   /** Unique identifier (nanoid) */
   id: string;
   /** Type of change */
-  type: 'replace' | 'insert' | 'delete';
+  type: 'replace' | 'insert' | 'delete' | 'replace-all';
   /** Original text that was changed (empty string if `insert`) */
   originalText: string;
   /** Teacher-suggested replacement (empty string if `delete`) */

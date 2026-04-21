@@ -40,7 +40,7 @@ export default async function AdminLayout({
               alt="Miora"
               className="h-10 w-auto max-w-full object-contain object-left"
             />
-            <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">
+            <span className="text-xs font-semibold uppercase tracking-wider text-gray-400 notranslate" translate="no">
               Admin
             </span>
           </Link>

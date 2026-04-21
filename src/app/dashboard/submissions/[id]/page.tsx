@@ -215,16 +215,9 @@ export default async function DashboardSubmissionReviewPage({ params }: PageProp
                   {/* Admin corrected answer or raw student answer */}
                   <div className="bg-sky-50 border border-sky-200 rounded-xl p-4">
                     <p className="text-xs font-bold text-blue-700 uppercase tracking-wider mb-2">Chi tiết bài làm</p>
-                    {(writingReview as any)?.version === 'v2' && (writingReview as any)?.mode === 'suggesting' ? (
-                      <WritingSuggestionReview
-                        submissionId={id}
-                        taskKey={t.key}
-                        initialHtml={reviewForTask || ''}
-                        initialSuggestions={(writingReview as any)?.suggestions?.[t.key] || []}
-                      />
-                    ) : reviewForTask && reviewForTask.length > 0 ? (
+                    {reviewForTask && reviewForTask.length > 0 ? (
                       <div 
-                        className="prose prose-sm max-w-none text-blue-900 leading-relaxed prose-headings:text-blue-900 prose-p:text-blue-900 [&_span[data-suggestion-type]]:bg-transparent [&_span[data-suggestion-type]]:text-inherit [&_span[data-suggestion-type]]:line-through-none"
+                        className="prose prose-sm max-w-none text-blue-900 leading-relaxed prose-headings:text-blue-900 prose-p:text-blue-900 [&_span[data-review-error]]:text-red-600 [&_span[data-review-error]]:line-through [&_span[data-review-error]]:bg-red-50 [&_span[data-review-fix]]:text-emerald-700 [&_span[data-review-fix]]:font-semibold [&_span[data-review-fix]]:underline [&_span[data-review-fix]]:bg-emerald-50 [&_span[data-suggestion-type='delete']]:line-through [&_span[data-suggestion-type='delete']]:text-red-500 [&_span[data-suggestion-type='delete']]:bg-red-50 [&_span[data-suggestion-type='insert']]:underline [&_span[data-suggestion-type='insert']]:decoration-green-500 [&_span[data-suggestion-type='insert']]:text-green-700 [&_span[data-suggestion-type='insert']]:bg-green-50"
                         dangerouslySetInnerHTML={{ __html: reviewForTask }}
                       />
                     ) : (

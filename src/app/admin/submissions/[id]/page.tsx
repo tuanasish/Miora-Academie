@@ -458,12 +458,29 @@ export default async function SubmissionDetailPage({ params, searchParams }: Pag
             {sub.exam_type === 'writing' && (
               <WritingInlineReviewFields
                 submissionId={id}
-                fields={writingTasks.map((task) => ({
-                  key: task.key,
-                  label: task.label,
-                  originalHtml: plainTextToReviewHtml(task.text),
-                  initialHtml: writingReview?.tasks[task.key] ?? plainTextToReviewHtml(task.text),
-                }))}
+                fields={writingTasks.map((task, i) => {
+                  const sujetText = writingPrompt
+                    ? i === 0 ? writingPrompt.tache1Sujet
+                      : i === 1 ? writingPrompt.tache2Sujet
+                      : writingPrompt.tache3Titre
+                    : '';
+                  const doc1 = i === 2 ? writingPrompt?.tache3Document1 : null;
+                  const doc2 = i === 2 ? writingPrompt?.tache3Document2 : null;
+                  
+                  const fullTopic = [
+                    sujetText, 
+                    doc1 ? `Document 1: ${doc1}` : '', 
+                    doc2 ? `Document 2: ${doc2}` : ''
+                  ].filter(Boolean).join('\n\n');
+
+                  return {
+                    key: task.key,
+                    label: task.label,
+                    topic: fullTopic,
+                    originalHtml: plainTextToReviewHtml(task.text),
+                    initialHtml: writingReview?.tasks[task.key] ?? plainTextToReviewHtml(task.text),
+                  };
+                })}
                 initialMode={writingReview && 'mode' in writingReview ? writingReview.mode : 'editing'}
                 initialSuggestionsByTask={
                   writingReview && 'suggestions' in writingReview ? writingReview.suggestions : undefined

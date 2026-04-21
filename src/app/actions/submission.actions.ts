@@ -374,7 +374,6 @@ export async function markSubmissionFeedbackViewed(id: string): Promise<boolean>
   }
 
   await touchLearningActivity(user.id, 'feedback_view');
-  revalidateSubmissionViews(id);
   return true;
 }
 
@@ -504,7 +503,7 @@ function emptySuggestions(): WritingTasksSuggestions {
 
 function normalizeSuggestion(raw: {
   id: string;
-  type: 'replace' | 'insert' | 'delete';
+  type: 'replace' | 'insert' | 'delete' | 'replace-all';
   originalText: string;
   suggestedText: string;
   reason: string;
@@ -525,6 +524,7 @@ export async function generateWritingAiSuggestions(input: {
   submissionId: string;
   taskKey: WritingTaskKey;
   taskHtml: string;
+  topic?: string;
 }): Promise<{ suggestions: Suggestion[]; message?: string }> {
   const ctx = await requireActiveTeacherOrAdminAndDb();
   const sub = await fetchSubmissionById(ctx.db, input.submissionId);
@@ -538,7 +538,7 @@ export async function generateWritingAiSuggestions(input: {
   const plainText = stripHtml(input.taskHtml);
   if (!plainText) return { suggestions: [], message: 'Bài viết trống, không thể tạo đề xuất.' };
 
-  const generated = await generateGeminiWritingSuggestions(input.taskKey, plainText);
+  const generated = await generateGeminiWritingSuggestions(input.taskKey, input.topic || '', plainText);
   if (generated.length === 0) return { suggestions: [], message: 'AI không tìm thấy đề xuất phù hợp.' };
 
   const now = new Date().toISOString();

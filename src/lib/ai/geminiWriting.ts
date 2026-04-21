@@ -1,6 +1,6 @@
 import type { WritingTaskKey } from '@/lib/exam/writingReview';
 
-export type GeminiSuggestionType = 'replace' | 'insert' | 'delete';
+export type GeminiSuggestionType = 'replace' | 'insert' | 'delete' | 'replace-all';
 export type GeminiSeverity = 'low' | 'medium' | 'high';
 
 export interface GeminiWritingSuggestion {
@@ -23,7 +23,11 @@ interface GeminiResponse {
   }>;
 }
 
-const DEFAULT_MODEL = process.env.GEMINI_WRITING_MODEL || 'gemini-2.0-flash';
+const DEFAULT_MODEL = process.env.GEMINI_WRITING_MODEL || 'gemini-2.5-pro';
+const FALLBACK_MODELS = (process.env.GEMINI_WRITING_FALLBACK_MODELS || 'gemini-2.0-flash')
+  .split(',')
+  .map((item) => item.trim())
+  .filter(Boolean);
 const MAX_SUGGESTIONS = 15;
 const REQUEST_TIMEOUT_MS = 30_000;
 const MAX_RETRIES = 2;
@@ -34,16 +38,18 @@ function taskLabel(taskKey: WritingTaskKey): string {
   return 'Tache 3';
 }
 
-function buildPrompt(taskKey: WritingTaskKey, text: string): string {
+function buildPrompt(taskKey: WritingTaskKey, topic: string, text: string): string {
   return [
     'You are a French writing correction assistant for TCF writing tasks.',
     `Target task: ${taskLabel(taskKey)}.`,
+    `Task topic/prompt:\n"""\n${topic}\n"""\n`,
     'Return only meaningful corrections for grammar, spelling, word choice, phrasing, and style.',
     `Return at most ${MAX_SUGGESTIONS} suggestions.`,
     'Output STRICT JSON with this shape:',
-    '{ "suggestions": [ { "type":"replace|insert|delete", "originalText":"...", "suggestedText":"...", "reason":"...", "severity":"low|medium|high" } ] }',
+    '{ "suggestions": [ { "type":"replace|insert|delete|replace-all", "originalText":"...", "suggestedText":"...", "reason":"...", "severity":"low|medium|high" } ] }',
     'Rules:',
     '- Keep originalText and suggestedText short and precise.',
+    '- If the student text is mostly gibberish, off-topic, or severely incomplete relative to the topic, return a single suggestion with "type":"replace-all". In this case, "originalText" can be empty, and "suggestedText" should be a full, model response that perfectly answers the topic prompt.',
     '- For type=insert, originalText must be empty.',
     '- For type=delete, suggestedText must be empty.',
     '- For type=replace, both originalText and suggestedText must be non-empty.',
@@ -70,7 +76,7 @@ function normalizeJsonText(raw: string): string {
 function isValidSuggestion(value: unknown): value is GeminiWritingSuggestion {
   if (!value || typeof value !== 'object') return false;
   const v = value as Record<string, unknown>;
-  const validType = v.type === 'replace' || v.type === 'insert' || v.type === 'delete';
+  const validType = v.type === 'replace' || v.type === 'insert' || v.type === 'delete' || v.type === 'replace-all';
   const validSeverity = v.severity === 'low' || v.severity === 'medium' || v.severity === 'high';
   if (!validType || !validSeverity) return false;
   if (typeof v.originalText !== 'string' || typeof v.suggestedText !== 'string') return false;
@@ -79,8 +85,8 @@ function isValidSuggestion(value: unknown): value is GeminiWritingSuggestion {
   if (v.type === 'replace') {
     return v.originalText.trim().length > 0 && v.suggestedText.trim().length > 0;
   }
-  if (v.type === 'insert') {
-    return v.originalText.trim().length === 0 && v.suggestedText.trim().length > 0;
+  if (v.type === 'insert' || v.type === 'replace-all') {
+    return v.suggestedText.trim().length > 0; // originalText can be empty
   }
   return v.originalText.trim().length > 0 && v.suggestedText.trim().length === 0;
 }
@@ -104,13 +110,29 @@ function parseSuggestions(rawText: string): GeminiWritingSuggestion[] {
   return valid;
 }
 
-async function callGeminiOnce(taskKey: WritingTaskKey, text: string): Promise<GeminiWritingSuggestion[]> {
+function isQuotaError(status: number, body: string): boolean {
+  if (status !== 429) return false;
+  const normalized = body.toLowerCase();
+  return (
+    normalized.includes('resource_exhausted') ||
+    normalized.includes('quota') ||
+    normalized.includes('rate limit') ||
+    normalized.includes('vượt quá hạn ngạch')
+  );
+}
+
+async function callGeminiOnce(
+  model: string,
+  taskKey: WritingTaskKey,
+  topic: string,
+  text: string,
+): Promise<GeminiWritingSuggestion[]> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     throw new Error('Thiếu GEMINI_API_KEY');
   }
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${DEFAULT_MODEL}:generateContent?key=${apiKey}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
@@ -131,7 +153,7 @@ async function callGeminiOnce(taskKey: WritingTaskKey, text: string): Promise<Ge
         contents: [
           {
             role: 'user',
-            parts: [{ text: buildPrompt(taskKey, text) }],
+            parts: [{ text: buildPrompt(taskKey, topic, text) }],
           },
         ],
       }),
@@ -153,17 +175,31 @@ async function callGeminiOnce(taskKey: WritingTaskKey, text: string): Promise<Ge
 
 export async function generateGeminiWritingSuggestions(
   taskKey: WritingTaskKey,
+  topic: string,
   text: string,
 ): Promise<GeminiWritingSuggestion[]> {
   const normalizedText = text.trim();
   if (!normalizedText) return [];
 
+  const modelCandidates = [DEFAULT_MODEL, ...FALLBACK_MODELS];
   let lastError: unknown = null;
-  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
-    try {
-      return await callGeminiOnce(taskKey, normalizedText);
-    } catch (error) {
-      lastError = error;
+
+  for (const model of modelCandidates) {
+    for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        return await callGeminiOnce(model, taskKey, topic, normalizedText);
+      } catch (error) {
+        lastError = error;
+        const message = error instanceof Error ? error.message : '';
+        const statusMatch = message.match(/Gemini API lỗi (\d+):/);
+        const status = statusMatch ? Number(statusMatch[1]) : 0;
+        const body = message.split(':').slice(1).join(':').trim();
+
+        // If quota/rate-limit on current model, stop retrying this model and fallback.
+        if (isQuotaError(status, body)) {
+          break;
+        }
+      }
     }
   }
 

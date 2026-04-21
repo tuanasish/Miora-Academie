@@ -1,12 +1,11 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect, useLayoutEffect } from 'react';
 import { Mark, mergeAttributes } from '@tiptap/core';
 import { TextSelection } from '@tiptap/pm/state';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import Underline from '@tiptap/extension-underline';
 import { SuggestionDeleteMark } from '@/lib/tiptap/SuggestionDeleteMark';
 import { SuggestionInsertMark } from '@/lib/tiptap/SuggestionInsertMark';
 import {
@@ -38,11 +37,13 @@ import {
   Eye,
 } from 'lucide-react';
 
+
 // ── Types ────────────────────────────────────────────
 
 interface WritingTaskReviewField {
   key: WritingTaskKey;
   label: string;
+  topic?: string;
   originalHtml: string;
   initialHtml: string;
 }
@@ -202,6 +203,11 @@ function WritingTaskReviewEditor({
   const [isAcceptingAll, setIsAcceptingAll] = useState(false);
   const [isUndoingSuggestion, setIsUndoingSuggestion] = useState(false);
   const [suggestions, setSuggestions] = useState<Suggestion[]>(initialSuggestions);
+  
+  // ── Inline hover undo tooltip ──
+  const [hoveredSuggestionId, setHoveredSuggestionId] = useState<string | null>(null);
+  const editorWrapperRef = useRef<HTMLDivElement>(null);
+  const tooltipRef = useRef<HTMLDivElement>(null);
 
   const modeRef = useRef(mode);
   useEffect(() => {
@@ -224,7 +230,6 @@ function WritingTaskReviewEditor({
   const editor = useEditor({
     extensions: [
       StarterKit,
-      Underline,
       ReviewErrorMark,
       ReviewFixMark,
       SuggestionDeleteMark,
@@ -417,6 +422,18 @@ function WritingTaskReviewEditor({
         suggestionId: suggestion.id,
       });
 
+      if (suggestion.type === 'replace-all') {
+        const size = editor.state.doc.content.size;
+        tr.addMark(0, size, deleteMark.create({ suggestionId: suggestion.id }));
+        
+        const feedbackText = suggestion.suggestedText;
+        tr.insertText(feedbackText, size, size);
+        tr.addMark(size, tr.doc.content.size, insertMark);
+        tr.setSelection(TextSelection.create(tr.doc, tr.doc.content.size));
+        editor.view.dispatch(tr);
+        return true;
+      }
+
       if (suggestion.type === 'insert') {
         const at = editor.state.selection.to;
         tr.insertText(suggestion.suggestedText, at, at);
@@ -449,22 +466,77 @@ function WritingTaskReviewEditor({
   // Update editable when mode changes
   const handleModeChange = useCallback(
     (newMode: EditorMode) => {
-      const prevMode = modeRef.current;
       setMode(newMode);
       onModeChange(newMode);
       setActionError(null);
       if (editor) {
-        // Leaving suggesting mode: clear transient marks so next typing in editing mode
-        // doesn't inherit suggestion insert/delete styling.
-        if (prevMode === 'suggesting' && newMode !== 'suggesting') {
-          const tr = editor.state.tr.setStoredMarks([]);
-          editor.view.dispatch(tr);
-        }
         editor.setEditable(newMode !== 'viewing');
       }
     },
     [editor, onModeChange],
   );
+
+  useEffect(() => {
+    if (!editor || !editorWrapperRef.current) return;
+    const container = editorWrapperRef.current;
+    let timeoutId: NodeJS.Timeout;
+    let lastY = 0;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+
+      // If hovering over the tooltip itself, freeze its position so user can click it
+      if (target.closest('.suggestion-undo-tooltip')) {
+        clearTimeout(timeoutId);
+        lastY = e.clientY;
+        return;
+      }
+
+      const span = target.closest<HTMLElement>('span[data-suggestion-id]');
+      
+      if (span) {
+        const sgId = span.getAttribute('data-suggestion-id');
+        const sgType = span.getAttribute('data-suggestion-type');
+        if (!sgId || (sgType !== 'insert' && sgType !== 'delete')) {
+          lastY = e.clientY;
+          return;
+        }
+        
+        clearTimeout(timeoutId);
+        if (hoveredSuggestionId !== sgId) {
+          setHoveredSuggestionId(sgId);
+        }
+
+        // If the user moves the mouse UP (towards the tooltip), we FREEZE the tooltip's position
+        // This prevents the "runaway" effect where the tooltip escapes from the cursor constantly.
+        const isMovingUp = e.clientY < lastY - 2; 
+
+        // Dynamically follow the mouse with a direct DOM update for performance
+        if (tooltipRef.current && !isMovingUp) {
+          const containerRect = container.getBoundingClientRect();
+          // Position it slightly above the cursor
+          tooltipRef.current.style.left = `${e.clientX - containerRect.left}px`;
+          tooltipRef.current.style.top = `${e.clientY - containerRect.top - 28}px`;
+        }
+      }
+      lastY = e.clientY;
+    };
+
+    const handleMouseOut = (e: MouseEvent) => {
+      // Delay hiding to allow the mouse to bridge the gap between text and tooltip
+      timeoutId = setTimeout(() => {
+        setHoveredSuggestionId(null);
+      }, 200);
+    };
+
+    container.addEventListener('mousemove', handleMouseMove);
+    container.addEventListener('mouseout', handleMouseOut);
+    return () => {
+      clearTimeout(timeoutId);
+      container.removeEventListener('mousemove', handleMouseMove);
+      container.removeEventListener('mouseout', handleMouseOut);
+    };
+  }, [editor, hoveredSuggestionId]);
 
   if (!editor) {
     return (
@@ -482,13 +554,17 @@ function WritingTaskReviewEditor({
   };
 
   const handleRunAi = async () => {
-    if (mode !== 'suggesting' || !editor) return;
+    if (!editor) return;
+    if (modeRef.current !== 'suggesting') {
+      handleModeChange('suggesting');
+    }
     setIsAiRunning(true);
     setActionError(null);
     try {
       const result = await generateWritingAiSuggestions({
         submissionId,
         taskKey: field.key,
+        topic: field.topic,
         taskHtml: editor.getHTML(),
       });
 
@@ -554,9 +630,14 @@ function WritingTaskReviewEditor({
       setActionError('Đặt con trỏ vào đoạn đang được đề xuất rồi bấm Undo đề xuất.');
       return;
     }
+    await handleUndoSuggestionById(suggestionId);
+  };
 
+  const handleUndoSuggestionById = async (suggestionId: string) => {
+    if (!editor) return;
     setIsUndoingSuggestion(true);
     setActionError(null);
+    setHoveredSuggestionId(null);
     try {
       const nextHtml = rejectSuggestionFromHtml(editor.getHTML(), suggestionId);
       editor.commands.setContent(nextHtml);
@@ -574,7 +655,7 @@ function WritingTaskReviewEditor({
 
   // ── Render ──
   return (
-    <div className="rounded-2xl border border-violet-200 bg-white shadow-sm">
+    <div className="rounded-2xl border border-violet-200 bg-white shadow-sm notranslate" translate="no">
       {/* Header: Mode Switcher + Reset */}
       <div className="flex flex-col gap-3 border-b border-violet-100 px-4 py-4">
         <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
@@ -615,6 +696,13 @@ function WritingTaskReviewEditor({
         {mode === 'editing' && (
           <>
             <div className="flex flex-wrap gap-2">
+              <ToolbarButton
+                onClick={handleRunAi}
+                disabled={isAiRunning}
+                title="Sinh đề xuất tự động bằng Gemini"
+              >
+                <WandSparkles className="h-3.5 w-3.5" /> {isAiRunning ? 'Đang chạy AI...' : 'AI đề xuất'}
+              </ToolbarButton>
               <ToolbarButton active={editor.isActive('bold')} onClick={() => editor.chain().focus().toggleBold().run()}>
                 <Bold className="h-3.5 w-3.5" /> Đậm
               </ToolbarButton>
@@ -686,10 +774,35 @@ function WritingTaskReviewEditor({
         )}
       </div>
 
-      <EditorContent
-        editor={editor}
-        className="bg-[#fffdf9]"
-      />
+      <div ref={editorWrapperRef} className="relative">
+        <EditorContent
+          editor={editor}
+          className="bg-[#fffdf9]"
+        />
+        {/* Inline undo tooltip */}
+        {hoveredSuggestionId && mode !== 'viewing' && (
+          <div
+            ref={tooltipRef}
+            className="suggestion-undo-tooltip"
+            style={{
+              position: 'absolute',
+              transform: 'translateX(-50%)',
+              zIndex: 50,
+              paddingBottom: '20px', // Hitbox extension to catch mouse quickly
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => handleUndoSuggestionById(hoveredSuggestionId)}
+              disabled={isUndoingSuggestion}
+              className="inline-flex items-center gap-1 rounded-lg border border-red-200 bg-white px-2 py-1 text-[11px] font-semibold text-red-600 shadow-lg hover:bg-red-50 hover:border-red-300 transition-all"
+            >
+              <RotateCcw className="h-3 w-3" />
+              Undo
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
