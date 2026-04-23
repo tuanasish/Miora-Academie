@@ -125,7 +125,7 @@ export default async function DashboardSubmissionReviewPage({ params }: PageProp
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 mt-8">
+      <div className="max-w-4xl xl:max-w-7xl mx-auto px-4 mt-8">
         
         {/* MCQ Details */}
         {(sub.exam_type === "listening" || sub.exam_type === "reading") && mcqQuestions && sub.serie_id != null && (

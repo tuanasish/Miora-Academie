@@ -34,23 +34,40 @@ export function FloatingFlashcardDock({
 
   return (
     <div
-      className="fixed bottom-5 right-3 sm:right-5 z-40 flex flex-col gap-2 items-end"
+      className="fixed top-1/2 -translate-y-1/2 right-0 z-40 flex flex-col items-center gap-3 bg-white border-y border-l border-amber-200 rounded-l-2xl shadow-[-8px_0_25px_-5px_rgba(217,119,6,0.15)] py-4 px-2"
       aria-label="Flashcards"
     >
+      <div className="vertical-text text-amber-800 font-bold text-xs uppercase tracking-widest mb-1" style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}>
+        Flashcards
+      </div>
+      
+      <div className="w-10 h-[1px] bg-amber-100 my-1"></div>
+
       <button
         type="button"
         onClick={onOpenCreate}
         title="Tạo flashcard"
-        className="pointer-events-auto flex h-11 w-11 items-center justify-center rounded-full bg-amber-600 text-white shadow-lg shadow-amber-900/20 ring-2 ring-white/80 transition hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-400"
+        className="pointer-events-auto group relative flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50 text-amber-700 transition-all hover:bg-amber-600 hover:text-white hover:shadow-lg hover:shadow-amber-900/20"
       >
         <BookmarkPlus className="h-5 w-5" strokeWidth={2.25} />
+        {/* Tooltip */}
+        <span className="absolute right-full mr-3 whitespace-nowrap rounded bg-amber-800 px-2 py-1 text-xs font-semibold text-white opacity-0 transition-opacity group-hover:opacity-100 pointer-events-none">
+          Tạo thẻ mới
+          <span className="absolute right-[-4px] top-1/2 -translate-y-1/2 border-4 border-transparent border-l-amber-800"></span>
+        </span>
       </button>
+
       <Link
         href={flashcardsHref}
-        title="Xem flashcards"
-        className="pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full border border-amber-200 bg-[#fffaf6] text-amber-900 shadow-md transition hover:bg-amber-50"
+        title="Xem thư viện flashcards"
+        className="pointer-events-auto group relative flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50 text-amber-700 transition-all hover:bg-emerald-600 hover:text-white hover:shadow-lg hover:shadow-emerald-900/20"
       >
-        <Library className="h-4 w-4" strokeWidth={2} />
+        <Library className="h-5 w-5" strokeWidth={2.25} />
+        {/* Tooltip */}
+        <span className="absolute right-full mr-3 whitespace-nowrap rounded bg-emerald-700 px-2 py-1 text-xs font-semibold text-white opacity-0 transition-opacity group-hover:opacity-100 pointer-events-none">
+          Thư viện
+          <span className="absolute right-[-4px] top-1/2 -translate-y-1/2 border-4 border-transparent border-l-emerald-700"></span>
+        </span>
       </Link>
     </div>
   );

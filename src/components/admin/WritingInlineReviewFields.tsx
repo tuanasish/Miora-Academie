@@ -268,73 +268,54 @@ function WritingTaskReviewEditor({
             
             return true;
           }
-        }
-        return false;
-      },
-      handleTextInput(view, from, to, text) {
-        if (modeRef.current !== 'suggesting') return false;
-        const deleteMarkType = view.state.schema.marks.suggestionDelete;
-        
-        // If they are typing inside an active Suggestion Insert mark, let ProseMirror handle it 
-        // to extend the inclusive mark seamlessly.
-        const activeMarks = view.state.doc.resolve(from).marks();
-        if (activeMarks.some(m => m.type.name === 'suggestionInsert')) {
-            return false;
+          return false;
         }
 
-        // 1. selection replacement
-        if (from !== to) {
+        // Ignore modifier key presses
+        if (event.ctrlKey || event.metaKey || event.altKey) return false;
+
+        const { from, to, empty } = view.state.selection;
+
+        // If typing a printable character over a selection
+        if (!empty && event.key.length === 1) {
           const originalText = view.state.doc.textBetween(from, to, ' ');
           const sgId = generateSuggestionId();
           
           const tr = view.state.tr;
           tr.addMark(from, to, view.state.schema.marks.suggestionDelete.create({ suggestionId: sgId }));
           tr.setSelection(TextSelection.create(tr.doc, to));
-          
           const insertMark = view.state.schema.marks.suggestionInsert.create({ suggestionId: sgId });
-          tr.setStoredMarks([]);
-          tr.insertText(text, to, to);
-          // Never let newly typed text inherit a delete mark.
-          tr.removeMark(to, to + text.length, deleteMarkType);
-          tr.addMark(to, to + text.length, insertMark);
-          tr.setSelection(TextSelection.create(tr.doc, to + text.length));
           tr.addStoredMark(insertMark);
-          
           view.dispatch(tr);
           
-          const newSg = createSuggestion('replace', originalText, text);
+          const newSg = createSuggestion('replace', originalText, '');
           newSg.id = sgId;
           setTimeout(() => {
             updateSuggestions([...suggestionsRef.current, newSg]);
           }, 0);
           
-          return true;
+          return false; // let browser type natively
         }
-        
-        // 2. auto insert track changes
-        if (from === to) {
-          const sgId = generateSuggestionId();
-          const tr = view.state.tr;
-          
-          const insertMark = view.state.schema.marks.suggestionInsert.create({ suggestionId: sgId });
-          tr.setStoredMarks([]);
-          tr.insertText(text, from, to);
-          // Never let newly typed text inherit a delete mark.
-          tr.removeMark(from, from + text.length, deleteMarkType);
-          tr.addMark(from, from + text.length, insertMark);
-          tr.setSelection(TextSelection.create(tr.doc, from + text.length));
-          tr.addStoredMark(insertMark);
-          
-          view.dispatch(tr);
-          
-          const newSg = createSuggestion('insert', '', text);
-          newSg.id = sgId;
-          setTimeout(() => {
-            updateSuggestions([...suggestionsRef.current, newSg]);
-          }, 0);
-          
-          return true;
+
+        // If typing normally without selection, ensure we trace the insertion
+        if (empty && event.key.length === 1) {
+            const activeMarks = view.state.storedMarks || view.state.doc.resolve(from).marks();
+            if (!activeMarks.some(m => m.type.name === 'suggestionInsert')) {
+                const sgId = generateSuggestionId();
+                const tr = view.state.tr;
+                const insertMark = view.state.schema.marks.suggestionInsert.create({ suggestionId: sgId });
+                tr.addStoredMark(insertMark);
+                view.dispatch(tr);
+                
+                const newSg = createSuggestion('insert', '', '');
+                newSg.id = sgId;
+                setTimeout(() => {
+                  updateSuggestions([...suggestionsRef.current, newSg]);
+                }, 0);
+            }
+            return false;
         }
+
         return false;
       }
     },
@@ -598,6 +579,7 @@ function WritingTaskReviewEditor({
 
     setIsAcceptingAll(true);
     setActionError(null);
+    setHoveredSuggestionId(null);
     try {
       let nextHtml = editor.getHTML();
       for (const item of pending) {
@@ -686,7 +668,7 @@ function WritingTaskReviewEditor({
           )}
           {mode === 'suggesting' && (
             <>
-              <span className="font-semibold text-emerald-700">Tự động đề xuất:</span> Bôi đen đoạn cần sửa rồi gõ phím trực tiếp! Hệ thống tự gạch bỏ <span className="text-red-600 line-through">bản cũ</span> và thêm <span className="font-semibold text-emerald-700 underline">bản mới</span> màu xanh lá bên cạnh để học viên duyệt.
+              Hệ thống tự gạch bỏ <span className="text-red-600 line-through">bản cũ</span> và đính kèm <span className="font-semibold text-emerald-700 underline">bản mới</span> kế bên để học viên duyệt. Hoặc nhấn <span className="font-semibold">AI đề xuất</span> để nhờ Gemini chấm giúp.
             </>
           )}
           {mode === 'viewing' && 'Xem trước bài viết với tất cả đánh dấu. Không thể chỉnh sửa ở chế độ này.'}
