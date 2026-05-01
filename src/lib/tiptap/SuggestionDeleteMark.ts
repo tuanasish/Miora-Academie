@@ -31,8 +31,6 @@ export const SuggestionDeleteMark = Mark.create({
         style: [
           'color: #dc2626',
           'background: rgba(220,38,38,0.08)',
-          'text-decoration: line-through',
-          'text-decoration-thickness: 2px',
           'text-decoration-color: #dc2626',
           'border-radius: 0.2rem',
           'padding: 0 0.1rem',

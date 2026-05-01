@@ -63,7 +63,7 @@ const ReviewErrorMark = Mark.create({
       mergeAttributes(HTMLAttributes, {
         'data-review-error': 'true',
         style:
-          'color:#dc2626;background:rgba(220,38,38,0.10);text-decoration:line-through;text-decoration-thickness:2px;border-radius:0.25rem;padding:0 0.12rem;font-weight:600;',
+          'color:#dc2626;background:rgba(220,38,38,0.10);border-radius:0.25rem;padding:0 0.12rem;font-weight:600;',
       }),
       0,
     ];
@@ -668,7 +668,7 @@ function WritingTaskReviewEditor({
           )}
           {mode === 'suggesting' && (
             <>
-              Hệ thống tự gạch bỏ <span className="text-red-600 line-through">bản cũ</span> và đính kèm <span className="font-semibold text-emerald-700 underline">bản mới</span> kế bên để học viên duyệt. Hoặc nhấn <span className="font-semibold">AI đề xuất</span> để nhờ Gemini chấm giúp.
+              Hệ thống tự đánh dấu đỏ <span className="text-red-600 font-semibold bg-red-50 px-1 rounded">bản cũ</span> và đính kèm <span className="font-semibold text-emerald-700 underline">bản mới</span> kế bên để học viên duyệt. Hoặc nhấn <span className="font-semibold">AI đề xuất</span> để nhờ Gemini chấm giúp.
             </>
           )}
           {mode === 'viewing' && 'Xem trước bài viết với tất cả đánh dấu. Không thể chỉnh sửa ở chế độ này.'}

@@ -24,7 +24,7 @@ export function SuggestionReviewCard({
             {suggestion.type === 'delete' ? (
               <span className="flex items-center text-red-600 bg-red-50 px-1.5 py-0.5 rounded gap-1">
                 <Trash2 className="w-3 h-3" />
-                Xóa: <span className="line-through">{suggestion.originalText}</span>
+                Xóa: <span>{suggestion.originalText}</span>
               </span>
             ) : suggestion.type === 'insert' ? (
               <span className="flex items-center text-green-600 bg-green-50 px-1.5 py-0.5 rounded gap-1">
@@ -32,7 +32,7 @@ export function SuggestionReviewCard({
               </span>
             ) : (
               <>
-                <span className="line-through text-red-500 bg-red-50 px-1.5 py-0.5 rounded">
+                <span className="text-red-500 bg-red-50 px-1.5 py-0.5 rounded">
                   {suggestion.originalText}
                 </span>
                 <ArrowRight className="w-4 h-4 text-gray-400" />

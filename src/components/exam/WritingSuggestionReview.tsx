@@ -107,7 +107,6 @@ export function WritingSuggestionReview({
         <div className="bg-white border rounded-lg p-5 min-h-[300px]">
           <div
             className="tiptap prose prose-blue max-w-none 
-              [&_span[data-suggestion-type='delete']]:line-through
               [&_span[data-suggestion-type='delete']]:text-red-500
               [&_span[data-suggestion-type='delete']]:bg-red-50
               [&_span[data-suggestion-type='delete']]:transition-opacity
