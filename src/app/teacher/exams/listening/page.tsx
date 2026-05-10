@@ -1,7 +1,8 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { Headphones, ChevronDown, ChevronRight, Volume2, Image as ImageIcon, CheckCircle2, HelpCircle } from 'lucide-react';
+import { Headphones, ChevronDown, ChevronRight, Volume2, Image as ImageIcon, CheckCircle2, HelpCircle, FileText } from 'lucide-react';
 import Link from 'next/link';
+import { getTranscriptionsForSerie } from '@/app/actions/transcription.actions';
 
 interface Question {
   id: number;
@@ -18,22 +19,30 @@ interface Question {
 
 const LABELS = ['A', 'B', 'C', 'D'];
 
-export default function AdminListeningBankPage() {
+export default function TeacherListeningBankPage() {
   const [selectedSerie, setSelectedSerie] = useState(1);
   const [questions, setQuestions] = useState<Question[]>([]);
+  const [transcriptions, setTranscriptions] = useState<Record<number, string>>({});
   const [loading, setLoading] = useState(true);
   const [expandedQ, setExpandedQ] = useState<number | null>(null);
 
   useEffect(() => {
     setLoading(true);
-    fetch(`/api/exam-data?type=listening&serie=${selectedSerie}`)
-      .then((r) => r.json())
-      .then((data) => {
-        setQuestions(data.questions || []);
+    
+    Promise.all([
+      fetch(`/api/exam-data?type=listening&serie=${selectedSerie}`).then((r) => r.json()),
+      getTranscriptionsForSerie(selectedSerie)
+    ])
+      .then(([examData, transData]) => {
+        setQuestions(examData.questions || []);
+        setTranscriptions(transData || {});
         setLoading(false);
         setExpandedQ(null);
       })
-      .catch(() => setLoading(false));
+      .catch((err) => {
+        console.error('Error fetching data:', err);
+        setLoading(false);
+      });
   }, [selectedSerie]);
 
   const levelStats = questions.reduce<Record<string, number>>((acc, q) => {
@@ -140,6 +149,11 @@ export default function AdminListeningBankPage() {
                       <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
                       <span className="text-xs font-bold text-emerald-600">{LABELS[q.correctAnswerIndex]}</span>
                     </span>
+                    {transcriptions[q.id] && (
+                      <div className="absolute right-2 top-2">
+                        <FileText className="w-3 h-3 text-sky-400" />
+                      </div>
+                    )}
                   </button>
 
                   {/* Expanded detail */}
@@ -208,6 +222,20 @@ export default function AdminListeningBankPage() {
                           <p className="text-xs text-gray-400 italic">Aucune explication disponible</p>
                         )}
                       </div>
+
+                      {/* Transcription View */}
+                      {transcriptions[q.id] && (
+                        <div className="mt-4 pt-4 border-t border-gray-100">
+                          <p className="text-xs font-bold text-gray-400 uppercase mb-2 flex items-center gap-1">
+                            <FileText className="w-3.5 h-3.5" /> Transcription (Lời thoại)
+                          </p>
+                          <div className="bg-white border border-sky-100 rounded-lg p-4 shadow-sm">
+                            <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed italic border-l-2 border-sky-300 pl-4">
+                              {transcriptions[q.id]}
+                            </p>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>

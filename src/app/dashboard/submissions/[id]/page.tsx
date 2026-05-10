@@ -12,6 +12,7 @@ import { ADMIN_GRADE_MAX } from '@/lib/exam/adminGrading';
 import { submissionWithSpeakingPlaybackUrls } from '@/lib/supabase/signSpeakingSubmissionUrl';
 import { PenLine, Mic, Clock, Download, FileText, AlignLeft, MessageSquare } from "lucide-react";
 import { WritingSuggestionReview } from "@/components/exam/WritingSuggestionReview";
+import { getTranscriptionsForSerie } from "@/app/actions/transcription.actions";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -51,10 +52,20 @@ export default async function DashboardSubmissionReviewPage({ params }: PageProp
     sub.exam_type === "reading" ? "text-emerald-600" :
     sub.exam_type === "writing" ? "text-violet-600" : "text-rose-600";
 
-  const mcqQuestions =
+  const mcqQuestionsRaw =
     (sub.exam_type === 'listening' || sub.exam_type === 'reading') && sub.serie_id != null
       ? await getMcqQuestionsForSerie(sub.exam_type, sub.serie_id)
       : null;
+
+  // Merge transcriptions if listening
+  const transcriptions = sub.exam_type === 'listening' && sub.serie_id != null
+    ? await getTranscriptionsForSerie(sub.serie_id)
+    : {};
+
+  const mcqQuestions = mcqQuestionsRaw?.map(q => ({
+    ...q,
+    transcription: transcriptions?.[q.id] || null
+  })) || null;
 
   const writingPrompt =
     sub.exam_type === 'writing' && sub.combinaison_id != null

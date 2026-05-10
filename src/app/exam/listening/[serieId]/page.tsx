@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
 import {
-  Headphones, ChevronLeft, ChevronRight, Clock, Send, Volume2, Flag, NotebookPen,
+  Headphones, ChevronLeft, ChevronRight, Clock, Send, Volume2, Flag, NotebookPen, FileText
 } from "lucide-react";
 import { useCountdown } from "@/hooks/useTimer";
 import { useKeyboardNav } from "@/hooks/useKeyboardNav";
@@ -9,6 +9,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { submitExam } from "@/lib/submitExam";
+import { getTranscriptionsForSerie } from "@/app/actions/transcription.actions";
 import SubmitConfirmModal from "@/components/exam/SubmitConfirmModal";
 import ScoreReveal from "@/components/exam/ScoreReveal";
 import McqSubmissionReview from "@/components/exam/McqSubmissionReview";
@@ -53,10 +54,13 @@ export default function ListeningSerieExamPage() {
   const deadline = useAssignmentDeadline("listening", serieId);
   const [showNote, setShowNote] = useState(false);
   const [questionNotes, setQuestionNotes] = useState<Record<number, string>>({});
+  const [transcriptions, setTranscriptions] = useState<Record<number, string>>({});
+  const [showTranscription, setShowTranscription] = useState(false);
 
   const timer = useCountdown(TOTAL_SECONDS, true);
 
   useEffect(() => {
+    // Fetch exam data
     fetch("/data/listening.json")
       .then((r) => r.json())
       .then((json: ExamData) => {
@@ -66,6 +70,11 @@ export default function ListeningSerieExamPage() {
         setLoading(false);
       })
       .catch(() => setLoading(false));
+
+    // Fetch transcriptions
+    getTranscriptionsForSerie(serieId).then(data => {
+      setTranscriptions(data || {});
+    });
   }, [serieId]);
 
   // Load saved notes for this serie from localStorage
@@ -189,7 +198,10 @@ export default function ListeningSerieExamPage() {
       <ScoreReveal serieId={serieId} correct={correctCount} total={total} tcfScore={tcfScore} examType="listening">
         <div className="max-w-3xl mx-auto px-4 mt-6 pb-8">
           <McqSubmissionReview
-            questions={questions}
+            questions={questions.map((q2) => ({
+              ...q2,
+              transcription: transcriptions[q2.id]
+            }))}
             userAnswerByQuestionId={answers}
             questionNotesById={questionNotes}
             variant="full"
@@ -313,6 +325,21 @@ export default function ListeningSerieExamPage() {
               <NotebookPen className="w-3 h-3" />
               Ghi chú
             </button>
+            {/* Transcription Toggle */}
+            {transcriptions[q?.id] && (
+              <button
+                type="button"
+                onClick={() => setShowTranscription((v) => !v)}
+                className={`flex items-center gap-1 text-xs px-2.5 py-1 rounded-full transition-all ${
+                  showTranscription
+                    ? "bg-sky-100 text-sky-800 font-semibold"
+                    : "bg-[#ede8dd] text-[#888] hover:text-sky-700"
+                }`}
+              >
+                <FileText className="w-3 h-3" />
+                Transcription
+              </button>
+            )}
             {/* Keyboard hint */}
             <span className="hidden lg:inline text-[10px] text-[#bbb] ml-auto">
               A/B/C/D · ←→ · F flag
@@ -335,6 +362,26 @@ export default function ListeningSerieExamPage() {
                 src={q.audioUrl}
                 preload="metadata"
               />
+            </div>
+          )}
+
+          {/* Transcription Display */}
+          {showTranscription && q && transcriptions[q.id] && (
+            <div className="bg-sky-50 rounded-xl border border-sky-100 p-3 sm:p-4 anim-fade-in shadow-sm">
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-xs font-semibold text-sky-800 uppercase tracking-wider">
+                  Transcription (Lời thoại)
+                </label>
+                <button 
+                  onClick={() => setShowTranscription(false)}
+                  className="text-[10px] text-sky-600 hover:underline"
+                >
+                  Ẩn lời thoại
+                </button>
+              </div>
+              <p className="text-sm text-sky-900 leading-relaxed italic border-l-2 border-sky-300 pl-4 py-1">
+                {transcriptions[q.id]}
+              </p>
             </div>
           )}
 

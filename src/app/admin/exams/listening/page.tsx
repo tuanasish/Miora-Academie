@@ -1,7 +1,9 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { Headphones, ChevronDown, ChevronRight, Volume2, Image as ImageIcon, CheckCircle2, HelpCircle } from 'lucide-react';
+import { Headphones, ChevronDown, ChevronRight, Volume2, Image as ImageIcon, CheckCircle2, HelpCircle, FileText } from 'lucide-react';
 import Link from 'next/link';
+import { getTranscriptionsForSerie } from '@/app/actions/transcription.actions';
+import TranscriptionEditor from '@/components/admin/TranscriptionEditor';
 
 interface Question {
   id: number;
@@ -21,19 +23,28 @@ const LABELS = ['A', 'B', 'C', 'D'];
 export default function AdminListeningBankPage() {
   const [selectedSerie, setSelectedSerie] = useState(1);
   const [questions, setQuestions] = useState<Question[]>([]);
+  const [transcriptions, setTranscriptions] = useState<Record<number, string>>({});
   const [loading, setLoading] = useState(true);
   const [expandedQ, setExpandedQ] = useState<number | null>(null);
 
   useEffect(() => {
     setLoading(true);
-    fetch(`/api/exam-data?type=listening&serie=${selectedSerie}`)
-      .then((r) => r.json())
-      .then((data) => {
-        setQuestions(data.questions || []);
+    
+    // Fetch both exam data and transcriptions
+    Promise.all([
+      fetch(`/api/exam-data?type=listening&serie=${selectedSerie}`).then((r) => r.json()),
+      getTranscriptionsForSerie(selectedSerie)
+    ])
+      .then(([examData, transData]) => {
+        setQuestions(examData.questions || []);
+        setTranscriptions(transData || {});
         setLoading(false);
         setExpandedQ(null);
       })
-      .catch(() => setLoading(false));
+      .catch((err) => {
+        console.error('Error fetching data:', err);
+        setLoading(false);
+      });
   }, [selectedSerie]);
 
   const levelStats = questions.reduce<Record<string, number>>((acc, q) => {
@@ -140,6 +151,11 @@ export default function AdminListeningBankPage() {
                       <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
                       <span className="text-xs font-bold text-emerald-600">{LABELS[q.correctAnswerIndex]}</span>
                     </span>
+                    {transcriptions[q.id] && (
+                      <div className="absolute right-2 top-2">
+                        <FileText className="w-3 h-3 text-sky-400" />
+                      </div>
+                    )}
                   </button>
 
                   {/* Expanded detail */}
@@ -207,6 +223,15 @@ export default function AdminListeningBankPage() {
                         ) : (
                           <p className="text-xs text-gray-400 italic">Aucune explication disponible</p>
                         )}
+                      </div>
+
+                      {/* Transcription Editor */}
+                      <div className="mt-5 pt-5 border-t border-gray-100">
+                        <TranscriptionEditor 
+                          serieId={selectedSerie}
+                          questionId={q.id}
+                          initialText={transcriptions[q.id] || ''}
+                        />
                       </div>
                     </div>
                   )}

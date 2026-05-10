@@ -13,6 +13,7 @@ export interface McqReviewQuestion {
   correctAnswerIndex: number;
   audioUrl?: string | null;
   imageUrl?: string | null;
+  transcription?: string | null;
 }
 
 export interface McqSubmissionReviewProps {
@@ -118,6 +119,11 @@ export default function McqSubmissionReview({
                         ✓ {indexToLetter(q2.correctAnswerIndex)} —{" "}
                         {q2.options[q2.correctAnswerIndex]}
                       </span>
+                      {q2.transcription && (
+                        <span className="text-[10px] bg-sky-50 text-sky-600 px-2 py-0.5 rounded italic">
+                          Kèm lời thoại
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -182,7 +188,7 @@ export default function McqSubmissionReview({
 
                 {q2.audioUrl && (
                   <div
-                    className="flex items-center gap-2.5 bg-[#fffaf6] border border-[#e4ddd1] rounded-lg p-2.5 w-full select-none"
+                    className="flex items-center gap-2.5 bg-[#fffaf6] border border-[#e4ddd1] rounded-xl p-2.5 w-full select-none"
                     onContextMenu={(e) => e.preventDefault()}
                   >
                     <Volume2 className="w-4 h-4 text-[#f05e23] shrink-0" />
@@ -193,6 +199,17 @@ export default function McqSubmissionReview({
                       src={q2.audioUrl}
                       preload="none"
                     />
+                  </div>
+                )}
+
+                {q2.transcription && (
+                  <div className="bg-sky-50 border border-sky-100 rounded-lg p-3 sm:p-4">
+                    <p className="text-[10px] font-bold text-sky-600 uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-sky-400" /> Transcription
+                    </p>
+                    <p className="text-[13px] text-sky-900 leading-relaxed italic border-l-2 border-sky-200 pl-3.5">
+                      {q2.transcription}
+                    </p>
                   </div>
                 )}
 
