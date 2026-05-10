@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FileText, Save, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 import { upsertTranscription } from '@/app/actions/transcription.actions';
 
@@ -8,14 +8,22 @@ interface TranscriptionEditorProps {
   serieId: number;
   questionId: number;
   initialText: string;
+  onSave?: (newText: string) => void;
 }
 
 export default function TranscriptionEditor({
   serieId,
   questionId,
   initialText,
+  onSave,
 }: TranscriptionEditorProps) {
   const [text, setText] = useState(initialText);
+
+  // Sync internal state if initialText from parent changes
+  useEffect(() => {
+    setText(initialText);
+  }, [initialText]);
+
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
@@ -29,6 +37,7 @@ export default function TranscriptionEditor({
         setStatus('success');
         setTimeout(() => setStatus('idle'), 3000);
         setIsEditing(false);
+        if (onSave) onSave(text);
       } else {
         setStatus('error');
       }

@@ -231,6 +231,12 @@ export default function AdminListeningBankPage() {
                           serieId={selectedSerie}
                           questionId={q.id}
                           initialText={transcriptions[q.id] || ''}
+                          onSave={(newText) => {
+                            setTranscriptions(prev => ({
+                              ...prev,
+                              [q.id]: newText
+                            }));
+                          }}
                         />
                       </div>
                     </div>
