@@ -24,7 +24,7 @@ interface GeminiResponse {
 }
 
 const DEFAULT_MODEL = process.env.GEMINI_WRITING_MODEL || 'gemini-2.5-pro';
-const FALLBACK_MODELS = (process.env.GEMINI_WRITING_FALLBACK_MODELS || 'gemini-2.0-flash')
+const FALLBACK_MODELS = (process.env.GEMINI_WRITING_FALLBACK_MODELS || 'gemini-2.5-flash,gemini-1.5-pro,gemini-2.0-flash')
   .split(',')
   .map((item) => item.trim())
   .filter(Boolean);
@@ -93,7 +93,13 @@ function isValidSuggestion(value: unknown): value is GeminiWritingSuggestion {
 
 function parseSuggestions(rawText: string): GeminiWritingSuggestion[] {
   const normalized = normalizeJsonText(rawText);
-  const parsed = JSON.parse(normalized) as { suggestions?: unknown[] };
+  let parsed: { suggestions?: unknown[] } = {};
+  try {
+    parsed = JSON.parse(normalized) as { suggestions?: unknown[] };
+  } catch (err) {
+    console.error('[geminiWriting] JSON parse error. Raw text:', rawText);
+    return [];
+  }
   const list = Array.isArray(parsed.suggestions) ? parsed.suggestions : [];
 
   const valid = list
@@ -161,6 +167,9 @@ async function callGeminiOnce(
 
     if (!response.ok) {
       const body = await response.text();
+      if (response.status === 429) {
+        throw new Error('QUOTA_EXCEEDED');
+      }
       throw new Error(`Gemini API lỗi ${response.status}: ${body}`);
     }
 
@@ -203,5 +212,8 @@ export async function generateGeminiWritingSuggestions(
     }
   }
 
+  if (lastError instanceof Error && lastError.message === 'QUOTA_EXCEEDED') {
+    throw new Error('Tài khoản AI của bạn đã hết hạn ngạch hôm nay (Quota Exceeded). Vui lòng thử lại sau hoặc nâng cấp gói.');
+  }
   throw lastError instanceof Error ? lastError : new Error('Không thể gọi Gemini');
 }

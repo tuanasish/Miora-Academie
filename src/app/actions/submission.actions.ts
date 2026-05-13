@@ -526,6 +526,7 @@ export async function generateWritingAiSuggestions(input: {
   taskHtml: string;
   topic?: string;
 }): Promise<{ suggestions: Suggestion[]; message?: string }> {
+  console.log('[AI Action] generateWritingAiSuggestions started:', { id: input.submissionId, task: input.taskKey });
   const ctx = await requireActiveTeacherOrAdminAndDb();
   const sub = await fetchSubmissionById(ctx.db, input.submissionId);
   if (!sub) throw new Error('SUBMISSION_NOT_FOUND');
@@ -538,7 +539,9 @@ export async function generateWritingAiSuggestions(input: {
   const plainText = stripHtml(input.taskHtml);
   if (!plainText) return { suggestions: [], message: 'Bài viết trống, không thể tạo đề xuất.' };
 
+  console.log('[AI Action] Calling Gemini...');
   const generated = await generateGeminiWritingSuggestions(input.taskKey, input.topic || '', plainText);
+  console.log('[AI Action] Gemini returned:', generated.length, 'suggestions');
   if (generated.length === 0) return { suggestions: [], message: 'AI không tìm thấy đề xuất phù hợp.' };
 
   const now = new Date().toISOString();

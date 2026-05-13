@@ -121,7 +121,9 @@ export function serializeWritingReviewMarkup(
 ): string {
   const hasSuggestions =
     suggestions &&
-    (suggestions.t1.length > 0 || suggestions.t2.length > 0 || suggestions.t3.length > 0);
+    ((suggestions.t1?.length ?? 0) > 0 ||
+      (suggestions.t2?.length ?? 0) > 0 ||
+      (suggestions.t3?.length ?? 0) > 0);
 
   if (mode === 'editing' && !hasSuggestions) {
     return serializeWritingReviewMarkupV1(tasks);
