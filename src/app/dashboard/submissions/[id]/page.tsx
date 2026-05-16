@@ -7,12 +7,12 @@ import { getSubmissionIfOwner, markSubmissionFeedbackViewed } from "@/app/action
 import { getMcqQuestionsForSerie } from "@/lib/exam/loadMcqExamData";
 import { storedAnswersToIndices } from "@/lib/exam/mcqAnswers";
 import { getWritingCombinaison, getSpeakingPartie } from '@/lib/exam/loadExamPrompts';
-import { parseWritingReviewMarkup, plainTextToReviewHtml } from '@/lib/exam/writingReview';
+import { parseWritingReviewMarkup } from '@/lib/exam/writingReview';
 import { ADMIN_GRADE_MAX } from '@/lib/exam/adminGrading';
 import { submissionWithSpeakingPlaybackUrls } from '@/lib/supabase/signSpeakingSubmissionUrl';
-import { PenLine, Mic, Clock, Download, FileText, AlignLeft, MessageSquare } from "lucide-react";
-import { WritingSuggestionReview } from "@/components/exam/WritingSuggestionReview";
+import { PenLine, Mic, Clock, FileText, AlignLeft, MessageSquare } from "lucide-react";
 import { getTranscriptionsForSerie } from "@/app/actions/transcription.actions";
+import SpeakingRecordingPlayer from "@/components/exam/SpeakingRecordingPlayer";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -247,8 +247,8 @@ export default async function DashboardSubmissionReviewPage({ params }: PageProp
         {sub.exam_type === 'speaking' && (
           <div className="space-y-6">
             {[
-              { label: 'Tâche 2 — Roleplay', url: sub.speaking_task1_video_url, sujet: speakingT2 },
-              { label: 'Tâche 3 — Débat', url: sub.speaking_task2_video_url, sujet: speakingT3 },
+              { label: 'Tâche 2 — Roleplay', url: sub.speaking_task1_video_url, sujet: speakingT2, mimeType: sub.speaking_task1_mime_type },
+              { label: 'Tâche 3 — Débat', url: sub.speaking_task2_video_url, sujet: speakingT3, mimeType: sub.speaking_task2_mime_type },
             ].map((t, i) => (
               <div key={i} className="bg-white rounded-2xl border border-[#e4ddd1] p-6 shadow-sm">
                 <h3 className="font-bold text-[#3d3d3d] text-lg mb-4 flex items-center gap-2">
@@ -277,21 +277,9 @@ export default async function DashboardSubmissionReviewPage({ params }: PageProp
 
                 {/* Student Recording */}
                 <div className="bg-sky-50 border border-sky-200 rounded-xl p-4">
-                  <p className="text-xs font-bold text-blue-700 uppercase tracking-wider mb-2">Bản ghi âm</p>
+                  <p className="text-xs font-bold text-blue-700 uppercase tracking-wider mb-2">Bản ghi</p>
                   {t.url ? (
-                    <div className="space-y-3">
-                      <audio controls preload="metadata" className="w-full h-12">
-                        <source src={t.url} />
-                      </audio>
-                      <a
-                        href={t.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-xs text-blue-600 hover:text-blue-800 font-semibold inline-flex items-center gap-1"
-                      >
-                        <Download className="w-3.5 h-3.5" /> Tải file gốc
-                      </a>
-                    </div>
+                    <SpeakingRecordingPlayer url={t.url} mimeType={t.mimeType} />
                   ) : (
                     <p className="text-sm text-blue-600/80 italic">Pas d&apos;enregistrement</p>
                   )}

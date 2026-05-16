@@ -44,18 +44,24 @@ interface TaskRecording {
   durationSec: number;
 }
 
+interface SpeakingUploadUrlResponse {
+  uploadUrl: string;
+  storagePath: string;
+  method: "PUT";
+  headers: Record<string, string>;
+}
+
 const TACHE2_PREP_SECONDS = 2 * 60;
 const TACHE2_SPEAK_SECONDS = 3 * 60 + 30;
 const TACHE2_TOTAL_SECONDS = TACHE2_PREP_SECONDS + TACHE2_SPEAK_SECONDS;
 const TACHE3_SECONDS = 4 * 60 + 30;
 
-const MAX_MB = 100;
+const MAX_MB = 45;
 const RECORDING_MIME_TYPES = [
-  "audio/webm;codecs=opus",
-  "audio/webm",
-  "audio/ogg;codecs=opus",
-  "audio/ogg",
-  "audio/mp4",
+  "video/webm;codecs=vp8,opus",
+  "video/webm;codecs=vp9,opus",
+  "video/webm",
+  "video/mp4",
 ];
 
 function emptyRecording(): TaskRecording {
@@ -69,8 +75,7 @@ function formatSeconds(seconds: number) {
 }
 
 function mimeToExtension(mimeType: string) {
-  if (mimeType.includes("ogg")) return "ogg";
-  if (mimeType.includes("mp4")) return "m4a";
+  if (mimeType.includes("mp4")) return "mp4";
   return "webm";
 }
 
@@ -217,7 +222,7 @@ function RecordingCard({
 
       {recording.previewUrl && (
         <div className="mt-3 space-y-2">
-          <audio controls src={recording.previewUrl} className="w-full h-10" />
+          <video controls playsInline src={recording.previewUrl} className="w-full max-h-56 rounded-lg bg-black" />
           <p className="text-xs text-slate-500">
             Durée: <span className="font-semibold text-slate-700">{formatSeconds(recording.durationSec)}</span> ·
             Taille: <span className="font-semibold text-slate-700"> {(recording.file!.size / 1024 / 1024).toFixed(1)} MB</span>
@@ -254,7 +259,7 @@ export default function SpeakingExamPage() {
   const recorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const chunksRef = useRef<Blob[]>([]);
-  const mimeTypeRef = useRef("audio/webm");
+  const mimeTypeRef = useRef("video/webm");
   const recordingTaskRef = useRef<2 | 3 | null>(null);
   const recordingStartedAtRef = useRef<number>(0);
 
@@ -355,7 +360,7 @@ export default function SpeakingExamPage() {
   const startRecording = useCallback(async (task: 2 | 3) => {
     if (recordingTaskRef.current) return;
     if (typeof navigator === "undefined" || !navigator.mediaDevices?.getUserMedia) {
-      setMicError("Le navigateur ne prend pas en charge l'enregistrement audio.");
+      setMicError("Le navigateur ne prend pas en charge l'enregistrement vidéo.");
       return;
     }
 
@@ -373,12 +378,20 @@ export default function SpeakingExamPage() {
     setActiveTask(task === 2 ? 0 : 1);
 
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+        video: {
+          facingMode: "user",
+          width: { ideal: 640 },
+          height: { ideal: 360 },
+          frameRate: { ideal: 15, max: 24 },
+        },
+      });
       const chosenMime = pickRecorderMimeType();
       const recorder = chosenMime ? new MediaRecorder(stream, { mimeType: chosenMime }) : new MediaRecorder(stream);
 
       chunksRef.current = [];
-      mimeTypeRef.current = chosenMime || recorder.mimeType || "audio/webm";
+      mimeTypeRef.current = chosenMime || recorder.mimeType || "video/webm";
       recordingTaskRef.current = task;
       recordingStartedAtRef.current = Date.now();
       recorderRef.current = recorder;
@@ -422,7 +435,7 @@ export default function SpeakingExamPage() {
       };
 
       recorder.onerror = () => {
-        setMicError("Erreur pendant l'enregistrement audio. Réessayez.");
+        setMicError("Erreur pendant l'enregistrement vidéo. Réessayez.");
         stream.getTracks().forEach((track) => track.stop());
         chunksRef.current = [];
         recorderRef.current = null;
@@ -435,7 +448,7 @@ export default function SpeakingExamPage() {
       if (task === 2) tache2Timer.resume();
       if (task === 3) tache3Timer.resume();
     } catch {
-      setMicError("Accès micro refusé ou indisponible. Autorisez le micro puis réessayez.");
+      setMicError("Accès caméra/micro refusé ou indisponible. Autorisez la caméra et le micro puis réessayez.");
       setRecordingTask(null);
       recordingTaskRef.current = null;
     }
@@ -496,43 +509,68 @@ export default function SpeakingExamPage() {
     const { data: { user } } = await supabase.auth.getUser();
     const uid = user?.id ?? "anonymous";
 
-    let url2: string | null = null;
-    let url3: string | null = null;
+    let storagePath2: string | null = null;
+    let storagePath3: string | null = null;
+
+    async function uploadRecordingToR2(task: 2 | 3, recording: TaskRecording) {
+      if (!recording.file) return null;
+
+      const uploadUrlRes = await fetch("/api/speaking/upload-url", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          partieId,
+          task,
+          mimeType: recording.file.type || "video/webm",
+          sizeBytes: recording.file.size,
+        }),
+      });
+      const uploadUrlBody = (await uploadUrlRes.json().catch(() => null)) as
+        | SpeakingUploadUrlResponse
+        | { error?: string }
+        | null;
+
+      if (!uploadUrlRes.ok || !uploadUrlBody || !("uploadUrl" in uploadUrlBody)) {
+        throw new Error(uploadUrlBody && "error" in uploadUrlBody ? uploadUrlBody.error ?? "UPLOAD_URL_FAILED" : "UPLOAD_URL_FAILED");
+      }
+
+      const uploadRes = await fetch(uploadUrlBody.uploadUrl, {
+        method: uploadUrlBody.method,
+        headers: uploadUrlBody.headers,
+        body: recording.file,
+      });
+
+      if (!uploadRes.ok) {
+        throw new Error(`R2_UPLOAD_FAILED_${uploadRes.status}`);
+      }
+
+      return uploadUrlBody.storagePath;
+    }
 
     if (recording2.file) {
       setUploading2(true);
-      const ext = recording2.file.name.split(".").pop() ?? "webm";
-      const path = `${uid}/${partieId}/tache2_${Date.now()}.${ext}`;
-      const { error } = await supabase.storage
-        .from("speaking-submissions")
-        .upload(path, recording2.file, { upsert: true });
-      if (error) {
-        setSubmitError(`Échec du téléversement Tâche 2: ${error.message}`);
+      try {
+        storagePath2 = await uploadRecordingToR2(2, recording2);
+      } catch (error) {
+        setSubmitError(`Échec du téléversement Tâche 2: ${error instanceof Error ? error.message : "UPLOAD_FAILED"}`);
         setSubmitting(false);
         setUploading2(false);
         return;
       }
-      const { data: urlData } = supabase.storage.from("speaking-submissions").getPublicUrl(path);
-      url2 = urlData.publicUrl;
       setUploaded2(true);
       setUploading2(false);
     }
 
     if (recording3.file) {
       setUploading3(true);
-      const ext = recording3.file.name.split(".").pop() ?? "webm";
-      const path = `${uid}/${partieId}/tache3_${Date.now()}.${ext}`;
-      const { error } = await supabase.storage
-        .from("speaking-submissions")
-        .upload(path, recording3.file, { upsert: true });
-      if (error) {
-        setSubmitError(`Échec du téléversement Tâche 3: ${error.message}`);
+      try {
+        storagePath3 = await uploadRecordingToR2(3, recording3);
+      } catch (error) {
+        setSubmitError(`Échec du téléversement Tâche 3: ${error instanceof Error ? error.message : "UPLOAD_FAILED"}`);
         setSubmitting(false);
         setUploading3(false);
         return;
       }
-      const { data: urlData } = supabase.storage.from("speaking-submissions").getPublicUrl(path);
-      url3 = urlData.publicUrl;
       setUploaded3(true);
       setUploading3(false);
     }
@@ -547,8 +585,14 @@ export default function SpeakingExamPage() {
       student_email: user?.email ?? "anonymous",
       student_id: uid,
       time_spent_seconds: Math.max(0, timeSpentSeconds),
-      speaking_task1_video_url: url2 ?? undefined,
-      speaking_task2_video_url: url3 ?? undefined,
+      speaking_task1_storage_path: storagePath2 ?? undefined,
+      speaking_task2_storage_path: storagePath3 ?? undefined,
+      speaking_task1_mime_type: recording2.file?.type || undefined,
+      speaking_task2_mime_type: recording3.file?.type || undefined,
+      speaking_task1_size_bytes: recording2.file?.size,
+      speaking_task2_size_bytes: recording3.file?.size,
+      speaking_task1_duration_sec: recording2.file ? recording2.durationSec : undefined,
+      speaking_task2_duration_sec: recording3.file ? recording3.durationSec : undefined,
     });
 
     setSubmitting(false);
@@ -588,7 +632,7 @@ export default function SpeakingExamPage() {
               <div className="flex items-center gap-2 text-sm">
                 <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                 <span className="text-slate-600">
-                  Tâche 2 — audio direct ({formatSeconds(recording2.durationSec)})
+                  Tâche 2 — vidéo directe ({formatSeconds(recording2.durationSec)})
                 </span>
               </div>
             )}
@@ -596,7 +640,7 @@ export default function SpeakingExamPage() {
               <div className="flex items-center gap-2 text-sm">
                 <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                 <span className="text-slate-600">
-                  Tâche 3 — audio direct ({formatSeconds(recording3.durationSec)})
+                  Tâche 3 — vidéo directe ({formatSeconds(recording3.durationSec)})
                 </span>
               </div>
             )}
@@ -675,8 +719,8 @@ export default function SpeakingExamPage() {
           <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
             <div className="flex items-center gap-2 mb-1">
               <Mic className="w-4 h-4 text-slate-500" />
-              <h3 className="font-semibold text-slate-700 text-sm">Enregistrement direct</h3>
-              <span className="text-xs text-slate-400 ml-auto">Micro requis · max {MAX_MB}MB par tâche</span>
+              <h3 className="font-semibold text-slate-700 text-sm">Enregistrement vidéo direct</h3>
+              <span className="text-xs text-slate-400 ml-auto">Caméra + micro requis · max {MAX_MB}MB par tâche</span>
             </div>
 
             <RecordingCard

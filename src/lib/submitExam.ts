@@ -22,6 +22,14 @@ export interface SpeakingPayload extends BasePayload {
   partie_id: number;
   speaking_task1_video_url?: string;
   speaking_task2_video_url?: string;
+  speaking_task1_storage_path?: string;
+  speaking_task2_storage_path?: string;
+  speaking_task1_mime_type?: string;
+  speaking_task2_mime_type?: string;
+  speaking_task1_size_bytes?: number;
+  speaking_task2_size_bytes?: number;
+  speaking_task1_duration_sec?: number;
+  speaking_task2_duration_sec?: number;
 }
 
 export interface ListeningPayload extends BasePayload {

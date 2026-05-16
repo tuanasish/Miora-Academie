@@ -44,6 +44,14 @@ export interface SubmissionRow {
   writing_task3?: string | null;
   speaking_task1_video_url?: string | null;
   speaking_task2_video_url?: string | null;
+  speaking_task1_storage_path?: string | null;
+  speaking_task2_storage_path?: string | null;
+  speaking_task1_mime_type?: string | null;
+  speaking_task2_mime_type?: string | null;
+  speaking_task1_size_bytes?: number | null;
+  speaking_task2_size_bytes?: number | null;
+  speaking_task1_duration_sec?: number | null;
+  speaking_task2_duration_sec?: number | null;
   task_times?: { t1: number; t2: number; t3: number } | null;
   notes?: string | null;
   admin_score?: number | null;
@@ -630,4 +638,3 @@ export async function undoWritingAiSuggestion(input: {
 
   if (error) throw new Error(`Không thể undo AI suggestion: ${error.message}`);
 }
-

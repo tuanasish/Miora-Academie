@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { createSpeakingPlaybackUrl } from '@/lib/storage/r2';
 
 const BUCKET = 'speaking-submissions';
 
@@ -49,14 +50,29 @@ type RowWithSpeaking = {
   exam_type: string;
   speaking_task1_video_url?: string | null;
   speaking_task2_video_url?: string | null;
+  speaking_task1_storage_path?: string | null;
+  speaking_task2_storage_path?: string | null;
 };
 
 export async function submissionWithSpeakingPlaybackUrls<T extends RowWithSpeaking>(row: T): Promise<T> {
   if (row.exam_type !== 'speaking') return row;
+
+  async function signR2First(storagePath: string | null | undefined, legacyUrl: string | null | undefined) {
+    if (storagePath) {
+      try {
+        return await createSpeakingPlaybackUrl(storagePath);
+      } catch (error) {
+        console.error('[signSpeakingSubmissionUrl] R2 signed URL failed:', error);
+      }
+    }
+    return signSpeakingSubmissionUrl(legacyUrl);
+  }
+
   const [u1, u2] = await Promise.all([
-    signSpeakingSubmissionUrl(row.speaking_task1_video_url),
-    signSpeakingSubmissionUrl(row.speaking_task2_video_url),
+    signR2First(row.speaking_task1_storage_path, row.speaking_task1_video_url),
+    signR2First(row.speaking_task2_storage_path, row.speaking_task2_video_url),
   ]);
+
   return {
     ...row,
     speaking_task1_video_url: u1 ?? row.speaking_task1_video_url,

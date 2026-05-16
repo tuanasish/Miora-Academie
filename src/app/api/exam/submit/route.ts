@@ -22,6 +22,14 @@ interface SubmitPayload {
   task_times?: { t1: number; t2: number; t3: number };
   speaking_task1_video_url?: string;
   speaking_task2_video_url?: string;
+  speaking_task1_storage_path?: string;
+  speaking_task2_storage_path?: string;
+  speaking_task1_mime_type?: string;
+  speaking_task2_mime_type?: string;
+  speaking_task1_size_bytes?: number;
+  speaking_task2_size_bytes?: number;
+  speaking_task1_duration_sec?: number;
+  speaking_task2_duration_sec?: number;
   time_spent_seconds?: number;
   notes?: string;
 }
