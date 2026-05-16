@@ -58,6 +58,8 @@ const TACHE2_TOTAL_SECONDS = TACHE2_PREP_SECONDS + TACHE2_SPEAK_SECONDS;
 const TACHE3_SECONDS = 4 * 60 + 30;
 
 const MAX_MB = 45;
+const RECORDING_VIDEO_BITS_PER_SECOND = 900_000;
+const RECORDING_AUDIO_BITS_PER_SECOND = 64_000;
 const RECORDING_MIME_TYPES = [
   "video/webm;codecs=vp8,opus",
   "video/webm;codecs=vp9,opus",
@@ -432,7 +434,7 @@ export default function SpeakingExamPage() {
       return;
     }
     if (task === 3 && !task3CanRecord) {
-      setSubmitError("Le temps de la Tâche 3 est terminé. Réinitialisez le timer pour réenregistrer.");
+      setSubmitError("Le temps de la Tâche 3 est terminé. Vous ne pouvez plus réenregistrer cette tâche.");
       return;
     }
 
@@ -442,16 +444,25 @@ export default function SpeakingExamPage() {
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        audio: true,
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+        },
         video: {
           facingMode: "user",
           width: { ideal: 640 },
           height: { ideal: 360 },
-          frameRate: { ideal: 15, max: 24 },
+          frameRate: { ideal: 15, max: 15 },
         },
       });
       const chosenMime = pickRecorderMimeType();
-      const recorder = chosenMime ? new MediaRecorder(stream, { mimeType: chosenMime }) : new MediaRecorder(stream);
+      const recorderOptions: MediaRecorderOptions = {
+        videoBitsPerSecond: RECORDING_VIDEO_BITS_PER_SECOND,
+        audioBitsPerSecond: RECORDING_AUDIO_BITS_PER_SECOND,
+      };
+      if (chosenMime) recorderOptions.mimeType = chosenMime;
+      const recorder = new MediaRecorder(stream, recorderOptions);
 
       chunksRef.current = [];
       mimeTypeRef.current = chosenMime || recorder.mimeType || "video/webm";
