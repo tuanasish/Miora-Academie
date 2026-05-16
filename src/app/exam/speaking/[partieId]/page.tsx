@@ -2,7 +2,8 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import {
   Mic, ChevronLeft, CheckCircle2, Loader2,
-  AlertCircle, RotateCcw,
+  AlertCircle, RotateCcw, Camera, Square, Play,
+  Pause, UploadCloud,
 } from "lucide-react";
 import { useCountdown } from "@/hooks/useTimer";
 import Link from "next/link";
@@ -143,6 +144,8 @@ interface RecordingCardProps {
   uploaded: boolean;
   uploading: boolean;
   canStart: boolean;
+  canReset: boolean;
+  liveStream: MediaStream | null;
   disabledReason?: string | null;
   onStart: () => void;
   onStop: () => void;
@@ -158,6 +161,8 @@ function RecordingCard({
   uploaded,
   uploading,
   canStart,
+  canReset,
+  liveStream,
   disabledReason,
   onStart,
   onStop,
@@ -165,17 +170,29 @@ function RecordingCard({
 }: RecordingCardProps) {
   const hasRecording = Boolean(recording.file);
   const primaryDisabled = isRecording ? false : !canStart;
+  const liveVideoRef = useRef<HTMLVideoElement | null>(null);
+
+  useEffect(() => {
+    if (!liveVideoRef.current) return;
+    liveVideoRef.current.srcObject = isRecording ? liveStream : null;
+  }, [isRecording, liveStream]);
 
   return (
-    <div className={`rounded-xl border p-4 ${colorClass}`}>
-      <div className="flex items-center gap-2 mb-3">
-        <Mic className="w-4 h-4" />
-        <div className="min-w-0">
-          <p className="text-sm font-bold text-slate-800">{title}</p>
-          <p className="text-xs text-slate-500">{subtitle}</p>
+    <div className={`rounded-xl border p-4 sm:p-5 ${colorClass}`}>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="flex items-start gap-3 min-w-0">
+          <div className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${
+            isRecording ? "bg-rose-100 text-rose-600" : hasRecording ? "bg-emerald-100 text-emerald-700" : "bg-white text-slate-500"
+          }`}>
+            {hasRecording ? <CheckCircle2 className="w-5 h-5" /> : <Camera className="w-5 h-5" />}
+          </div>
+          <div className="min-w-0">
+            <p className="text-sm font-bold text-slate-900">{title}</p>
+            <p className="text-xs text-slate-500 leading-relaxed">{subtitle}</p>
+          </div>
         </div>
         <span
-          className={`ml-auto text-[11px] font-bold px-2 py-1 rounded-full ${
+          className={`w-fit shrink-0 text-[11px] font-bold px-2.5 py-1 rounded-full ${
             uploading
               ? "bg-slate-100 text-slate-600"
               : uploaded
@@ -184,50 +201,97 @@ function RecordingCard({
                   ? "bg-rose-100 text-rose-700"
                   : hasRecording
                     ? "bg-blue-100 text-blue-700"
-                    : "bg-slate-100 text-slate-500"
+                    : "bg-white text-slate-500"
           }`}
         >
-          {uploading ? "Téléversement..." : uploaded ? "Téléversé" : isRecording ? "REC" : hasRecording ? "Prêt" : "En attente"}
+          {uploading ? "Téléversement..." : uploaded ? "Téléversé" : isRecording ? "REC en cours" : hasRecording ? "Prêt à soumettre" : "À enregistrer"}
         </span>
       </div>
 
-      <div className="flex flex-wrap items-center gap-2">
-        <button
-          onClick={isRecording ? onStop : onStart}
-          disabled={primaryDisabled}
-          className={`inline-flex items-center gap-2 rounded-lg text-white text-sm font-semibold px-3 py-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
-            isRecording
-              ? "bg-rose-600 hover:bg-rose-700"
-              : "bg-slate-800 hover:bg-slate-900"
-          }`}
-        >
-          <Mic className={`w-4 h-4 ${isRecording ? "text-rose-100" : "text-red-300"}`} />
-          {isRecording ? "Arrêter l'enregistrement" : "Démarrer l'enregistrement"}
-        </button>
-        <button
-          onClick={onReset}
-          disabled={!hasRecording || isRecording}
-          className="inline-flex items-center gap-2 rounded-lg bg-slate-100 hover:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed text-slate-700 text-sm font-semibold px-3 py-2 transition-colors"
-        >
-          <RotateCcw className="w-4 h-4" />
-          Réenregistrer
-        </button>
+      <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
+        <div className="min-w-0">
+          {isRecording && (
+            <div className="overflow-hidden rounded-xl border border-rose-200 bg-slate-950">
+              <div className="flex items-center justify-between bg-rose-600 px-3 py-2 text-xs font-bold text-white">
+                <span className="inline-flex items-center gap-2">
+                  <span className="h-2 w-2 rounded-full bg-white animate-pulse" />
+                  Caméra active
+                </span>
+                <span>Ne quittez pas cette page</span>
+              </div>
+              <video
+                ref={liveVideoRef}
+                autoPlay
+                muted
+                playsInline
+                className="aspect-video w-full bg-slate-950 object-cover"
+              />
+            </div>
+          )}
+
+          {!isRecording && recording.previewUrl && (
+            <div className="overflow-hidden rounded-xl border border-slate-200 bg-slate-950">
+              <video controls playsInline src={recording.previewUrl} className="aspect-video w-full bg-black object-contain" />
+            </div>
+          )}
+
+          {!isRecording && !recording.previewUrl && (
+            <div className="flex aspect-video w-full items-center justify-center rounded-xl border border-dashed border-slate-300 bg-white/70">
+              <div className="text-center">
+                <Camera className="mx-auto h-8 w-8 text-slate-300" />
+                <p className="mt-2 text-sm font-semibold text-slate-500">Chưa có video</p>
+              </div>
+            </div>
+          )}
+
+          {recording.previewUrl && (
+            <p className="mt-2 text-xs text-slate-500">
+              Durée: <span className="font-semibold text-slate-700">{formatSeconds(recording.durationSec)}</span> ·
+              Taille: <span className="font-semibold text-slate-700"> {(recording.file!.size / 1024 / 1024).toFixed(1)} MB</span>
+            </p>
+          )}
+        </div>
+
+        <div className="flex flex-col gap-2 sm:min-w-52">
+          <button
+            onClick={isRecording ? onStop : onStart}
+            disabled={primaryDisabled}
+            className={`inline-flex w-full items-center justify-center gap-2 rounded-lg text-white text-sm font-semibold px-4 py-2.5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+              isRecording
+                ? "bg-rose-600 hover:bg-rose-700"
+                : "bg-slate-900 hover:bg-slate-800"
+              }`}
+          >
+            <span
+              className="items-center gap-2 whitespace-nowrap"
+              style={{ display: isRecording ? "inline-flex" : "none" }}
+            >
+              <Square className="w-4 h-4" />
+              <span>Arrêter</span>
+            </span>
+            <span
+              className="items-center gap-2 whitespace-nowrap"
+              style={{ display: isRecording ? "none" : "inline-flex" }}
+            >
+              <Mic className="w-4 h-4 text-red-300" />
+              <span>Démarrer</span>
+            </span>
+          </button>
+          <button
+            onClick={onReset}
+            disabled={!hasRecording || isRecording || !canReset}
+            className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-white hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed text-slate-700 text-sm font-semibold px-4 py-2.5 transition-colors border border-slate-200"
+          >
+            <RotateCcw className="w-4 h-4" />
+            Refaire
+          </button>
+        </div>
       </div>
 
       {!canStart && disabledReason && !isRecording && (
         <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mt-3">
           {disabledReason}
         </p>
-      )}
-
-      {recording.previewUrl && (
-        <div className="mt-3 space-y-2">
-          <video controls playsInline src={recording.previewUrl} className="w-full max-h-56 rounded-lg bg-black" />
-          <p className="text-xs text-slate-500">
-            Durée: <span className="font-semibold text-slate-700">{formatSeconds(recording.durationSec)}</span> ·
-            Taille: <span className="font-semibold text-slate-700"> {(recording.file!.size / 1024 / 1024).toFixed(1)} MB</span>
-          </p>
-        </div>
       )}
     </div>
   );
@@ -249,6 +313,7 @@ export default function SpeakingExamPage() {
   const [uploaded2, setUploaded2] = useState(false);
   const [uploaded3, setUploaded3] = useState(false);
   const [recordingTask, setRecordingTask] = useState<2 | 3 | null>(null);
+  const [liveStream, setLiveStream] = useState<MediaStream | null>(null);
 
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -345,7 +410,6 @@ export default function SpeakingExamPage() {
         return emptyRecording();
       });
       setUploaded2(false);
-      tache2Timer.reset();
       return;
     }
 
@@ -354,8 +418,7 @@ export default function SpeakingExamPage() {
       return emptyRecording();
     });
     setUploaded3(false);
-    tache3Timer.reset();
-  }, [tache2Timer, tache3Timer]);
+  }, []);
 
   const startRecording = useCallback(async (task: 2 | 3) => {
     if (recordingTaskRef.current) return;
@@ -396,6 +459,7 @@ export default function SpeakingExamPage() {
       recordingStartedAtRef.current = Date.now();
       recorderRef.current = recorder;
       streamRef.current = stream;
+      setLiveStream(stream);
       setRecordingTask(task);
 
       if (task === 2) setUploaded2(false);
@@ -431,6 +495,7 @@ export default function SpeakingExamPage() {
         recorderRef.current = null;
         streamRef.current = null;
         recordingTaskRef.current = null;
+        setLiveStream(null);
         setRecordingTask(null);
       };
 
@@ -441,6 +506,7 @@ export default function SpeakingExamPage() {
         recorderRef.current = null;
         streamRef.current = null;
         recordingTaskRef.current = null;
+        setLiveStream(null);
         setRecordingTask(null);
       };
 
@@ -450,6 +516,7 @@ export default function SpeakingExamPage() {
     } catch {
       setMicError("Accès caméra/micro refusé ou indisponible. Autorisez la caméra et le micro puis réessayez.");
       setRecordingTask(null);
+      setLiveStream(null);
       recordingTaskRef.current = null;
     }
   }, [task2CanRecord, task3CanRecord, tache2Timer, tache3Timer]);
@@ -654,9 +721,9 @@ export default function SpeakingExamPage() {
   }
 
   return (
-    <div className="h-screen flex flex-col bg-slate-100 overflow-hidden">
-      <header className="bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between shrink-0">
-        <div className="flex items-center gap-3">
+    <div className="min-h-screen lg:h-screen flex flex-col bg-slate-100 lg:overflow-hidden">
+      <header className="bg-white border-b border-slate-200 px-4 py-3 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between shrink-0">
+        <div className="flex flex-wrap items-center gap-3">
           <Link href="/exam/speaking" className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-800 transition-colors">
             <ChevronLeft className="w-4 h-4" />Liste
           </Link>
@@ -668,7 +735,7 @@ export default function SpeakingExamPage() {
           </h1>
           <AssignmentNoteNotice note={deadline.note} />
         </div>
-        <div className="flex items-center gap-1 bg-slate-100 rounded-xl p-1">
+        <div className="grid grid-cols-2 gap-1 bg-slate-100 rounded-xl p-1 lg:flex lg:items-center">
           <button
             onClick={() => switchTask(0)}
             className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${activeTask === 0 ? "bg-white shadow text-rose-700" : "text-slate-400 hover:text-slate-600"}`}
@@ -684,8 +751,8 @@ export default function SpeakingExamPage() {
         </div>
       </header>
 
-      <div className="flex flex-1 overflow-hidden">
-        <main className="flex-1 p-8 flex flex-col gap-5 overflow-y-auto">
+      <div className="flex flex-1 flex-col-reverse lg:flex-row lg:overflow-hidden">
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 flex flex-col gap-5 lg:overflow-y-auto">
           <DeadlineNotice dueDateLabel={deadline.formattedDueDate} isOverdue={deadline.isOverdue} />
 
           <div className="flex items-center gap-2">
@@ -716,11 +783,26 @@ export default function SpeakingExamPage() {
             )}
           </div>
 
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
-            <div className="flex items-center gap-2 mb-1">
+          <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm space-y-4">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center mb-1">
               <Mic className="w-4 h-4 text-slate-500" />
-              <h3 className="font-semibold text-slate-700 text-sm">Enregistrement vidéo direct</h3>
-              <span className="text-xs text-slate-400 ml-auto">Caméra + micro requis · max {MAX_MB}MB par tâche</span>
+              <h3 className="font-semibold text-slate-800 text-sm">Enregistrement vidéo direct</h3>
+              <span className="text-xs text-slate-400 sm:ml-auto">Caméra + micro requis · max {MAX_MB}MB par tâche</span>
+            </div>
+
+            <div className="grid gap-3 md:grid-cols-3">
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400">Étape 1</p>
+                <p className="mt-1 text-sm font-semibold text-slate-700">Lancez le timer</p>
+              </div>
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400">Étape 2</p>
+                <p className="mt-1 text-sm font-semibold text-slate-700">Enregistrez la vidéo</p>
+              </div>
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400">Étape 3</p>
+                <p className="mt-1 text-sm font-semibold text-slate-700">Vérifiez puis soumettez</p>
+              </div>
             </div>
 
             <RecordingCard
@@ -732,10 +814,12 @@ export default function SpeakingExamPage() {
               uploaded={uploaded2}
               uploading={uploading2}
               canStart={task2CanRecord && recordingTask !== 3}
+              canReset={task2CanRecord && recordingTask !== 3}
+              liveStream={recordingTask === 2 ? liveStream : null}
               disabledReason={isTask2Prep
                 ? "Lancez le timer de la Tâche 2 puis attendez la fin des 2:00 de préparation."
                 : tache2Timer.seconds === 0
-                  ? "Temps écoulé. Réinitialisez le timer pour réenregistrer."
+                  ? "Temps écoulé. Vous ne pouvez plus réenregistrer cette tâche."
                   : recordingTask === 3
                     ? "Arrêtez d'abord l'enregistrement de la Tâche 3."
                     : null}
@@ -753,8 +837,10 @@ export default function SpeakingExamPage() {
               uploaded={uploaded3}
               uploading={uploading3}
               canStart={task3CanRecord && recordingTask !== 2}
+              canReset={task3CanRecord && recordingTask !== 2}
+              liveStream={recordingTask === 3 ? liveStream : null}
               disabledReason={tache3Timer.seconds === 0
-                ? "Temps écoulé. Réinitialisez le timer pour réenregistrer."
+                ? "Temps écoulé. Vous ne pouvez plus réenregistrer cette tâche."
                 : recordingTask === 2
                   ? "Arrêtez d'abord l'enregistrement de la Tâche 2."
                   : null}
@@ -785,7 +871,7 @@ export default function SpeakingExamPage() {
               disabled={submitting || (!recording2.file && !recording3.file)}
               className="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-3 px-6 rounded-xl transition-colors"
             >
-              {submitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <CheckCircle2 className="w-5 h-5" />}
+              {submitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <UploadCloud className="w-5 h-5" />}
               {submitting
                 ? uploading2 ? "Téléversement Tâche 2..."
                 : uploading3 ? "Téléversement Tâche 3..."
@@ -804,7 +890,8 @@ export default function SpeakingExamPage() {
           </div>
         </main>
 
-        <aside className="w-56 bg-white border-l border-slate-200 flex flex-col items-center p-8 gap-6 shrink-0">
+        <aside className="bg-white border-b border-slate-200 p-4 sm:p-6 lg:w-60 lg:border-b-0 lg:border-l lg:flex lg:flex-col lg:items-center lg:p-8 lg:gap-6 shrink-0">
+          <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-4 lg:flex lg:flex-col lg:gap-6">
           <CircularTimer
             seconds={activeDisplaySeconds}
             total={activeTotal}
@@ -813,32 +900,35 @@ export default function SpeakingExamPage() {
             color={activeTask === 0 ? "#3b82f6" : "#f97316"}
           />
 
-          <div className="flex flex-col gap-2 w-full text-center">
+          <div className="w-full space-y-3 rounded-2xl border border-slate-200 bg-slate-50 p-3">
+            <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400">Minuteur</p>
             <button
               onClick={activeTimer.isRunning ? activeTimer.pause : activeTimer.resume}
               disabled={recordingTask === (activeTask === 0 ? 2 : 3)}
-              className={`w-full py-2.5 rounded-xl text-sm font-bold transition-colors ${
+              className={`min-h-12 w-full inline-flex items-center justify-center rounded-xl px-4 text-sm font-bold shadow-sm transition-colors ${
                 activeTimer.isRunning
-                  ? "bg-slate-200 text-slate-600 hover:bg-slate-300"
+                  ? "bg-white text-slate-700 hover:bg-slate-100 border border-slate-200"
                   : "bg-rose-600 text-white hover:bg-rose-700"
               } disabled:opacity-50 disabled:cursor-not-allowed`}
             >
-              {activeTimer.isRunning ? "⏸ Pause" : "▶ Démarrer"}
+              <span
+                className="items-center gap-2 whitespace-nowrap"
+                style={{ display: activeTimer.isRunning ? "inline-flex" : "none" }}
+              >
+                <Pause className="w-4 h-4" />
+                <span>Pause</span>
+              </span>
+              <span
+                className="items-center gap-2 whitespace-nowrap"
+                style={{ display: activeTimer.isRunning ? "none" : "inline-flex" }}
+              >
+                <Play className="w-4 h-4" />
+                <span>Démarrer</span>
+              </span>
             </button>
-            <button
-              onClick={() => {
-                if (recordingTask === 2 && activeTask === 0) return;
-                if (recordingTask === 3 && activeTask === 1) return;
-                activeTimer.reset();
-              }}
-              className="text-xs text-slate-400 hover:text-slate-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={recordingTask === 2 && activeTask === 0 || recordingTask === 3 && activeTask === 1}
-            >
-              Réinitialiser le timer
-            </button>
-          </div>
+            </div>
 
-          <div className="flex items-center gap-3 mt-2">
+            <div className="flex items-center justify-center gap-3 mt-2 lg:mt-0">
             <div className="flex flex-col items-center gap-1">
               <div className={`w-3 h-3 rounded-full ${uploaded2 ? "bg-emerald-400" : recording2.file ? "bg-blue-400" : "bg-slate-200"}`} />
               <span className="text-xs text-slate-400">T2</span>
@@ -848,11 +938,12 @@ export default function SpeakingExamPage() {
               <div className={`w-3 h-3 rounded-full ${uploaded3 ? "bg-emerald-400" : recording3.file ? "bg-orange-400" : "bg-slate-200"}`} />
               <span className="text-xs text-slate-400">T3</span>
             </div>
-          </div>
+            </div>
 
-          <p className="text-xs text-slate-400 text-center mt-auto leading-relaxed">
+            <p className="hidden lg:block text-xs text-slate-400 text-center mt-auto leading-relaxed">
             Tâche 2 : le cercle affiche le temps de la phase en cours (2:00 puis 3:30). Un signal sonore marque la fin de chaque phase.
-          </p>
+            </p>
+          </div>
         </aside>
       </div>
     </div>
