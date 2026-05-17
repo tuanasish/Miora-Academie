@@ -224,6 +224,45 @@ export async function deleteSubmission(id: string): Promise<void> {
   revalidateSubmissionViews(id);
 }
 
+export async function deleteTeacherAccessibleSubmission(id: string): Promise<void> {
+  const ctx = await requireActiveTeacherOrAdminAndDb();
+  const { db } = ctx;
+  const existing = await fetchSubmissionById(db, id);
+  if (!existing) throw new Error('NOT_FOUND');
+
+  if (ctx.profile.role === 'teacher') {
+    await requireOwnedStudentResource({ studentEmail: existing.student_email });
+  }
+
+  const { error } = await db.from('exam_submissions').delete().eq('id', id);
+  if (error) throw new Error(`Lỗi xóa bài nộp: ${error.message}`);
+  if (existing.exam_type === 'speaking') {
+    await deleteSpeakingObjectsBestEffort([existing]);
+  }
+
+  await logAuditEventSafely(db, {
+    actorId: ctx.user.id,
+    actorEmail: ctx.profile.email,
+    actorName: ctx.profile.full_name,
+    actorRole: ctx.profile.role,
+    action: 'submission.delete',
+    targetType: 'exam_submission',
+    targetId: id,
+    targetLabel: existing.student_email,
+    metadata: {
+      student_email: existing.student_email,
+      exam_type: existing.exam_type,
+      serie_id: existing.serie_id,
+      combinaison_id: existing.combinaison_id,
+      partie_id: existing.partie_id,
+      submitted_at: existing.submitted_at,
+      deleted_from: 'teacher',
+    },
+  });
+
+  revalidateSubmissionViews(id);
+}
+
 export async function deleteSubmissionsMatching(params: {
   student_email?: string | null;
   submitted_from?: string | null;

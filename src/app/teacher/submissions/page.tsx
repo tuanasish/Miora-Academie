@@ -10,6 +10,7 @@ import {
 
 import { ADMIN_GRADE_MAX } from '@/lib/exam/adminGrading';
 import { getTeacherStudents, getTeacherSubmissions } from '@/app/actions/teacher.actions';
+import { DeleteTeacherSubmissionButton } from '@/components/teacher/DeleteTeacherSubmissionButton';
 
 const TYPE_BADGE: Record<
   string,
@@ -207,6 +208,7 @@ export default async function TeacherSubmissionsPage({ searchParams }: PageProps
                 <th className="text-left px-4 py-3 font-semibold text-gray-600">Thời gian</th>
                 <th className="text-left px-4 py-3 font-semibold text-gray-600">Ngày nộp</th>
                 <th className="text-left px-4 py-3 font-semibold text-gray-600">Trạng thái</th>
+                <th className="text-right px-4 py-3 font-semibold text-gray-600">Thao tác</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -304,6 +306,9 @@ export default async function TeacherSubmissionsPage({ searchParams }: PageProps
                           </span>
                         )}
                       </Link>
+                    </td>
+                    <td className="px-4 py-3 text-right align-middle">
+                      <DeleteTeacherSubmissionButton id={submission.id} />
                     </td>
                   </tr>
                 );

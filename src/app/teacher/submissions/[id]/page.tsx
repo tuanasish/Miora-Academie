@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { submissionWithSpeakingPlaybackUrls } from '@/lib/supabase/signSpeakingSubmissionUrl';
 import SpeakingRecordingPlayer from '@/components/exam/SpeakingRecordingPlayer';
+import { DeleteTeacherSubmissionButton } from '@/components/teacher/DeleteTeacherSubmissionButton';
 
 const TYPE_META: Record<string, { label: string; Icon: React.ComponentType<{ className?: string }>; color: string }> = {
   listening: { label: 'Compréhension Orale', Icon: Headphones, color: 'text-sky-600' },
@@ -166,6 +167,11 @@ export default async function TeacherSubmissionDetailPage({ params, searchParams
           <meta.Icon className={`w-6 h-6 ${meta.color}`} /> Chi Tiết Bài Nộp
         </h1>
         <div className="ml-auto flex flex-wrap items-center gap-2">
+          <DeleteTeacherSubmissionButton
+            id={id}
+            redirectTo="/teacher/submissions"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-sm font-semibold text-red-700 hover:bg-red-100 disabled:opacity-50"
+          />
           {isGraded && (
             <span className="text-xs font-bold bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full flex items-center gap-1">
               <CheckCircle className="w-3 h-3" /> Đã chấm
