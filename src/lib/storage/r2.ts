@@ -1,4 +1,4 @@
-import { GetObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { DeleteObjectCommand, GetObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 export const SPEAKING_UPLOAD_MAX_BYTES = 45 * 1024 * 1024;
@@ -126,6 +126,28 @@ export async function uploadSpeakingObject(input: {
     ContentType: contentType,
     Body: input.body,
   }));
+}
+
+export async function deleteSpeakingObject(storagePath: string | null | undefined) {
+  if (!storagePath) return;
+  const config = getR2Config();
+  const client = createR2Client(config);
+
+  await client.send(new DeleteObjectCommand({
+    Bucket: config.bucket,
+    Key: storagePath,
+  }));
+}
+
+export async function deleteSpeakingObjects(storagePaths: Array<string | null | undefined>) {
+  const uniquePaths = Array.from(new Set(storagePaths.filter((path): path is string => Boolean(path))));
+  if (uniquePaths.length === 0) return;
+
+  const results = await Promise.allSettled(uniquePaths.map((path) => deleteSpeakingObject(path)));
+  const failed = results.filter((result) => result.status === "rejected");
+  if (failed.length > 0) {
+    console.error("[r2] failed to delete speaking objects:", failed);
+  }
 }
 
 export async function createSpeakingPlaybackUrl(

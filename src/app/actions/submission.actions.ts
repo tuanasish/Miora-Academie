@@ -25,6 +25,7 @@ import {
   respondToAllSuggestions as respondToAll,
 } from '@/lib/exam/suggestions';
 import { generateGeminiWritingSuggestions } from '@/lib/ai/geminiWriting';
+import { deleteSpeakingObjects } from '@/lib/storage/r2';
 
 export interface SubmissionRow {
   id: string;
@@ -78,6 +79,23 @@ async function fetchSubmissionById(
   }
 
   return data as SubmissionRow | null;
+}
+
+function speakingStoragePathsFromSubmissions(rows: Array<Pick<SubmissionRow, 'speaking_task1_storage_path' | 'speaking_task2_storage_path'>>) {
+  return rows.flatMap((row) => [
+    row.speaking_task1_storage_path,
+    row.speaking_task2_storage_path,
+  ]);
+}
+
+async function deleteSpeakingObjectsBestEffort(
+  rows: Array<Pick<SubmissionRow, 'speaking_task1_storage_path' | 'speaking_task2_storage_path'>>,
+) {
+  try {
+    await deleteSpeakingObjects(speakingStoragePathsFromSubmissions(rows));
+  } catch (error) {
+    console.error('[submission.actions] speaking object cleanup failed:', error);
+  }
 }
 
 function submissionBulkFilterAllowed(params: {
@@ -178,6 +196,9 @@ export async function deleteSubmission(id: string): Promise<void> {
   const existing = await fetchSubmissionById(db, id);
   const { error } = await db.from('exam_submissions').delete().eq('id', id);
   if (error) throw new Error(`Lỗi xóa bài nộp: ${error.message}`);
+  if (existing?.exam_type === 'speaking') {
+    await deleteSpeakingObjectsBestEffort([existing]);
+  }
 
   await logAuditEventSafely(db, {
     actorId: ctx.user.id,
@@ -232,6 +253,22 @@ export async function deleteSubmissionsMatching(params: {
   const total = count ?? 0;
   if (total === 0) return { deleted: 0 };
 
+  let storageQ = db
+    .from('exam_submissions')
+    .select('speaking_task1_storage_path, speaking_task2_storage_path')
+    .eq('exam_type', 'speaking');
+  if (params.student_email?.trim()) {
+    storageQ = storageQ.eq('student_email', params.student_email.trim().toLowerCase());
+  }
+  if (params.exam_type && params.exam_type !== 'all') {
+    storageQ = storageQ.eq('exam_type', params.exam_type);
+  }
+  if (fromIso) storageQ = storageQ.gte('submitted_at', fromIso);
+  if (toIso) storageQ = storageQ.lte('submitted_at', toIso);
+
+  const { data: speakingRows, error: storageError } = await storageQ;
+  if (storageError) throw new Error(`Lỗi lấy file bài nói cần xóa: ${storageError.message}`);
+
   let deleteQ = db.from('exam_submissions').delete();
   if (params.student_email?.trim()) {
     deleteQ = deleteQ.eq('student_email', params.student_email.trim().toLowerCase());
@@ -244,6 +281,7 @@ export async function deleteSubmissionsMatching(params: {
 
   const { error: deleteError } = await deleteQ;
   if (deleteError) throw new Error(`Lỗi xóa bài nộp: ${deleteError.message}`);
+  await deleteSpeakingObjectsBestEffort((speakingRows ?? []) as SubmissionRow[]);
 
   await logAuditEventSafely(db, {
     actorId: ctx.user.id,

@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useRef, useCallback } from "react";
+import fixWebmDuration from "fix-webm-duration";
 import {
   Mic, ChevronLeft, CheckCircle2, Loader2,
   AlertCircle, RotateCcw, Camera, Square, Play,
@@ -85,6 +86,16 @@ function formatSeconds(seconds: number) {
 function mimeToExtension(mimeType: string) {
   if (mimeType.includes("mp4")) return "mp4";
   return "webm";
+}
+
+async function fixRecordedBlobDuration(blob: Blob, durationMs: number) {
+  if (!blob.type.includes("webm")) return blob;
+  try {
+    return await fixWebmDuration(blob, durationMs, { logger: false });
+  } catch (error) {
+    console.warn("[speaking] webm duration fix failed:", error);
+    return blob;
+  }
 }
 
 function pickRecorderMimeType() {
@@ -532,21 +543,25 @@ export default function SpeakingExamPage() {
         const blob = new Blob(chunksRef.current, { type: mimeTypeRef.current });
         const ext = mimeToExtension(mimeTypeRef.current);
         const filename = `tache${finishedTask}_${Date.now()}.${ext}`;
-        const file = new File([blob], filename, { type: mimeTypeRef.current });
-        const previewUrl = URL.createObjectURL(blob);
-        const durationSec = Math.max(1, Math.floor((Date.now() - recordingStartedAtRef.current) / 1000));
+        const durationMs = Math.max(1000, Date.now() - recordingStartedAtRef.current);
+        const durationSec = Math.max(1, Math.floor(durationMs / 1000));
 
-        if (finishedTask === 2) {
-          setRecording2((prev) => {
-            if (prev.previewUrl) URL.revokeObjectURL(prev.previewUrl);
-            return { file, previewUrl, durationSec };
-          });
-        } else if (finishedTask === 3) {
-          setRecording3((prev) => {
-            if (prev.previewUrl) URL.revokeObjectURL(prev.previewUrl);
-            return { file, previewUrl, durationSec };
-          });
-        }
+        void fixRecordedBlobDuration(blob, durationMs).then((fixedBlob) => {
+          const file = new File([fixedBlob], filename, { type: mimeTypeRef.current });
+          const previewUrl = URL.createObjectURL(fixedBlob);
+
+          if (finishedTask === 2) {
+            setRecording2((prev) => {
+              if (prev.previewUrl) URL.revokeObjectURL(prev.previewUrl);
+              return { file, previewUrl, durationSec };
+            });
+          } else if (finishedTask === 3) {
+            setRecording3((prev) => {
+              if (prev.previewUrl) URL.revokeObjectURL(prev.previewUrl);
+              return { file, previewUrl, durationSec };
+            });
+          }
+        });
 
         stream.getTracks().forEach((track) => track.stop());
         chunksRef.current = [];
@@ -985,53 +1000,55 @@ export default function SpeakingExamPage() {
               </div>
             </div>
 
-            <RecordingCard
-              title="Tâche 2 · Roleplay"
-              subtitle="2:00 préparation puis 3:30 de parole"
-              colorClass="border-blue-100 bg-blue-50/40"
-              recording={recording2}
-              isRecording={recordingTask === 2}
-              uploaded={uploaded2}
-              uploading={uploading2}
-              canStart={tache2Timer.seconds > 0 && recordingTask !== 3 && countdownTask !== 3}
-              canReset={tache2Timer.seconds > 0 && recordingTask !== 3 && countdownTask !== 3}
-              isCameraOn={cameraTask === 2}
-              countdown={countdownTask === 2 ? preRecordCountdown : null}
-              liveStream={cameraTask === 2 ? liveStream : null}
-              disabledReason={isTask2Prep
-                ? "Démarrez la Tâche 2: la caméra reste ouverte pendant les 2:00 de préparation."
-                : tache2Timer.seconds === 0
+            {activeTask === 0 ? (
+              <RecordingCard
+                title="Tâche 2 · Roleplay"
+                subtitle="2:00 préparation puis 3:30 de parole"
+                colorClass="border-blue-100 bg-blue-50/40"
+                recording={recording2}
+                isRecording={recordingTask === 2}
+                uploaded={uploaded2}
+                uploading={uploading2}
+                canStart={tache2Timer.seconds > 0 && recordingTask !== 3 && countdownTask !== 3}
+                canReset={tache2Timer.seconds > 0 && recordingTask !== 3 && countdownTask !== 3}
+                isCameraOn={cameraTask === 2}
+                countdown={countdownTask === 2 ? preRecordCountdown : null}
+                liveStream={cameraTask === 2 ? liveStream : null}
+                disabledReason={isTask2Prep
+                  ? "Démarrez la Tâche 2: la caméra reste ouverte pendant les 2:00 de préparation."
+                  : tache2Timer.seconds === 0
+                    ? "Temps écoulé. Vous ne pouvez plus réenregistrer cette tâche."
+                    : recordingTask === 3
+                      ? "Arrêtez d'abord l'enregistrement de la Tâche 3."
+                      : null}
+                onStart={() => beginTaskFlow(2)}
+                onStop={stopRecording}
+                onReset={() => redoTaskRecording(2)}
+              />
+            ) : (
+              <RecordingCard
+                title="Tâche 3 · Débat"
+                subtitle="4:30 de parole"
+                colorClass="border-orange-100 bg-orange-50/40"
+                recording={recording3}
+                isRecording={recordingTask === 3}
+                uploaded={uploaded3}
+                uploading={uploading3}
+                canStart={task3CanRecord && recordingTask !== 2 && countdownTask !== 2}
+                canReset={task3CanRecord && recordingTask !== 2 && countdownTask !== 2}
+                isCameraOn={cameraTask === 3}
+                countdown={countdownTask === 3 ? preRecordCountdown : null}
+                liveStream={cameraTask === 3 ? liveStream : null}
+                disabledReason={tache3Timer.seconds === 0
                   ? "Temps écoulé. Vous ne pouvez plus réenregistrer cette tâche."
-                  : recordingTask === 3
-                    ? "Arrêtez d'abord l'enregistrement de la Tâche 3."
+                  : recordingTask === 2
+                    ? "Arrêtez d'abord l'enregistrement de la Tâche 2."
                     : null}
-              onStart={() => beginTaskFlow(2)}
-              onStop={stopRecording}
-              onReset={() => redoTaskRecording(2)}
-            />
-
-            <RecordingCard
-              title="Tâche 3 · Débat"
-              subtitle="4:30 de parole"
-              colorClass="border-orange-100 bg-orange-50/40"
-              recording={recording3}
-              isRecording={recordingTask === 3}
-              uploaded={uploaded3}
-              uploading={uploading3}
-              canStart={task3CanRecord && recordingTask !== 2 && countdownTask !== 2}
-              canReset={task3CanRecord && recordingTask !== 2 && countdownTask !== 2}
-              isCameraOn={cameraTask === 3}
-              countdown={countdownTask === 3 ? preRecordCountdown : null}
-              liveStream={cameraTask === 3 ? liveStream : null}
-              disabledReason={tache3Timer.seconds === 0
-                ? "Temps écoulé. Vous ne pouvez plus réenregistrer cette tâche."
-                : recordingTask === 2
-                  ? "Arrêtez d'abord l'enregistrement de la Tâche 2."
-                  : null}
-              onStart={() => beginTaskFlow(3)}
-              onStop={stopRecording}
-              onReset={() => redoTaskRecording(3)}
-            />
+                onStart={() => beginTaskFlow(3)}
+                onStop={stopRecording}
+                onReset={() => redoTaskRecording(3)}
+              />
+            )}
 
             {(submitError || micError) && (
               <div className="space-y-2">
