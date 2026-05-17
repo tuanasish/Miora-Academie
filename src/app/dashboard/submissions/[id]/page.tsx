@@ -247,8 +247,8 @@ export default async function DashboardSubmissionReviewPage({ params }: PageProp
         {sub.exam_type === 'speaking' && (
           <div className="space-y-6">
             {[
-              { label: 'Tâche 2 — Roleplay', url: sub.speaking_task1_video_url, sujet: speakingT2, mimeType: sub.speaking_task1_mime_type },
-              { label: 'Tâche 3 — Débat', url: sub.speaking_task2_video_url, sujet: speakingT3, mimeType: sub.speaking_task2_mime_type },
+              { label: 'Tâche 2 — Roleplay', url: sub.speaking_task1_video_url, sujet: speakingT2, mimeType: sub.speaking_task1_mime_type, durationSec: sub.speaking_task1_duration_sec, filename: `speaking-${sub.id}-tache-2.webm` },
+              { label: 'Tâche 3 — Débat', url: sub.speaking_task2_video_url, sujet: speakingT3, mimeType: sub.speaking_task2_mime_type, durationSec: sub.speaking_task2_duration_sec, filename: `speaking-${sub.id}-tache-3.webm` },
             ].map((t, i) => (
               <div key={i} className="bg-white rounded-2xl border border-[#e4ddd1] p-6 shadow-sm">
                 <h3 className="font-bold text-[#3d3d3d] text-lg mb-4 flex items-center gap-2">
@@ -279,7 +279,7 @@ export default async function DashboardSubmissionReviewPage({ params }: PageProp
                 <div className="bg-sky-50 border border-sky-200 rounded-xl p-4">
                   <p className="text-xs font-bold text-blue-700 uppercase tracking-wider mb-2">Bản ghi</p>
                   {t.url ? (
-                    <SpeakingRecordingPlayer url={t.url} mimeType={t.mimeType} />
+                    <SpeakingRecordingPlayer url={t.url} mimeType={t.mimeType} durationSec={t.durationSec} filename={t.filename} />
                   ) : (
                     <p className="text-sm text-blue-600/80 italic">Pas d&apos;enregistrement</p>
                   )}
