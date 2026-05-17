@@ -111,6 +111,23 @@ export async function createSpeakingUploadUrl(input: {
   });
 }
 
+export async function uploadSpeakingObject(input: {
+  storagePath: string;
+  mimeType: string;
+  body: Uint8Array;
+}) {
+  const config = getR2Config();
+  const client = createR2Client(config);
+  const contentType = normalizeSpeakingMimeType(input.mimeType);
+
+  await client.send(new PutObjectCommand({
+    Bucket: config.bucket,
+    Key: input.storagePath,
+    ContentType: contentType,
+    Body: input.body,
+  }));
+}
+
 export async function createSpeakingPlaybackUrl(
   storagePath: string | null | undefined,
   expiresInSeconds = 7200,

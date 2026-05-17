@@ -25,11 +25,16 @@ export function useCountdown(initialSeconds: number, autoStart = true) {
   const pause = useCallback(() => { clear(); setIsRunning(false); }, [clear]);
   const resume = useCallback(() => setIsRunning(true), []);
   const reset = useCallback(() => { clear(); setSeconds(initialSeconds); setIsRunning(false); }, [clear, initialSeconds]);
+  const setRemaining = useCallback((value: number) => {
+    clear();
+    setSeconds(Math.max(0, Math.floor(value)));
+    setIsRunning(false);
+  }, [clear]);
 
   const formatted = `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
   const isExpired = seconds === 0;
 
-  return { seconds, formatted, isRunning, isExpired, pause, resume, reset };
+  return { seconds, formatted, isRunning, isExpired, pause, resume, reset, setRemaining };
 }
 
 /** Stopwatch — counts up from 0 */

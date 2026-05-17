@@ -52,10 +52,15 @@ interface SpeakingUploadUrlResponse {
   headers: Record<string, string>;
 }
 
+interface SpeakingUploadFileResponse {
+  storagePath: string;
+}
+
 const TACHE2_PREP_SECONDS = 2 * 60;
 const TACHE2_SPEAK_SECONDS = 3 * 60 + 30;
 const TACHE2_TOTAL_SECONDS = TACHE2_PREP_SECONDS + TACHE2_SPEAK_SECONDS;
 const TACHE3_SECONDS = 4 * 60 + 30;
+const PRE_RECORD_COUNTDOWN_SECONDS = 3;
 
 const MAX_MB = 45;
 const RECORDING_VIDEO_BITS_PER_SECOND = 900_000;
@@ -87,6 +92,14 @@ function pickRecorderMimeType() {
     return "";
   }
   return RECORDING_MIME_TYPES.find((mime) => MediaRecorder.isTypeSupported(mime)) ?? "";
+}
+
+function uploadErrorMessage(error: unknown) {
+  if (error instanceof TypeError && error.message === "Failed to fetch") {
+    return "Không kết nối được máy chủ lưu video. Kiểm tra mạng rồi bấm Soumettre lại.";
+  }
+  if (error instanceof Error) return error.message;
+  return "UPLOAD_FAILED";
 }
 
 function CircularTimer({
@@ -147,6 +160,8 @@ interface RecordingCardProps {
   uploading: boolean;
   canStart: boolean;
   canReset: boolean;
+  isCameraOn: boolean;
+  countdown: number | null;
   liveStream: MediaStream | null;
   disabledReason?: string | null;
   onStart: () => void;
@@ -164,6 +179,8 @@ function RecordingCard({
   uploading,
   canStart,
   canReset,
+  isCameraOn,
+  countdown,
   liveStream,
   disabledReason,
   onStart,
@@ -176,8 +193,8 @@ function RecordingCard({
 
   useEffect(() => {
     if (!liveVideoRef.current) return;
-    liveVideoRef.current.srcObject = isRecording ? liveStream : null;
-  }, [isRecording, liveStream]);
+    liveVideoRef.current.srcObject = isCameraOn || isRecording ? liveStream : null;
+  }, [isCameraOn, isRecording, liveStream]);
 
   return (
     <div className={`rounded-xl border p-4 sm:p-5 ${colorClass}`}>
@@ -212,32 +229,41 @@ function RecordingCard({
 
       <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
         <div className="min-w-0">
-          {isRecording && (
+          {(isCameraOn || isRecording) && (
             <div className="overflow-hidden rounded-xl border border-rose-200 bg-slate-950">
-              <div className="flex items-center justify-between bg-rose-600 px-3 py-2 text-xs font-bold text-white">
+              <div className={`flex items-center justify-between px-3 py-2 text-xs font-bold text-white ${isRecording ? "bg-rose-600" : "bg-slate-700"}`}>
                 <span className="inline-flex items-center gap-2">
-                  <span className="h-2 w-2 rounded-full bg-white animate-pulse" />
-                  Caméra active
+                  <span className={`h-2 w-2 rounded-full bg-white ${isRecording ? "animate-pulse" : ""}`} />
+                  {isRecording ? "REC en cours" : "Caméra prête"}
                 </span>
-                <span>Ne quittez pas cette page</span>
+                <span>{countdown ? `Départ dans ${countdown}` : "Préparez votre cadrage"}</span>
               </div>
-              <video
-                ref={liveVideoRef}
-                autoPlay
-                muted
-                playsInline
-                className="aspect-video w-full bg-slate-950 object-cover"
-              />
+              <div className="relative">
+                <video
+                  ref={liveVideoRef}
+                  autoPlay
+                  muted
+                  playsInline
+                  className="aspect-video w-full bg-slate-950 object-cover"
+                />
+                {countdown && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-slate-950/35">
+                    <div className="flex h-24 w-24 items-center justify-center rounded-full bg-white text-5xl font-black text-rose-600 shadow-xl">
+                      {countdown}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
-          {!isRecording && recording.previewUrl && (
+          {!isCameraOn && !isRecording && recording.previewUrl && (
             <div className="overflow-hidden rounded-xl border border-slate-200 bg-slate-950">
               <video controls playsInline src={recording.previewUrl} className="aspect-video w-full bg-black object-contain" />
             </div>
           )}
 
-          {!isRecording && !recording.previewUrl && (
+          {!isCameraOn && !isRecording && !recording.previewUrl && (
             <div className="flex aspect-video w-full items-center justify-center rounded-xl border border-dashed border-slate-300 bg-white/70">
               <div className="text-center">
                 <Camera className="mx-auto h-8 w-8 text-slate-300" />
@@ -275,7 +301,7 @@ function RecordingCard({
               className="items-center gap-2 whitespace-nowrap"
               style={{ display: isRecording ? "none" : "inline-flex" }}
             >
-              <Mic className="w-4 h-4 text-red-300" />
+              <Camera className="w-4 h-4 text-rose-100" />
               <span>Démarrer</span>
             </span>
           </button>
@@ -316,6 +342,9 @@ export default function SpeakingExamPage() {
   const [uploaded3, setUploaded3] = useState(false);
   const [recordingTask, setRecordingTask] = useState<2 | 3 | null>(null);
   const [liveStream, setLiveStream] = useState<MediaStream | null>(null);
+  const [cameraTask, setCameraTask] = useState<2 | 3 | null>(null);
+  const [countdownTask, setCountdownTask] = useState<2 | 3 | null>(null);
+  const [preRecordCountdown, setPreRecordCountdown] = useState<number | null>(null);
 
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -329,6 +358,7 @@ export default function SpeakingExamPage() {
   const mimeTypeRef = useRef("video/webm");
   const recordingTaskRef = useRef<2 | 3 | null>(null);
   const recordingStartedAtRef = useRef<number>(0);
+  const countdownTaskRef = useRef<2 | 3 | null>(null);
 
   const tache2Timer = useCountdown(TACHE2_TOTAL_SECONDS, false);
   const tache3Timer = useCountdown(TACHE3_SECONDS, false);
@@ -376,7 +406,6 @@ export default function SpeakingExamPage() {
     : isTask2Prep
       ? "Préparation"
       : "Parole";
-  const task2CanRecord = !isTask2Prep && tache2Timer.seconds > 0;
   const task3CanRecord = tache3Timer.seconds > 0;
 
   useEffect(() => {
@@ -405,6 +434,14 @@ export default function SpeakingExamPage() {
     if (recordingTaskRef.current === 3) tache3Timer.pause();
   }, [tache2Timer, tache3Timer]);
 
+  const stopCameraPreview = useCallback(() => {
+    if (recorderRef.current && recorderRef.current.state !== "inactive") return;
+    streamRef.current?.getTracks().forEach((track) => track.stop());
+    streamRef.current = null;
+    setLiveStream(null);
+    setCameraTask(null);
+  }, []);
+
   const resetTaskRecording = useCallback((task: 2 | 3) => {
     if (task === 2) {
       setRecording2((prev) => {
@@ -422,18 +459,42 @@ export default function SpeakingExamPage() {
     setUploaded3(false);
   }, []);
 
-  const startRecording = useCallback(async (task: 2 | 3) => {
+  const acquireCameraStream = useCallback(async (task: 2 | 3) => {
+    if (streamRef.current && cameraTask === task) return streamRef.current;
+    stopCameraPreview();
+
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: {
+        echoCancellation: true,
+        noiseSuppression: true,
+        autoGainControl: true,
+      },
+      video: {
+        facingMode: "user",
+        width: { ideal: 640 },
+        height: { ideal: 360 },
+        frameRate: { ideal: 15, max: 15 },
+      },
+    });
+
+    streamRef.current = stream;
+    setLiveStream(stream);
+    setCameraTask(task);
+    return stream;
+  }, [cameraTask, stopCameraPreview]);
+
+  const beginActualRecording = useCallback(async (task: 2 | 3) => {
     if (recordingTaskRef.current) return;
     if (typeof navigator === "undefined" || !navigator.mediaDevices?.getUserMedia) {
       setMicError("Le navigateur ne prend pas en charge l'enregistrement vidéo.");
       return;
     }
 
-    if (task === 2 && !task2CanRecord) {
-      setSubmitError("Tâche 2: terminez d'abord les 2 minutes de préparation.");
+    if (task === 2 && tache2Timer.seconds <= 0) {
+      setSubmitError("Le temps de la Tâche 2 est terminé. Vous ne pouvez plus réenregistrer cette tâche.");
       return;
     }
-    if (task === 3 && !task3CanRecord) {
+    if (task === 3 && tache3Timer.seconds <= 0) {
       setSubmitError("Le temps de la Tâche 3 est terminé. Vous ne pouvez plus réenregistrer cette tâche.");
       return;
     }
@@ -443,19 +504,7 @@ export default function SpeakingExamPage() {
     setActiveTask(task === 2 ? 0 : 1);
 
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: {
-          echoCancellation: true,
-          noiseSuppression: true,
-          autoGainControl: true,
-        },
-        video: {
-          facingMode: "user",
-          width: { ideal: 640 },
-          height: { ideal: 360 },
-          frameRate: { ideal: 15, max: 15 },
-        },
-      });
+      const stream = await acquireCameraStream(task);
       const chosenMime = pickRecorderMimeType();
       const recorderOptions: MediaRecorderOptions = {
         videoBitsPerSecond: RECORDING_VIDEO_BITS_PER_SECOND,
@@ -469,8 +518,6 @@ export default function SpeakingExamPage() {
       recordingTaskRef.current = task;
       recordingStartedAtRef.current = Date.now();
       recorderRef.current = recorder;
-      streamRef.current = stream;
-      setLiveStream(stream);
       setRecordingTask(task);
 
       if (task === 2) setUploaded2(false);
@@ -507,6 +554,7 @@ export default function SpeakingExamPage() {
         streamRef.current = null;
         recordingTaskRef.current = null;
         setLiveStream(null);
+        setCameraTask(null);
         setRecordingTask(null);
       };
 
@@ -518,6 +566,7 @@ export default function SpeakingExamPage() {
         streamRef.current = null;
         recordingTaskRef.current = null;
         setLiveStream(null);
+        setCameraTask(null);
         setRecordingTask(null);
       };
 
@@ -528,13 +577,102 @@ export default function SpeakingExamPage() {
       setMicError("Accès caméra/micro refusé ou indisponible. Autorisez la caméra et le micro puis réessayez.");
       setRecordingTask(null);
       setLiveStream(null);
+      setCameraTask(null);
       recordingTaskRef.current = null;
     }
-  }, [task2CanRecord, task3CanRecord, tache2Timer, tache3Timer]);
+  }, [acquireCameraStream, tache2Timer, tache3Timer]);
+
+  const startPreRecordCountdown = useCallback(async (task: 2 | 3) => {
+    if (recordingTaskRef.current || countdownTaskRef.current) return;
+    if (typeof navigator === "undefined" || !navigator.mediaDevices?.getUserMedia) {
+      setMicError("Le navigateur ne prend pas en charge l'enregistrement vidéo.");
+      return;
+    }
+
+    try {
+      setSubmitError(null);
+      setMicError(null);
+      setActiveTask(task === 2 ? 0 : 1);
+      await acquireCameraStream(task);
+      countdownTaskRef.current = task;
+      setCountdownTask(task);
+      setPreRecordCountdown(PRE_RECORD_COUNTDOWN_SECONDS);
+    } catch {
+      setMicError("Accès caméra/micro refusé ou indisponible. Autorisez la caméra et le micro puis réessayez.");
+    }
+  }, [acquireCameraStream]);
+
+  const beginTaskFlow = useCallback(async (task: 2 | 3) => {
+    if (recordingTaskRef.current || countdownTaskRef.current) return;
+    if (task === 2) {
+      setActiveTask(0);
+      if (isTask2Prep) {
+        try {
+          await acquireCameraStream(2);
+          tache2Timer.resume();
+        } catch {
+          setMicError("Accès caméra/micro refusé ou indisponible. Autorisez la caméra et le micro puis réessayez.");
+        }
+        return;
+      }
+      void startPreRecordCountdown(2);
+      return;
+    }
+
+    setActiveTask(1);
+    void startPreRecordCountdown(3);
+  }, [acquireCameraStream, isTask2Prep, startPreRecordCountdown, tache2Timer]);
+
+  const redoTaskRecording = useCallback((task: 2 | 3) => {
+    resetTaskRecording(task);
+    if (task === 2) {
+      tache2Timer.setRemaining(TACHE2_SPEAK_SECONDS);
+      void startPreRecordCountdown(2);
+      return;
+    }
+
+    tache3Timer.setRemaining(TACHE3_SECONDS);
+    void startPreRecordCountdown(3);
+  }, [resetTaskRecording, startPreRecordCountdown, tache2Timer, tache3Timer]);
+
+  useEffect(() => {
+    if (preRecordCountdown === null) return;
+
+    const timeout = window.setTimeout(() => {
+      setPreRecordCountdown((current) => {
+        if (current === null) return null;
+        if (current > 1) return current - 1;
+
+        const task = countdownTaskRef.current;
+        countdownTaskRef.current = null;
+        setCountdownTask(null);
+        if (task) void beginActualRecording(task);
+        return null;
+      });
+    }, 1000);
+
+    return () => window.clearTimeout(timeout);
+  }, [beginActualRecording, preRecordCountdown]);
+
+  useEffect(() => {
+    const s = tache2Timer.seconds;
+    if (
+      s === TACHE2_SPEAK_SECONDS &&
+      cameraTask === 2 &&
+      tache2Timer.isRunning &&
+      !recordingTaskRef.current &&
+      !countdownTaskRef.current
+    ) {
+      tache2Timer.pause();
+      window.setTimeout(() => {
+        void startPreRecordCountdown(2);
+      }, 0);
+    }
+  }, [cameraTask, startPreRecordCountdown, tache2Timer, tache2Timer.isRunning, tache2Timer.seconds]);
 
   const switchTask = (nextTask: 0 | 1) => {
-    if (recordingTaskRef.current) {
-      setSubmitError("Arrêtez l'enregistrement en cours avant de changer de tâche.");
+    if (recordingTaskRef.current || countdownTaskRef.current) {
+      setSubmitError("Attendez la fin de l'enregistrement ou du compte à rebours avant de changer de tâche.");
       return;
     }
     setSubmitError(null);
@@ -554,6 +692,7 @@ export default function SpeakingExamPage() {
       recorderRef.current.stop();
     }
     streamRef.current?.getTracks().forEach((track) => track.stop());
+    countdownTaskRef.current = null;
   }, []);
 
   const sujets = partie?.sujets || [];
@@ -593,6 +732,28 @@ export default function SpeakingExamPage() {
     async function uploadRecordingToR2(task: 2 | 3, recording: TaskRecording) {
       if (!recording.file) return null;
 
+      async function uploadViaServer() {
+        const formData = new FormData();
+        formData.append("partieId", String(partieId));
+        formData.append("task", String(task));
+        formData.append("file", recording.file!);
+
+        const uploadFileRes = await fetch("/api/speaking/upload-file", {
+          method: "POST",
+          body: formData,
+        });
+        const uploadFileBody = (await uploadFileRes.json().catch(() => null)) as
+          | SpeakingUploadFileResponse
+          | { error?: string }
+          | null;
+
+        if (!uploadFileRes.ok || !uploadFileBody || !("storagePath" in uploadFileBody)) {
+          throw new Error(uploadFileBody && "error" in uploadFileBody ? uploadFileBody.error ?? "UPLOAD_FILE_FAILED" : "UPLOAD_FILE_FAILED");
+        }
+
+        return uploadFileBody.storagePath;
+      }
+
       const uploadUrlRes = await fetch("/api/speaking/upload-url", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -612,14 +773,22 @@ export default function SpeakingExamPage() {
         throw new Error(uploadUrlBody && "error" in uploadUrlBody ? uploadUrlBody.error ?? "UPLOAD_URL_FAILED" : "UPLOAD_URL_FAILED");
       }
 
-      const uploadRes = await fetch(uploadUrlBody.uploadUrl, {
-        method: uploadUrlBody.method,
-        headers: uploadUrlBody.headers,
-        body: recording.file,
-      });
+      let uploadRes: Response;
+      try {
+        uploadRes = await fetch(uploadUrlBody.uploadUrl, {
+          method: uploadUrlBody.method,
+          headers: uploadUrlBody.headers,
+          body: recording.file,
+        });
+      } catch (error) {
+        if (error instanceof TypeError) {
+          return uploadViaServer();
+        }
+        throw error;
+      }
 
       if (!uploadRes.ok) {
-        throw new Error(`R2_UPLOAD_FAILED_${uploadRes.status}`);
+        return uploadViaServer();
       }
 
       return uploadUrlBody.storagePath;
@@ -630,7 +799,7 @@ export default function SpeakingExamPage() {
       try {
         storagePath2 = await uploadRecordingToR2(2, recording2);
       } catch (error) {
-        setSubmitError(`Échec du téléversement Tâche 2: ${error instanceof Error ? error.message : "UPLOAD_FAILED"}`);
+        setSubmitError(`Échec du téléversement Tâche 2: ${uploadErrorMessage(error)}`);
         setSubmitting(false);
         setUploading2(false);
         return;
@@ -644,7 +813,7 @@ export default function SpeakingExamPage() {
       try {
         storagePath3 = await uploadRecordingToR2(3, recording3);
       } catch (error) {
-        setSubmitError(`Échec du téléversement Tâche 3: ${error instanceof Error ? error.message : "UPLOAD_FAILED"}`);
+        setSubmitError(`Échec du téléversement Tâche 3: ${uploadErrorMessage(error)}`);
         setSubmitting(false);
         setUploading3(false);
         return;
@@ -824,19 +993,21 @@ export default function SpeakingExamPage() {
               isRecording={recordingTask === 2}
               uploaded={uploaded2}
               uploading={uploading2}
-              canStart={task2CanRecord && recordingTask !== 3}
-              canReset={task2CanRecord && recordingTask !== 3}
-              liveStream={recordingTask === 2 ? liveStream : null}
+              canStart={tache2Timer.seconds > 0 && recordingTask !== 3 && countdownTask !== 3}
+              canReset={tache2Timer.seconds > 0 && recordingTask !== 3 && countdownTask !== 3}
+              isCameraOn={cameraTask === 2}
+              countdown={countdownTask === 2 ? preRecordCountdown : null}
+              liveStream={cameraTask === 2 ? liveStream : null}
               disabledReason={isTask2Prep
-                ? "Lancez le timer de la Tâche 2 puis attendez la fin des 2:00 de préparation."
+                ? "Démarrez la Tâche 2: la caméra reste ouverte pendant les 2:00 de préparation."
                 : tache2Timer.seconds === 0
                   ? "Temps écoulé. Vous ne pouvez plus réenregistrer cette tâche."
                   : recordingTask === 3
                     ? "Arrêtez d'abord l'enregistrement de la Tâche 3."
                     : null}
-              onStart={() => startRecording(2)}
+              onStart={() => beginTaskFlow(2)}
               onStop={stopRecording}
-              onReset={() => resetTaskRecording(2)}
+              onReset={() => redoTaskRecording(2)}
             />
 
             <RecordingCard
@@ -847,17 +1018,19 @@ export default function SpeakingExamPage() {
               isRecording={recordingTask === 3}
               uploaded={uploaded3}
               uploading={uploading3}
-              canStart={task3CanRecord && recordingTask !== 2}
-              canReset={task3CanRecord && recordingTask !== 2}
-              liveStream={recordingTask === 3 ? liveStream : null}
+              canStart={task3CanRecord && recordingTask !== 2 && countdownTask !== 2}
+              canReset={task3CanRecord && recordingTask !== 2 && countdownTask !== 2}
+              isCameraOn={cameraTask === 3}
+              countdown={countdownTask === 3 ? preRecordCountdown : null}
+              liveStream={cameraTask === 3 ? liveStream : null}
               disabledReason={tache3Timer.seconds === 0
                 ? "Temps écoulé. Vous ne pouvez plus réenregistrer cette tâche."
                 : recordingTask === 2
                   ? "Arrêtez d'abord l'enregistrement de la Tâche 2."
                   : null}
-              onStart={() => startRecording(3)}
+              onStart={() => beginTaskFlow(3)}
               onStop={stopRecording}
-              onReset={() => resetTaskRecording(3)}
+              onReset={() => redoTaskRecording(3)}
             />
 
             {(submitError || micError) && (
@@ -882,12 +1055,22 @@ export default function SpeakingExamPage() {
               disabled={submitting || (!recording2.file && !recording3.file)}
               className="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-3 px-6 rounded-xl transition-colors"
             >
-              {submitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <UploadCloud className="w-5 h-5" />}
-              {submitting
-                ? uploading2 ? "Téléversement Tâche 2..."
-                : uploading3 ? "Téléversement Tâche 3..."
-                : "Enregistrement..."
-                : "Soumettre"}
+              <span
+                className="items-center gap-2 whitespace-nowrap"
+                style={{ display: submitting ? "none" : "inline-flex" }}
+              >
+                <UploadCloud className="w-5 h-5" />
+                <span>Soumettre</span>
+              </span>
+              <span
+                className="items-center gap-2 whitespace-nowrap"
+                style={{ display: submitting ? "inline-flex" : "none" }}
+              >
+                <Loader2 className="w-5 h-5 animate-spin" />
+                <span style={{ display: uploading2 ? "inline" : "none" }}>Téléversement Tâche 2...</span>
+                <span style={{ display: !uploading2 && uploading3 ? "inline" : "none" }}>Téléversement Tâche 3...</span>
+                <span style={{ display: !uploading2 && !uploading3 ? "inline" : "none" }}>Enregistrement...</span>
+              </span>
             </button>
           </div>
 
@@ -914,8 +1097,8 @@ export default function SpeakingExamPage() {
           <div className="w-full space-y-3 rounded-2xl border border-slate-200 bg-slate-50 p-3">
             <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400">Minuteur</p>
             <button
-              onClick={activeTimer.isRunning ? activeTimer.pause : activeTimer.resume}
-              disabled={recordingTask === (activeTask === 0 ? 2 : 3)}
+              onClick={activeTimer.isRunning ? activeTimer.pause : () => beginTaskFlow(activeTask === 0 ? 2 : 3)}
+              disabled={recordingTask === (activeTask === 0 ? 2 : 3) || countdownTask === (activeTask === 0 ? 2 : 3)}
               className={`min-h-12 w-full inline-flex items-center justify-center rounded-xl px-4 text-sm font-bold shadow-sm transition-colors ${
                 activeTimer.isRunning
                   ? "bg-white text-slate-700 hover:bg-slate-100 border border-slate-200"
